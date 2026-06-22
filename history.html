@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Momentum & History - Territory Radar</title>
+<style>
+:root{--bg:#0f1115;--panel:#171a21;--panel2:#1d212a;--line:#2a2f3a;--txt:#e7eaf0;--muted:#9aa3b2;--accent:#6c8cff;--accent2:#41d3a3;
+--hot:#ff6b5d;--hotbg:#3a1f1d;--warm:#e3b341;--warmbg:#352d18;--watch:#5a6172;--watchbg:#22262f;--up:#41d3a3;--down:#ff7a7a;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{padding:60px 0 26px;border-bottom:1px solid var(--line)}
+.eyebrow{color:var(--accent2);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:12px;margin:0 0 13px}
+h1{font-size:38px;line-height:1.12;margin:0 0 13px;font-weight:740;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:18px;max-width:700px;margin:0}
+.byline{margin-top:18px;color:var(--muted);font-size:14px}.byline b{color:var(--txt)}
+.callout{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:14px 16px;margin:22px 0 0;font-size:14px;color:#cdd3de;max-width:760px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0 0}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:29px}}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.stat .n{font-size:26px;font-weight:720;letter-spacing:-.02em}.stat .l{color:var(--muted);font-size:12.5px;margin-top:3px}
+section{padding:34px 0 0}h2{font-size:21px;margin:0 0 13px;letter-spacing:-.01em}
+.about p{color:#cdd3de;max-width:780px}
+.score-help{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
+.score-help code{background:var(--panel2);padding:2px 7px;border-radius:6px;color:#cdd3de}
+.controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:20px 0 12px;margin-top:30px;border-bottom:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+#q{flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:11px 14px;border-radius:10px;font-size:14px;outline:none}
+#q:focus{border-color:var(--accent)}
+.seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:4px}
+.seg button{background:transparent;border:0;color:var(--muted);padding:7px 13px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
+.seg button.on{background:var(--accent);color:#0b0d12}
+.count{color:var(--muted);font-size:13px;white-space:nowrap}
+.tablewrap{overflow-x:auto;margin:16px 0 60px;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:920px}
+thead th{position:sticky;top:0;background:var(--panel2);text-align:left;padding:12px 14px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--txt)}.arw{opacity:.5;font-size:10px}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}tbody tr:hover{background:var(--panel)}
+.acct{font-weight:650;font-size:15px}.meta{color:var(--muted);font-size:12.5px;margin-top:2px}
+.scorewrap{display:flex;align-items:center;gap:9px}.scoren{font-size:19px;font-weight:740;font-variant-numeric:tabular-nums}
+.tier{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.t-Hot{background:var(--hotbg);color:var(--hot)}.t-Warm{background:var(--warmbg);color:var(--warm)}.t-Watch{background:var(--watchbg);color:var(--watch)}
+.mom{font-weight:700;font-size:14px}.m-up{color:var(--up)}.m-down{color:var(--down)}.m-flat{color:var(--muted)}.m-new{color:var(--accent2);font-size:11px;font-weight:700}
+.roles{font-variant-numeric:tabular-nums;font-weight:650}
+.sig{font-size:12.5px;color:#cdd3de}.sig .p{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:2px 7px;margin:2px 3px 0 0}
+.why{font-size:12.5px;color:var(--muted);font-style:italic;max-width:240px}
+.yes{color:var(--accent2);font-weight:700}.no{color:var(--muted)}
+.muted{color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:28px 0 64px;color:var(--muted);font-size:13px}footer .wrap{max-width:780px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.legend{display:flex;gap:18px;margin-top:10px;font-size:12.5px;color:var(--muted)}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.wk{border-bottom:1px solid var(--line);padding:14px 0}.wk:last-child{border-bottom:0}.wkhead{font-size:14.5px;margin-bottom:8px}
+.wkrow{display:flex;gap:8px;align-items:baseline;margin:4px 0;flex-wrap:wrap}.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);min-width:68px}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 0}.chip.up{background:var(--hotbg);color:var(--up)}.chip.down{background:var(--watchbg);color:var(--down)}
+.nav a{margin-right:4px}
+</style></head><body>
+<header><div class="wrap">
+  <p class="eyebrow">B2B Sales · Territory Intelligence</p>
+  <h1>Momentum &amp; History</h1>
+  <p class="sub">How the territory is moving over time. Each weekly run is snapshotted, so you can see which accounts are heating up, which are cooling, and how overall hiring signal in the territory is trending.</p>
+  <p class="byline"><a href="./">← Territory board</a> &nbsp;·&nbsp; <a href="roles.html">All open roles</a> &nbsp;·&nbsp; <span class="muted">updated June 22, 2026</span></p>
+  <div class="stats">
+    <div class="stat"><div class="n">1</div><div class="l">weekly snapshots</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">hot accounts now</div></div>
+    <div class="stat"><div class="n">1564</div><div class="l">total open roles now</div></div>
+    <div class="stat"><div class="n">+0</div><div class="l">total roles vs start</div></div>
+  </div>
+</div></header>
+<div class="wrap">
+  <section><h2>Hiring signal across the territory</h2><div class="panel"><div id="chart"></div></div></section>
+  <section><h2>Weekly movers</h2><div class="panel" id="log"></div></section>
+</div>
+<footer><div class="wrap">Total open roles is the aggregate of every open position across the territory; relevant roles are the subset that match the signal profile. Momentum is the week-over-week change in each account's signal score, from the dated snapshots in <code>data/</code>. Built by Eric Hastie · auto-refreshed weekly.</div></footer>
+<script>
+const M=[{"date": "2026-06-22", "accounts": 16, "hot": 4, "roles": 79, "total_roles": 1564, "up": [], "down": [], "first": true}];
+function drawChart(){
+  const w=720,h=300,pad={l:44,r:16,t:16,b:42},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b,n=M.length;
+  const maxv=Math.max(...M.map(d=>d.total_roles),1);
+  const X=i=>n<=1?pad.l+iw/2:pad.l+iw*i/(n-1),Y=v=>pad.t+ih*(1-v/maxv);
+  const S=[{k:'total_roles',c:'#6c8cff',l:'Total open roles'},{k:'roles',c:'#41d3a3',l:'Relevant roles'}];
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Hiring signal across the territory over time">`;
+  for(let g=0;g<=4;g++){const v=Math.round(maxv*g/4),yy=Y(v);s+=`<line x1="${pad.l}" y1="${yy}" x2="${w-pad.r}" y2="${yy}" stroke="#2a2f3a"/><text x="${pad.l-8}" y="${yy+4}" fill="#9aa3b2" font-size="11" text-anchor="end">${v}</text>`;}
+  const step=Math.max(1,Math.ceil(n/8));
+  M.forEach((d,i)=>{if(i%step===0||i===n-1)s+=`<text x="${X(i)}" y="${h-pad.b+18}" fill="#9aa3b2" font-size="10" text-anchor="middle">${d.date.slice(5)}</text>`;});
+  S.forEach(se=>{if(n>1)s+=`<polyline points="${M.map((d,i)=>X(i)+','+Y(d[se.k])).join(' ')}" fill="none" stroke="${se.c}" stroke-width="2.5"/>`;M.forEach((d,i)=>s+=`<circle cx="${X(i)}" cy="${Y(d[se.k])}" r="3.5" fill="${se.c}"/>`);});
+  s+=`</svg><div class="legend">`+S.map(se=>`<span><i style="background:${se.c}"></i>${se.l}</span>`).join('')+`</div>`;
+  document.getElementById('chart').innerHTML=s;
+}
+function drawLog(){
+  const chips=(a,c)=>a.length?a.map(x=>`<span class="chip ${c}">${x}</span>`).join(' '):'<span class="muted">-</span>';
+  document.getElementById('log').innerHTML=M.slice().reverse().map((d,ri)=>{
+    const prev=M[M.length-2-ri];
+    const td=prev?d.total_roles-prev.total_roles:0;
+    const tdtxt=prev?` (<span class="${td>0?'m-up':td<0?'m-down':'muted'}">${td>0?'+':''}${td}</span>)`:'';
+    const head=`<div class="wkhead"><b>${d.date}</b> · ${d.accounts} accounts · ${d.hot} hot · <b>${d.total_roles}</b> open roles${tdtxt} · ${d.roles} relevant</div>`;
+    if(d.first)return `<div class="wk">${head}<div class="wkrow"><span class="muted">Baseline snapshot.</span></div></div>`;
+    return `<div class="wk">${head}
+      <div class="wkrow"><span class="lbl">Heating up</span> ${chips(d.up,'up')}</div>
+      <div class="wkrow"><span class="lbl">Cooling</span> ${chips(d.down,'down')}</div></div>`;
+  }).join('');
+}
+drawChart();drawLog();
+</script>
+</body></html>
