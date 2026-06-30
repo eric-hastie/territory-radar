@@ -58,10 +58,10 @@ footer{border-top:1px solid var(--line);padding:28px 0 64px;color:var(--muted);f
   <p class="eyebrow">B2B Sales · Territory Intelligence</p>
   <h1>Momentum &amp; History</h1>
   <p class="sub">How the territory is moving over time. Each weekly run is snapshotted, so you can see which accounts are heating up, which are cooling, and how overall hiring signal in the territory is trending.</p>
-  <p class="byline"><a href="./">← Territory board</a> &nbsp;·&nbsp; <a href="roles.html">All open roles</a> &nbsp;·&nbsp; <span class="muted">updated June 23, 2026</span></p>
+  <p class="byline"><a href="./">← Territory board</a> &nbsp;·&nbsp; <a href="roles.html">All open roles</a> &nbsp;·&nbsp; <span class="muted">updated June 30, 2026</span></p>
   <div class="stats">
-    <div class="stat"><div class="n">2</div><div class="l">weekly snapshots</div></div>
-    <div class="stat"><div class="n">5</div><div class="l">hot accounts now</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">weekly snapshots</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">hot accounts now</div></div>
     <div class="stat"><div class="n">1564</div><div class="l">total open roles now</div></div>
     <div class="stat"><div class="n">+0</div><div class="l">total roles vs start</div></div>
   </div>
@@ -72,7 +72,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 64px;color:var(--muted);f
 </div>
 <footer><div class="wrap">Total open roles is the aggregate of every open position across the territory; relevant roles are the subset that match the signal profile. Momentum is the week-over-week change in each account's signal score, from the dated snapshots in <code>data/</code>. Built by Eric Hastie · auto-refreshed weekly.</div></footer>
 <script>
-const M=[{"date": "2026-06-22", "accounts": 16, "hot": 4, "roles": 79, "total_roles": 1564, "up": [], "down": [], "first": true}, {"date": "2026-06-23", "accounts": 16, "hot": 5, "roles": 79, "total_roles": 1564, "up": ["Cohere Health", "Faire", "Komodo Health"], "down": [], "first": false}];
+const M=[{"date": "2026-06-22", "accounts": 16, "hot": 4, "roles": 79, "total_roles": 1564, "up": [], "down": [], "first": true}, {"date": "2026-06-23", "accounts": 16, "hot": 5, "roles": 79, "total_roles": 1564, "up": ["Cohere Health", "Faire", "Komodo Health"], "down": [], "first": false}, {"date": "2026-06-30", "accounts": 16, "hot": 6, "roles": 79, "total_roles": 1564, "up": ["Coinbase", "Gusto"], "down": [], "first": false}];
 function drawChart(){
   const w=720,h=300,pad={l:44,r:16,t:16,b:42},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b,n=M.length;
   const maxv=Math.max(...M.map(d=>d.total_roles),1);
