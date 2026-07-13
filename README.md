@@ -15,7 +15,7 @@ An automated **territory-intelligence tool for Account Executives**. It scores t
 
 ## The demo
 
-Models an AE selling a cloud infrastructure / DevOps platform, so a buying signal = an account investing in its platform/infra org (hiring SRE / platform / DevOps engineers, raising capital, new eng leadership). The sample territory is 15 real mid-market/enterprise companies with signals verified against their ATS and public sources. This is illustrative demo data - a live deployment runs against a real book of business in a **private** repo.
+Models an AE selling a cloud infrastructure / DevOps platform, so a buying signal = an account investing in its platform/infra org (hiring SRE / platform / DevOps engineers, raising capital, new eng leadership). The sample territory is 16 real mid-market/enterprise companies with signals verified against their ATS and public sources. This is illustrative demo data - a live deployment runs against a real book of business in a **private** repo.
 
 ## How it works
 
