@@ -1,5 +1,4 @@
 Account,Title,Location,Matched,URL
-Discord,Principal Software Engineer - Infrastructure,SF Bay Area,1,https://job-boards.greenhouse.io/discord/jobs/8400845002
 Discord,"Engineering Manager, Data Platform",SF Bay Area,1,https://job-boards.greenhouse.io/discord/jobs/8397385002
 Discord,"Engineering Manager, Notifications",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8537955002
 Discord,"Engineering Manager, Revenue",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8502342002
@@ -13,15 +12,12 @@ Discord,Senior Privacy Engineer,SF Bay Area,0,https://job-boards.greenhouse.io/d
 Discord,"Senior Security Engineer, Enterprise Security",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8447477002
 Discord,"Senior Software Engineer, Ads Measurement & Targeting",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8575644002
 Discord,"Senior Software Engineer, Consumer Revenue",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8460791002
-Discord,Senior Software Engineer - Database Infrastructure,SF Bay Area,1,https://job-boards.greenhouse.io/discord/jobs/8200328002
 Discord,"Senior Software Engineer, Enforce - Safety Processing",SF/LA,0,https://job-boards.greenhouse.io/discord/jobs/8545675002
 Discord,"Senior Software Engineer, Front-End Infrastructure",SF/Remote-US,1,https://job-boards.greenhouse.io/discord/jobs/8599753002
 Discord,"Senior Software Engineer, Machine Learning (Ads)",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8538039002
-Discord,Senior Software Engineer - Platform Infrastructure,SF Bay Area,1,https://job-boards.greenhouse.io/discord/jobs/8136321002
 Discord,Senior Software Engineer - Safety Platform,SF/LA,1,https://job-boards.greenhouse.io/discord/jobs/8544305002
 Discord,Senior Software Engineer - Safety Processing,SF/LA,0,https://job-boards.greenhouse.io/discord/jobs/8377248002
 Discord,Senior Software Engineer - Web Platform,SF/Remote-US,1,https://job-boards.greenhouse.io/discord/jobs/8399456002
-Discord,Software Engineer - Database Infrastructure,SF Bay Area,1,https://job-boards.greenhouse.io/discord/jobs/8487457002
 Discord,"Software Engineer, Data Platform",SF Bay Area,1,https://job-boards.greenhouse.io/discord/jobs/8396927002
 Discord,"Software Engineer, Distributed Systems",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8545663002
 Discord,"Staff Data Engineer, Ads",Remote (U.S.),0,https://job-boards.greenhouse.io/discord/jobs/8299493002
@@ -31,9 +27,10 @@ Discord,"Staff Software Engineer, Platform Security",SF/Remote,0,https://job-boa
 Discord,Staff Software Engineer - Safety Experience,SF/LA,0,https://job-boards.greenhouse.io/discord/jobs/8344197002
 Discord,"Staff Software Engineer, Safety Processing",SF/LA,0,https://job-boards.greenhouse.io/discord/jobs/8214127002
 Discord,Staff Software Engineer - Consumer Revenue,Remote (U.S.),0,https://job-boards.greenhouse.io/discord/jobs/8460867002
+Discord,"Senior Full-Stack Software Engineer, Social Commerce",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8604768002
+Discord,"Software Engineer, Developer Success",SF Bay Area,0,https://job-boards.greenhouse.io/discord/jobs/8609250002
 Robinhood,Android Engineer,"New York, NY",0,https://boards.greenhouse.io/robinhood/jobs/6669758?gh_jid=6669758
 Robinhood,Android Engineer,"Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7350823?gh_jid=7350823
-Robinhood,"Engineering Manager, Advisory Platform",Menlo Park/NY,1,https://boards.greenhouse.io/robinhood/jobs/7992784?gh_jid=7992784
 Robinhood,"Engineering Manager, Concierge","Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7542965?gh_jid=7542965
 Robinhood,"Engineering Manager, Derivatives","Ljubljana, Slovenia",0,https://boards.greenhouse.io/robinhood/jobs/7542975?gh_jid=7542975
 Robinhood,"Engineering Manager, Equities","Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7489553?gh_jid=7489553
@@ -76,12 +73,11 @@ Robinhood,"Senior Software Engineer, Data Engineering","Menlo Park, CA",0,https:
 Robinhood,Senior Software Engineer - Robinhood Command Center,"Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7838644?gh_jid=7838644
 Robinhood,"Senior Software Engineer, Robinhood Command Center","New York, NY",0,https://boards.greenhouse.io/robinhood/jobs/7993511?gh_jid=7993511
 Robinhood,"Senior Software Engineer, Security Platform","Bellevue, WA",0,https://boards.greenhouse.io/robinhood/jobs/7899482?gh_jid=7899482
-Robinhood,"Senior Software Engineer, Storage Platform","Bellevue, WA",1,https://boards.greenhouse.io/robinhood/jobs/7982870?gh_jid=7982870
 Robinhood,"Senior Software Engineer, Trade PMR","New York, NY",0,https://boards.greenhouse.io/robinhood/jobs/7684760?gh_jid=7684760
 Robinhood,"Senior Staff Software Developer, Developer Productivity & AI Tooling","Toronto, Canada",0,https://boards.greenhouse.io/robinhood/jobs/6913966?gh_jid=6913966
 Robinhood,"Senior Staff Software Engineer, Data Platform","Bellevue, WA",1,https://boards.greenhouse.io/robinhood/jobs/7729014?gh_jid=7729014
 Robinhood,"Senior Web Engineer, Legend",Menlo Park/NY,0,https://boards.greenhouse.io/robinhood/jobs/7847004?gh_jid=7847004
-Robinhood,"Software Developer, Kubernetes Compute","Toronto, Canada",1,https://boards.greenhouse.io/robinhood/jobs/7871249?gh_jid=7871249
+Robinhood,"Software Developer, Kubernetes Compute","Toronto, Canada",1,https://boards.greenhouse.io/robinhood/jobs/7770009?gh_jid=7770009
 Robinhood,"Software Developer, Provisioning","Toronto, Canada",0,https://boards.greenhouse.io/robinhood/jobs/4829946?gh_jid=4829946
 Robinhood,Software Engineer,"Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7975557?gh_jid=7975557
 Robinhood,Software Engineer,"Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7960734?gh_jid=7960734
@@ -97,7 +93,6 @@ Robinhood,Software Engineer,"Menlo Park, CA",0,https://boards.greenhouse.io/robi
 Robinhood,Software Engineer,"Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7975558?gh_jid=7975558
 Robinhood,"Software Engineer, Agentic AI","Bellevue, WA",0,https://boards.greenhouse.io/robinhood/jobs/7975477?gh_jid=7975477
 Robinhood,"Software Engineer, Backend","Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/7263592?gh_jid=7263592
-Robinhood,"Software Engineer, Cloud Engineering","Ljubljana, Slovenia",1,https://boards.greenhouse.io/robinhood/jobs/7589432?gh_jid=7589432
 Robinhood,Staff Offensive Security Engineer,"Bellevue, WA",0,https://boards.greenhouse.io/robinhood/jobs/7460167?gh_jid=7460167
 Robinhood,Staff Offensive Security Engineer,"Toronto, Canada",0,https://boards.greenhouse.io/robinhood/jobs/7460169?gh_jid=7460169
 Robinhood,"Staff Security Engineer, Application Security",Bellevue/Menlo Park,0,https://boards.greenhouse.io/robinhood/jobs/7754299?gh_jid=7754299
@@ -108,6 +103,9 @@ Robinhood,"Staff Software Engineer, Security","Bellevue, WA",0,https://boards.gr
 Robinhood,"Staff Software Engineer, Web3",Menlo Park/NY,0,https://boards.greenhouse.io/robinhood/jobs/7489950?gh_jid=7489950
 Robinhood,"Staff Software Engineer, Web3","Toronto, Canada",0,https://boards.greenhouse.io/robinhood/jobs/7489952?gh_jid=7489952
 Robinhood,Senior Network Developer,"Toronto, Canada",0,https://boards.greenhouse.io/robinhood/jobs/8014801?gh_jid=8014801
+Robinhood,"Engineering Manager, Prediction Markets","Menlo Park, CA",0,https://boards.greenhouse.io/robinhood/jobs/8036664?gh_jid=8036664
+Robinhood,"Staff Software Engineer, Storage Platform","Bellevue, WA",1,https://boards.greenhouse.io/robinhood/jobs/8044227?gh_jid=8044227
+Robinhood,Web Developer - Crypto Expansion,"Toronto, Canada",0,https://boards.greenhouse.io/robinhood/jobs/8049662?gh_jid=8049662
 Faire,Applied AI / ML Scientist - Ads Bidding,"San Francisco, CA",0,https://boards.greenhouse.io/faire/jobs/8400765002?gh_jid=8400765002
 Faire,Data Engineer - Analytics Platform,"Kitchener-Waterloo/Toronto, ON",0,https://boards.greenhouse.io/faire/jobs/8538503002?gh_jid=8538503002
 Faire,Data Science Intern,"San Francisco, CA",0,https://boards.greenhouse.io/faire/jobs/8376377002?gh_jid=8376377002
@@ -126,8 +124,8 @@ Faire,Senior Applied AI/ML Scientist - Search,"Kitchener-Waterloo/Toronto, ON",0
 Faire,Senior Engineering Manager - Discovery,"San Francisco, CA",0,https://boards.greenhouse.io/faire/jobs/8564077002?gh_jid=8564077002
 Faire,Senior Frontend or Backend Engineer - Growth,"Kitchener-Waterloo/Toronto, ON",0,https://boards.greenhouse.io/faire/jobs/8465048002?gh_jid=8465048002
 Faire,Senior Software Engineer - Growth,"Kitchener-Waterloo/Toronto, ON",0,https://boards.greenhouse.io/faire/jobs/8465041002?gh_jid=8465041002
-Faire,Senior Staff Data Engineer - Platform Data and Analytics,"Kitchener-Waterloo/Toronto, ON",1,https://boards.greenhouse.io/faire/jobs/8561199002?gh_jid=8561199002
-Faire,Senior Staff Data Engineer - Platform Data and Analytics,"San Francisco, CA",1,https://boards.greenhouse.io/faire/jobs/8561202002?gh_jid=8561202002
+Faire,Senior Staff Data Engineer - Platform Data and Analytics,"Kitchener-Waterloo/Toronto, ON",1,https://boards.greenhouse.io/faire/jobs/8612419002?gh_jid=8612419002
+Faire,Senior Staff Data Engineer - Platform Data and Analytics,"San Francisco, CA",1,https://boards.greenhouse.io/faire/jobs/8612420002?gh_jid=8612420002
 Faire,Senior Staff Engineer - Product Security,LA/NYC/SF,0,https://boards.greenhouse.io/faire/jobs/8462924002?gh_jid=8462924002
 Faire,Senior Staff Engineer - Product Security,"Kitchener-Waterloo/Toronto, ON",0,https://boards.greenhouse.io/faire/jobs/8462925002?gh_jid=8462925002
 Faire,Senior Staff Machine Learning Platform Engineer,"Kitchener-Waterloo/Toronto, ON",1,https://boards.greenhouse.io/faire/jobs/8618464002?gh_jid=8618464002
@@ -141,9 +139,9 @@ Faire,"Staff Engineer, Enterprise AI","San Francisco, CA",0,https://boards.green
 Faire,Staff Engineer - Growth Platform,"Kitchener-Waterloo/Toronto, ON",1,https://boards.greenhouse.io/faire/jobs/8558462002?gh_jid=8558462002
 Faire,Staff Engineer - Product Security,"Kitchener-Waterloo/Toronto, ON",0,https://boards.greenhouse.io/faire/jobs/8552817002?gh_jid=8552817002
 Faire,Staff Engineer - Product Security,LA/NYC/SF,0,https://boards.greenhouse.io/faire/jobs/8552826002?gh_jid=8552826002
-Faire,Staff Machine Learning Platform Engineer,"Kitchener-Waterloo/Toronto, ON",1,https://boards.greenhouse.io/faire/jobs/8542017002?gh_jid=8542017002
-Faire,Staff Machine Learning Platform Engineer,"San Francisco, CA",1,https://boards.greenhouse.io/faire/jobs/8426107002?gh_jid=8426107002
 Faire,Senior Platform Analytics Engineer,"Kitchener-Waterloo/Toronto, ON",0,https://boards.greenhouse.io/faire/jobs/8569249002?gh_jid=8569249002
+Faire,Senior Backend Engineer - Brand Platform,"San Francisco, CA",1,https://boards.greenhouse.io/faire/jobs/8620224002?gh_jid=8620224002
+Faire,Staff Backend Engineer - Ads Formats,"Kitchener-Waterloo/Toronto, ON",0,https://boards.greenhouse.io/faire/jobs/8609131002?gh_jid=8609131002
 Gusto,Enterprise Application AI Architect,Multi-US / Remote,0,https://job-boards.greenhouse.io/gusto/jobs/7369003
 Gusto,Head of AI and Machine Learning Engineering,Denver/SF/NY,0,https://job-boards.greenhouse.io/gusto/jobs/7948318
 Gusto,Data Governance Technical Program Manager,"Denver, CO",0,https://job-boards.greenhouse.io/gusto/jobs/7982793
@@ -195,6 +193,8 @@ Chime,"Software Engineer, Machine Learning Platform","San Francisco, CA",1,https
 Chime,"Software Engineer, MyPay","San Francisco, CA",0,https://boards.greenhouse.io/chime/jobs/8499450002
 Chime,Product Security Engineer,"San Francisco, CA",0,https://boards.greenhouse.io/chime/jobs/8141068002
 Chime,"Manager, Product Security","San Francisco, CA",0,https://boards.greenhouse.io/chime/jobs/8526680002
+Chime,"Software Engineer, Infrastructure","Remote, USA",1,https://boards.greenhouse.io/chime/jobs/8616359002
+Chime,"Senior Software Engineer, Platform","San Francisco, CA",1,https://boards.greenhouse.io/chime/jobs/8525883002
 Lyft,Business Systems Engineer,"Mexico City, MX",0,https://app.careerpuck.com/job-board/lyft/job/8483264002?gh_jid=8483264002
 Lyft,"Business Systems Engineer, Oracle EPM","Toronto, Canada",0,https://app.careerpuck.com/job-board/lyft/job/8578270002?gh_jid=8578270002
 Lyft,"Business Systems Engineer, Oracle OTC","Mexico City, MX",0,https://app.careerpuck.com/job-board/lyft/job/8464813002?gh_jid=8464813002
@@ -221,13 +221,14 @@ Lyft,"Senior Software Engineer, Growth Platforms","San Francisco, CA",1,https://
 Lyft,"Senior Software Engineer, Lyft Business","San Francisco, CA",0,https://app.careerpuck.com/job-board/lyft/job/8445493002?gh_jid=8445493002
 Lyft,"Senior Software Engineer, Rider","New York, NY",0,https://app.careerpuck.com/job-board/lyft/job/8525090002?gh_jid=8525090002
 Lyft,"Senior Software Engineer, Self-Serve Intelligence","San Francisco, CA",0,https://app.careerpuck.com/job-board/lyft/job/8508257002?gh_jid=8508257002
-Lyft,"Software Engineer, Ad Infra","Toronto, Canada",1,https://app.careerpuck.com/job-board/lyft/job/8527740002?gh_jid=8527740002
 Lyft,"Software Engineer (Backend), Growth Platforms","Toronto, Canada",0,https://app.careerpuck.com/job-board/lyft/job/8421508002?gh_jid=8421508002
 Lyft,"Software Engineer, Frontend - Lyft Urban Solutions","Toronto, Canada",0,https://app.careerpuck.com/job-board/lyft/job/8594759002?gh_jid=8594759002
 Lyft,"Software Engineer, Fulfillment","Toronto, Canada",0,https://app.careerpuck.com/job-board/lyft/job/8584593002?gh_jid=8584593002
 Lyft,"Software Engineer, iOS","Mexico City, MX",0,https://app.careerpuck.com/job-board/lyft/job/8559585002?gh_jid=8559585002
 Lyft,"Software Engineer, Pricing","Toronto, Canada",0,https://app.careerpuck.com/job-board/lyft/job/8396751002?gh_jid=8396751002
 Lyft,"Software Engineer, Scheduled Rides","Toronto, Canada",0,https://app.careerpuck.com/job-board/lyft/job/8544638002?gh_jid=8544638002
+Lyft,"Senior Software Engineer, Ad Infra","Toronto, Canada",1,https://app.careerpuck.com/job-board/lyft/job/8603660002?gh_jid=8603660002
+Lyft,Senior Platform Engineer - Workday,"San Francisco, CA",1,https://app.careerpuck.com/job-board/lyft/job/8621017002?gh_jid=8621017002
 Komodo Health,AI Enablement Lead (Mavens),United States,0,https://job-boards.greenhouse.io/komodohealth/jobs/8521714002
 Komodo Health,Consultant (Salesforce Configuration),India,0,https://job-boards.greenhouse.io/komodohealth/jobs/7763676002
 Komodo Health,Cloud Systems Engineer,United States,1,https://job-boards.greenhouse.io/komodohealth/jobs/8571139002
@@ -298,7 +299,6 @@ Cohere Health,Lead Data Engineer,"Hyderabad, India",0,https://job-boards.greenho
 Cohere Health,Lead Data Governance Specialist,United States,0,https://job-boards.greenhouse.io/coherehealth/jobs/7700324003
 Cohere Health,Lead Data Scientist,"Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7693268003
 Cohere Health,Lead Machine Learning Engineer,"Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7693174003
-Cohere Health,Lead Software Engineer - Data Platform,United States,1,https://job-boards.greenhouse.io/coherehealth/jobs/7722409003
 Cohere Health,Data Science Manager,"Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7013656003
 Cohere Health,Data Scientist,"Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7741414003
 Cohere Health,"Manager, Data Analytics","Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7693376003
@@ -314,75 +314,35 @@ Cohere Health,Staff Application Engineer,"Hyderabad, India",0,https://job-boards
 Cohere Health,Staff Data Scientist,"Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7693289003
 Cohere Health,Staff Machine Learning Engineer,United States,0,https://job-boards.greenhouse.io/coherehealth/jobs/7617095003
 Cohere Health,Staff Machine Learning Engineer,"Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7693285003
-Cohere Health,Staff Platform Engineer,"Hyderabad, India",1,https://job-boards.greenhouse.io/coherehealth/jobs/7735261003
+Cohere Health,Staff Software Engineer - Integration,"Hyderabad, India",0,https://job-boards.greenhouse.io/coherehealth/jobs/7735261003
 Cohere Health,Staff Software Engineer - Platform Engineering,United States,1,https://job-boards.greenhouse.io/coherehealth/jobs/7718566003
 Cohere Health,"Senior Software Engineer, Client Implementations",United States,0,https://job-boards.greenhouse.io/coherehealth/jobs/7771934003
 Cohere Health,"Senior Software Engineer, Payment Integrity",United States,0,https://job-boards.greenhouse.io/coherehealth/jobs/7691011003
-Brex,"Software Engineer II, Frontend","São Paulo, Brazil",0,https://www.brex.com/careers/8310523002?gh_jid=8310523002
+Cohere Health,"Manager, Data Platform",United States,1,https://job-boards.greenhouse.io/coherehealth/jobs/7784645003
+Cohere Health,"Software Engineer II, Data Platform",United States,1,https://job-boards.greenhouse.io/coherehealth/jobs/7787107003
 Brex,"Engineering Manager, GTM Engineering","San Francisco, CA",0,https://www.brex.com/careers/8339037002?gh_jid=8339037002
 Brex,"Engineering Manager, GTM Engineering","New York, NY",0,https://www.brex.com/careers/8367549002?gh_jid=8367549002
 Brex,"Engineering Manager, GTM Engineering","Seattle, WA",0,https://www.brex.com/careers/8367552002?gh_jid=8367552002
 Brex,"Engineering Manager, GTM Engineering","Vancouver, BC",0,https://www.brex.com/careers/8367553002?gh_jid=8367553002
-Brex,Senior Security Operations Engineer,"San Francisco, CA",0,https://www.brex.com/careers/8339252002?gh_jid=8339252002
-Brex,Senior Security Operations Engineer,"New York, NY",0,https://www.brex.com/careers/8339277002?gh_jid=8339277002
-Brex,Senior Security Operations Engineer,"Seattle, WA",0,https://www.brex.com/careers/8339283002?gh_jid=8339283002
-Brex,Senior Security Operations Engineer,"Vancouver, BC",0,https://www.brex.com/careers/8339287002?gh_jid=8339287002
-Brex,Senior GRC Lead,"San Francisco, CA",0,https://www.brex.com/careers/8378792002?gh_jid=8378792002
-Brex,Senior GRC Lead,"New York, NY",0,https://www.brex.com/careers/8378840002?gh_jid=8378840002
-Brex,Senior GRC Lead,"Seattle, WA",0,https://www.brex.com/careers/8541244002?gh_jid=8541244002
-Brex,Senior GRC Lead,"Vancouver, BC",0,https://www.brex.com/careers/8541251002?gh_jid=8541251002
 Brex,"Engineering Manager, AI — Brex Assistant","San Francisco, CA",0,https://www.brex.com/careers/8393583002?gh_jid=8393583002
 Brex,"Engineering Manager, AI — Brex Assistant","Seattle, WA",0,https://www.brex.com/careers/8395068002?gh_jid=8395068002
-Brex,Senior Application Security Engineer (Remote),Canada,0,https://www.brex.com/careers/8426273002?gh_jid=8426273002
-Brex,Senior Application Security Engineer (Remote),United States,0,https://www.brex.com/careers/8590025002?gh_jid=8590025002
-Brex,"Senior Software Engineer, Product Data Platform","San Francisco, CA",0,https://www.brex.com/careers/8430182002?gh_jid=8430182002
-Brex,"Senior Software Engineer, Product Data Platform","Vancouver, BC",0,https://www.brex.com/careers/8430196002?gh_jid=8430196002
-Brex,"Senior Software Engineer, Product Data Platform","Seattle, WA",0,https://www.brex.com/careers/8430197002?gh_jid=8430197002
 Brex,"Engineering Program Manager, AI","Seattle, WA",0,https://www.brex.com/careers/8443298002?gh_jid=8443298002
-Brex,"Software Engineer II, Backend","San Francisco, CA",0,https://www.brex.com/careers/8459783002?gh_jid=8459783002
-Brex,"Software Engineer II, Backend","New York, NY",0,https://www.brex.com/careers/8536424002?gh_jid=8536424002
-Brex,"Senior Software Engineer, Backend (Product Eng)","Seattle, WA",0,https://www.brex.com/careers/8461333002?gh_jid=8461333002
-Brex,"Senior Software Engineer, Backend (Product Eng)","San Francisco, CA",0,https://www.brex.com/careers/8461469002?gh_jid=8461469002
-Brex,"Senior Software Engineer, Backend (Product Eng)","New York, NY",0,https://www.brex.com/careers/8465003002?gh_jid=8465003002
 Brex,"Engineering Manager, Onboarding","Vancouver, BC",0,https://www.brex.com/careers/8461597002?gh_jid=8461597002
 Brex,"Engineering Manager, Onboarding","Seattle, WA",0,https://www.brex.com/careers/8461598002?gh_jid=8461598002
 Brex,"Engineering Manager, Onboarding","New York, NY",0,https://www.brex.com/careers/8461599002?gh_jid=8461599002
 Brex,"Engineering Manager, Onboarding","San Francisco, CA",0,https://www.brex.com/careers/8461600002?gh_jid=8461600002
-Brex,"Senior Software Engineer, Full Stack","Vancouver, BC",0,https://www.brex.com/careers/8472632002?gh_jid=8472632002
-Brex,"Senior Software Engineer, Full Stack","Seattle, WA",0,https://www.brex.com/careers/8472633002?gh_jid=8472633002
-Brex,"Senior Software Engineer, Full Stack","New York, NY",0,https://www.brex.com/careers/8472634002?gh_jid=8472634002
-Brex,"Senior Software Engineer, Full Stack","San Francisco, CA",0,https://www.brex.com/careers/8472635002?gh_jid=8472635002
-Brex,"Senior Software Engineer, Full Stack","São Paulo, Brazil",0,https://www.brex.com/careers/8477314002?gh_jid=8477314002
-Brex,"Senior Software Engineer, Frontend","Seattle, WA",0,https://www.brex.com/careers/8501025002?gh_jid=8501025002
-Brex,"Senior Software Engineer, Frontend","San Francisco, CA",0,https://www.brex.com/careers/8501051002?gh_jid=8501051002
-Brex,"Senior Software Engineer, Frontend","New York, NY",0,https://www.brex.com/careers/8501052002?gh_jid=8501052002
-Brex,"Senior Software Engineer, Frontend","Vancouver, BC",0,https://www.brex.com/careers/8536763002?gh_jid=8536763002
-Brex,"Senior Software Engineer, Release Infra","São Paulo, Brazil",0,https://www.brex.com/careers/8522011002?gh_jid=8522011002
-Brex,"Software Engineer, Forward Deployed Agent Builder","New York, NY",0,https://www.brex.com/careers/8523177002?gh_jid=8523177002
-Brex,"Software Engineer, Forward Deployed Agent Builder","San Francisco, CA",0,https://www.brex.com/careers/8523203002?gh_jid=8523203002
-Brex,"Software Engineer, Forward Deployed Agent Builder","Seattle, WA",0,https://www.brex.com/careers/8523205002?gh_jid=8523205002
-Brex,"Software Engineer, Forward Deployed Agent Builder","Vancouver, BC",0,https://www.brex.com/careers/8523430002?gh_jid=8523430002
-Brex,"Software Engineer, Forward Deployed Agent Builder","São Paulo, Brazil",0,https://www.brex.com/careers/8523435002?gh_jid=8523435002
-Brex,"Software Engineer II, Product","São Paulo, Brazil",0,https://www.brex.com/careers/8524941002?gh_jid=8524941002
+Brex,"Senior Software Engineer, Product Data Platform","San Francisco, CA",0,https://www.brex.com/careers/8430182002?gh_jid=8430182002
+Brex,"Senior Software Engineer, Product Data Platform","Vancouver, BC",0,https://www.brex.com/careers/8430196002?gh_jid=8430196002
 Brex,"Engineering Manager, Cloud Infrastructure","Seattle, WA",1,https://www.brex.com/careers/8534621002?gh_jid=8534621002
 Brex,"Engineering Manager, Cloud Infrastructure","San Francisco, CA",1,https://www.brex.com/careers/8534633002?gh_jid=8534633002
 Brex,"Engineering Manager, Cloud Infrastructure","New York, NY",1,https://www.brex.com/careers/8534634002?gh_jid=8534634002
-Brex,"Senior Engineering Manager, Acquisition","San Francisco, CA",0,https://www.brex.com/careers/8536914002?gh_jid=8536914002
-Brex,"Senior Engineering Manager, Acquisition","New York, NY",0,https://www.brex.com/careers/8536938002?gh_jid=8536938002
-Brex,"Senior Engineering Manager, Acquisition","Seattle, WA",0,https://www.brex.com/careers/8536939002?gh_jid=8536939002
-Brex,"Senior Engineering Manager, Acquisition","Vancouver, BC",0,https://www.brex.com/careers/8536942002?gh_jid=8536942002
-Brex,"Software Engineer II, Credit Limit Engineering","São Paulo, Brazil",0,https://www.brex.com/careers/8545586002?gh_jid=8545586002
-Brex,"Software Engineer II, Cloud Infrastructure","São Paulo, Brazil",0,https://www.brex.com/careers/8587789002?gh_jid=8587789002
-Brex,Senior Salesforce Developer,"São Paulo, Brazil",0,https://www.brex.com/careers/8599061002?gh_jid=8599061002
 SoFi,Cybersecurity Incident Commander,Seattle/SF,0,https://sofi.com/careers/job/7751404003?gh_jid=7751404003
 SoFi,"Data Science Manager, Borrow",SF/NYC,0,https://sofi.com/careers/job/7601581003?gh_jid=7601581003
-SoFi,"Director, AI Platforms",SF/Seattle,1,https://sofi.com/careers/job/7704803003?gh_jid=7704803003
 SoFi,"Engineering Manager, Commercial Banking - Web","Seattle, WA",0,https://sofi.com/careers/job/7663516003?gh_jid=7663516003
 SoFi,"Principal Engineer, Digital Identity",Seattle/SF,0,https://sofi.com/careers/job/7679621003?gh_jid=7679621003
 SoFi,"Principal Software Engineer, Agentic Experiences",Seattle/SF,0,https://sofi.com/careers/job/7666785003?gh_jid=7666785003
 SoFi,"Principal Software Engineer, AI Accelerated SDLC",SF/Seattle,0,https://sofi.com/careers/job/7511157003?gh_jid=7511157003
 SoFi,"Principal Software Engineer, Loans Originations",Seattle/SF,0,https://sofi.com/careers/job/7575386003?gh_jid=7575386003
-SoFi,"Principal Software Engineer, Loans Platform","Seattle, WA",1,https://sofi.com/careers/job/7575382003?gh_jid=7575382003
 SoFi,"Principal Software Engineer, Loans Platform","Seattle, WA",1,https://sofi.com/careers/job/7575354003?gh_jid=7575354003
 SoFi,"Principal Software Engineer, Member Growth",SF/Seattle,0,https://sofi.com/careers/job/7688391003?gh_jid=7688391003
 Coinbase,Analytics Engineer,Hybrid - Luxembourg,0,https://www.coinbase.com/careers/positions/7843712?gh_jid=7843712
@@ -414,6 +374,7 @@ Coinbase,"Senior Staff Software Engineer, Payments",Remote - USA,0,https://www.c
 Coinbase,Software Engineer,"Charlotte, NC",0,https://www.coinbase.com/careers/positions/8003605?gh_jid=8003605
 Coinbase,"Software Engineer, Backend (Consumer - Risk)",Remote - Canada,0,https://www.coinbase.com/careers/positions/7991763?gh_jid=7991763
 Coinbase,"Software Engineer, EAA Integrations",Remote - India,0,https://www.coinbase.com/careers/positions/7558051?gh_jid=7558051
+Coinbase,"Senior Software Engineer, AI Platform Team",Remote - USA,1,https://www.coinbase.com/careers/positions/7997420?gh_jid=7997420
 Airtable,"Software Engineer, Compute (8+ YOE)",SF/NY/Remote-US,0,https://job-boards.greenhouse.io/airtable/jobs/8442397002
 Airtable,"Software Engineer, Data",SF/Austin/NY,0,https://job-boards.greenhouse.io/airtable/jobs/8124953002
 Airtable,"Software Engineer, Infrastructure (4-8 YOE)",SF/NY/Seattle,1,https://job-boards.greenhouse.io/airtable/jobs/8400373002
@@ -434,12 +395,10 @@ Flexport,Software Engineer II,"Shanghai, China",0,https://boards.greenhouse.io/f
 Flexport,"Software Engineer II, Autonomous Freight Systems","San Francisco, CA",0,https://boards.greenhouse.io/flexport/jobs/7839346?gh_jid=7839346
 Flexport,Staff Software Engineer: Applied AI,"Amsterdam, NL",0,https://boards.greenhouse.io/flexport/jobs/7311883?gh_jid=7311883
 Flexport,"Staff Software Engineer, Autonomous Freight Systems","San Francisco, CA",0,https://boards.greenhouse.io/flexport/jobs/7819181?gh_jid=7819181
-Hims & Hers,Sr. Platform Engineer,US Remote,1,https://jobs.ashbyhq.com/hims-and-hers/03409df3-5d56-4cb0-9c33-8c28832d0ed0
 Hims & Hers,Sr Manager - Regulatory Affairs,US Remote,0,https://jobs.ashbyhq.com/hims-and-hers/025f97fe-5568-4840-93f5-a8baa3631710
 Hims & Hers,Compounding Pharmacy Technician (Nights),"Gilbert, AZ",0,https://jobs.ashbyhq.com/hims-and-hers/04d538b7-05aa-4786-b5e9-828e469645b4
 Hims & Hers,Inventory Clerk,"Mesa, AZ",0,https://jobs.ashbyhq.com/hims-and-hers/08a43c59-40e9-46ba-b45a-9838a2de82b6
 Hims & Hers,Staff Pharmacist,"North York, ON",0,https://jobs.ashbyhq.com/hims-and-hers/08e6c489-2de2-4cd8-9030-af120e53ba98
-Hims & Hers,Talent Acquisition Recruiter - Operations,"Gilbert, AZ",0,https://jobs.ashbyhq.com/hims-and-hers/096a50f7-b18a-4054-a8c7-66d9078630cf
 Hims & Hers,Maintenance Technician - Pharmaceutical Compounding,"Gilbert, AZ",0,https://jobs.ashbyhq.com/hims-and-hers/0a54d1d9-4403-41e7-8a12-9bbc2e7cf173
 Carta,Senior Site Reliability Engineer,SF/Santa Clara/Seattle,1,https://job-boards.greenhouse.io/carta/jobs/7688689003
 Carta,Senior Software Engineer II,"London, UK",0,https://job-boards.greenhouse.io/carta/jobs/7652562003
