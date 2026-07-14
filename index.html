@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Territory Radar - Account buying-signal intelligence for AEs</title>
-<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity.">
+<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Three demo industries: cloud data warehousing, product analytics, observability.">
 <style>
 :root{--bg:#0f1115;--panel:#171a21;--panel2:#1d212a;--line:#2a2f3a;--txt:#e7eaf0;--muted:#9aa3b2;--accent:#6c8cff;--accent2:#41d3a3;
 --hot:#ff6b5d;--hotbg:#3a1f1d;--warm:#e3b341;--warmbg:#352d18;--watch:#5a6172;--watchbg:#22262f;--up:#41d3a3;--down:#ff7a7a;}
@@ -53,101 +53,49 @@ footer{border-top:1px solid var(--line);padding:28px 0 64px;color:var(--muted);f
 .wk{border-bottom:1px solid var(--line);padding:14px 0}.wk:last-child{border-bottom:0}.wkhead{font-size:14.5px;margin-bottom:8px}
 .wkrow{display:flex;gap:8px;align-items:baseline;margin:4px 0;flex-wrap:wrap}.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);min-width:68px}
 .chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 0}.chip.up{background:var(--hotbg);color:var(--up)}.chip.down{background:var(--watchbg);color:var(--down)}
-.nav a{margin-right:4px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 0}
+@media(max-width:860px){.cards{grid-template-columns:1fr}}
+a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;color:var(--txt);transition:border-color .15s ease,transform .15s ease}
+a.card:hover{border-color:var(--accent);transform:translateY(-2px);text-decoration:none}
+.card .ind{font-size:21px;font-weight:720;letter-spacing:-.015em;margin:0 0 7px}
+.card .cap{color:var(--muted);font-size:13.5px;margin:0 0 16px;line-height:1.5}
+.card .mini{display:flex;gap:16px;font-size:12.5px;color:var(--muted)}
+.card .mini b{color:var(--txt);font-size:16px;font-variant-numeric:tabular-nums}
+.card .mini .hotn b{color:var(--hot)}
+.card .go{margin-top:16px;color:var(--accent);font-size:13.5px;font-weight:600}
 </style></head><body>
 <header><div class="wrap">
   <p class="eyebrow">B2B Sales · Territory Intelligence</p>
   <h1>Territory Radar</h1>
-  <p class="sub">An automated territory-research tool for Account Executives. It scores the accounts in a sales territory on real buying signals - hiring, funding, and leadership moves - and tracks which ones are heating up, so account planning starts from "why now," not a static list.</p>
-  <p class="byline">Built by <b>Eric Hastie</b> · sample territory · updated July 7, 2026 · <span class="muted">a portfolio project</span></p>
-  <p class="byline" style="margin-top:6px"><b>Territory board</b> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> &nbsp;·&nbsp; <a href="roles.html">All open roles →</a></p>
-  <div class="callout"><b>What this models:</b> an AE selling a cloud infrastructure / DevOps platform (IaC, observability, Kubernetes ops, cloud-cost). A <b>buying signal</b> here means an account investing in its platform / infrastructure org - hiring SRE, platform, DevOps or infrastructure engineers, raising fresh capital, or bringing on engineering leadership. Swap the config and the account list, and the same engine works for any product and territory.</div>
-  <div class="stats">
-    <div class="stat"><div class="n">16</div><div class="l">accounts in territory</div></div>
-    <div class="stat"><div class="n">3</div><div class="l">🔥 hot right now</div></div>
-    <div class="stat"><div class="n">63<span style="color:var(--muted);font-size:16px"> / 1469</span></div><div class="l">relevant / total open roles</div></div>
-    <div class="stat"><div class="n">12</div><div class="l">moved this week</div></div>
-  </div>
+  <p class="sub">An automated territory-research tool for Account Executives. It scores every account in a sales territory on real buying signals - hiring, funding, leadership moves, and expansion - and tracks which accounts are heating up, so account planning starts from "why now," not a static list.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · demo territories · updated July 13, 2026 · <span class="muted">a portfolio project</span></p>
 </div></header>
 
 <section class="about"><div class="wrap">
-  <h2>About this project</h2>
-  <p>This started as the engine behind a <a href="https://eric-hastie.github.io/remote-ae-job-hunt/" target="_blank" rel="noopener">remote-AE job search</a> - a pipeline that screens companies against a profile, verifies live job postings, and tracks change week over week. That job-hunt build was the prototype; <b>Territory Radar</b> re-points the same engine at the other side of the desk: instead of finding jobs, it finds buying signals across a sales territory. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it.</p>
-  <h2 style="margin-top:30px">How the signal score works</h2>
-  <p>Each account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box:</p>
-  <div class="score-help">
-    <code>relevant open role &times; 10</code>
-    <code>recent funding +20</code>
-    <code>new eng leadership +20</code>
-    <code>expansion / new region +12</code>
-  </div>
-  <div class="score-help" style="margin-top:8px">
-    <span><span class="tier t-Hot">Hot</span> &nbsp;score &ge; 80</span>
-    <span><span class="tier t-Warm">Warm</span> &nbsp;&ge; 40</span>
-    <span><span class="tier t-Watch">Watch</span> &nbsp;below 40</span>
-  </div>
+  <h2>Pick an industry</h2>
+  <p>The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores the same universe of companies through that lens. Below are three demo territories I built to show exactly that - same tool, three different products, three different answers to "who do I call first?" (It started life as my remote-AE job-search engine; finding buying signals turns out to be the same problem as finding jobs.)</p>
+  <div class="cards"><a class="card" href="data-warehouse/">
+  <p class="ind">Cloud Data Warehousing</p>
+  <p class="cap">Run as if selling MotherDuck - a serverless, DuckDB-powered cloud data warehouse.</p>
+  <div class="mini"><span><b>20</b> accounts</span><span class="hotn"><b>5</b> hot right now</span></div>
+  <div class="go">Open the board &rarr;</div>
+</a><a class="card" href="product-analytics/">
+  <p class="ind">Product Analytics</p>
+  <p class="cap">Run as if selling PostHog - product analytics, session replay, feature flags, and experiments.</p>
+  <div class="mini"><span><b>20</b> accounts</span><span class="hotn"><b>5</b> hot right now</span></div>
+  <div class="go">Open the board &rarr;</div>
+</a><a class="card" href="observability/">
+  <p class="ind">Observability</p>
+  <p class="cap">Run as if selling an unnamed observability platform - logs, metrics, traces, and uptime.</p>
+  <div class="mini"><span><b>20</b> accounts</span><span class="hotn"><b>5</b> hot right now</span></div>
+  <div class="go">Open the board &rarr;</div>
+</a></div>
+  <div class="callout" style="margin-top:26px"><b>Illustrative demos.</b> Each board is run as if I were an AE selling a named vendor's product (or an unnamed one) - none of these vendors is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are real, verified July 13, 2026 against live ATS job boards (Greenhouse / Lever / Ashby) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
 </div></section>
 
-<div class="wrap">
-  <div class="controls">
-    <input id="q" type="search" placeholder="Search account, industry, signal…" autocomplete="off">
-    <div class="seg" id="seg">
-      <button data-seg="all" class="on">All</button>
-      <button data-seg="Hot">Hot</button>
-      <button data-seg="Warm">Warm</button>
-      <button data-seg="Watch">Watch</button>
-    </div>
-    <span class="count" id="count"></span>
-  </div>
-  <div class="tablewrap"><table>
-    <thead><tr>
-      <th data-k="account">Account <span class="arw"></span></th>
-      <th data-k="score">Signal <span class="arw">▼</span></th>
-      <th data-k="mom">Momentum <span class="arw"></span></th>
-      <th data-k="roles">Roles (rel / total) <span class="arw"></span></th>
-      <th>Key signals</th>
-      <th>Why now</th>
-    </tr></thead>
-    <tbody id="rows"></tbody>
-  </table></div>
-</div>
-
 <footer><div class="wrap">
-  <p><b>Methodology.</b> Sample territory, signals verified July 7, 2026 against company career pages / ATS and public sources; re-verified weekly. Signal counts and firmographics are best-effort from public data. This is illustrative demo data on real companies - a live deployment would run against your actual book of business in a <b>private</b> repo.</p>
-  <p>Prototyped from the remote-AE job-hunt tool. Built by Eric Hastie · auto-refreshed weekly.</p>
+  <p>Every account's score is a transparent, weighted sum of verified signals: relevant open roles &times; 10, recent funding +20, new leadership +20, expansion +12. Each board explains its own tiers.</p>
+  <p>Still curious where this started? <a href="legacy.html">The original demo board (June-July 2026)</a> - a cloud-infrastructure territory tracked across four weekly snapshots - is still live, with its <a href="history.html">momentum history</a> and <a href="roles.html">open-roles inventory</a>.</p>
+  <p>Built by Eric Hastie · <a href="https://github.com/eric-hastie/territory-radar" target="_blank" rel="noopener">source on GitHub</a> · refreshed by a weekly cloud agent.</p>
 </div></footer>
-
-<script>
-const DATA = [{"account": "Robinhood", "industry": "Fintech / Brokerage", "hq": "Menlo Park, CA", "headcount": "2,000-3,000", "funding": "Public (NASDAQ: HOOD)", "total_roles": 129, "roles": 9, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 1, "signals": "9 platform/infra roles incl. Kubernetes Compute, Storage & Data Platform, Network Reliability | WonderFi closed Jun 1 2026 - Canada platform integration underway", "why": "WonderFi acquisition (closed Jun 1 2026) creates active Kubernetes, storage, and data-platform integration work across Toronto and Bellevue.", "url": "https://careers.robinhood.com/", "score": 102, "tier": "Hot", "mom": "down", "mom_delta": -20}, {"account": "Discord", "industry": "Consumer Social / Comms", "hq": "San Francisco, CA", "headcount": "1,000-1,500", "funding": "Private, ~$8.5B", "total_roles": 58, "roles": 10, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "10 platform/infra roles incl. Platform Infrastructure, Database Infrastructure, Data Platform | S-1 filed Mar 2026, IPO possibly Oct 2026", "why": "Active IPO preparation under new CEO Humam Sakhnini - platform reliability and infrastructure investment is a board-level priority ahead of public listing.", "url": "https://discord.com/careers", "score": 100, "tier": "Hot", "mom": "down", "mom_delta": -10}, {"account": "Faire", "industry": "E-commerce / Wholesale Marketplace", "hq": "San Francisco, CA", "headcount": "1,000-1,200", "funding": "Private, ~$5.2B", "total_roles": 77, "roles": 7, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 0, "signals": "$100M Series I (Nov 2025) | 7 platform-eng roles (ML Platform x4, Data/Growth Platform x3) | Profitability push", "why": "Fresh $100M Series I (Nov 2025) with growing ML-platform team (7 matched roles) - cloud-cost and platform-efficiency tooling is a CFO-friendly fit heading into 2026/2027 IPO window.", "url": "https://job-boards.greenhouse.io/faire", "score": 90, "tier": "Hot", "mom": "up", "mom_delta": 10}, {"account": "Gusto", "industry": "HR / Payroll SaaS", "hq": "San Francisco, CA", "headcount": "2,000-3,000", "funding": "Private, ~$10B", "total_roles": 80, "roles": 5, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 0, "signals": "$175M Series F (Oct 2025) | 5 platform/infra roles incl. Database Infrastructure, Core AI Platforms, Tax Platform Engineering", "why": "$175M Series F (Oct 2025) at $10B valuation with platform team actively hiring including new Senior Staff Tax Platform Engineering role - cloud-cost discipline on the CFO agenda.", "url": "https://job-boards.greenhouse.io/gusto", "score": 70, "tier": "Warm", "mom": "down", "mom_delta": -10}, {"account": "Komodo Health", "industry": "Healthcare-Tech / Data", "hq": "San Francisco, CA", "headcount": "500-1,000", "funding": "Private, $514M raised", "total_roles": 43, "roles": 4, "funding_sig": 0, "leadership_sig": 1, "expansion_sig": 0, "signals": "4 platform/infra roles incl. Cloud Systems Eng (new), Infrastructure Eng, Platform Eng | New CTO Amit Sangani (ex-Meta, Jan 2026) | AI reorg", "why": "New CTO from Meta (Jan 2026) re-platforming the Marmot AI stack with fresh Cloud Systems Engineer opening - a rare exec-led infra re-evaluation window.", "url": "https://job-boards.greenhouse.io/komodohealth", "score": 60, "tier": "Warm", "mom": "up", "mom_delta": 10}, {"account": "Chime", "industry": "Fintech / Neobank", "hq": "San Francisco, CA", "headcount": "1,000-1,500", "funding": "Public (NASDAQ: CHYM)", "total_roles": 64, "roles": 5, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "5 platform/infra roles incl. Infrastructure, ML & Financial Platform | First full year public", "why": "Newly public and scaling platform/infra teams under public-market cost scrutiny - reliability and cost discipline are live priorities.", "url": "https://job-boards.greenhouse.io/chime", "score": 50, "tier": "Warm", "mom": "flat", "mom_delta": 0}, {"account": "Lyft", "industry": "Mobility / Rideshare", "hq": "San Francisco, CA", "headcount": "2,500-3,000", "funding": "Public (NASDAQ: LYFT)", "total_roles": 193, "roles": 4, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "4 platform/infra roles incl. Data-Platform Lakehouse, Growth Platforms, Ad Infra | Total open roles surged 120\u2192193 (+73 net)", "why": "Major hiring ramp (+73 roles to 193 total) with data-platform lakehouse and growth-platform teams actively building - platform tooling conversation timely.", "url": "https://app.careerpuck.com/job-board/lyft", "score": 40, "tier": "Warm", "mom": "down", "mom_delta": -10}, {"account": "Airtable", "industry": "SaaS / No-Code", "hq": "San Francisco, CA", "headcount": "800-1,000", "funding": "Private, $1.4B raised", "total_roles": 38, "roles": 2, "funding_sig": 0, "leadership_sig": 1, "expansion_sig": 0, "signals": "New CTO David Azose (ex-OpenAI, Oct 2025) + DeepSky acq (Oct 2025) | 2 Infrastructure Eng roles", "why": "Ex-OpenAI CTO is 'AI-refounding' the company and re-evaluating the whole infra stack right now - a rare greenfield moment.", "url": "https://job-boards.greenhouse.io/airtable", "score": 40, "tier": "Warm", "mom": "flat", "mom_delta": 0}, {"account": "Coinbase", "industry": "Crypto / Fintech", "hq": "Remote-first", "headcount": "5,000-10,000", "funding": "Public (NASDAQ: COIN)", "total_roles": 124, "roles": 2, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 1, "signals": "2 SRE roles (Core AI Infra, Workforce Identity) | NYC $30M R&D hub (Mar 2026, 630+ jobs, $750M R&D/yr) | Platform/infra SWE roles contracted", "why": "NYC R&D hub commitment ($750M annual R&D, 630+ new jobs) signals ongoing infrastructure investment - engage leadership now before platform team rebuilds.", "url": "https://www.coinbase.com/careers/positions", "score": 32, "tier": "Watch", "mom": "down", "mom_delta": -70}, {"account": "Twilio", "industry": "Communications SaaS / CPaaS", "hq": "San Francisco, CA", "headcount": "5,000+", "funding": "Public (NYSE: TWLO)", "total_roles": 221, "roles": 3, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "3 platform/infra roles (Cloud SWE, Infrastructure Eng - Stytch, Staff Data Platform) | Stytch identity platform acq (Oct 2025)", "why": "Large platform footprint with Stytch infrastructure integration ongoing - steady data-platform and reliability hiring suggests active tooling needs.", "url": "https://job-boards.greenhouse.io/twilio", "score": 30, "tier": "Watch", "mom": "down", "mom_delta": -10}, {"account": "Cohere Health", "industry": "Healthcare-Tech", "hq": "Boston, MA", "headcount": "500-1,000", "funding": "Private (Series C $90M May 2025)", "total_roles": 66, "roles": 3, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "3 platform-eng roles (Platform Eng x2, Software Eng Data Platform) | ZignaAI acq (Sep 2025) | $90M Series C (May 2025)", "why": "ZignaAI acquisition expanding clinical AI capabilities - active platform engineering team building; good timing for cloud-infra and observability tooling standards.", "url": "https://job-boards.greenhouse.io/coherehealth", "score": 30, "tier": "Watch", "mom": "down", "mom_delta": -20}, {"account": "Brex", "industry": "Fintech / Corporate Cards", "hq": "San Francisco, CA", "headcount": "1,000-1,500", "funding": "Acquired by Capital One (Apr 2026)", "total_roles": 139, "roles": 3, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "3 Cloud Infrastructure EM roles | Capital One integration ongoing | Platform/infra SWE headcount contracted post-acquisition", "why": "Cloud Infrastructure EM openings mid-Capital One integration indicate active platform consolidation work - right time to discuss tooling standardization as teams merge.", "url": "https://www.brex.com/careers", "score": 30, "tier": "Watch", "mom": "down", "mom_delta": -50}, {"account": "SoFi", "industry": "Fintech / Lending", "hq": "San Francisco, CA", "headcount": "4,000+", "funding": "Public (NASDAQ: SOFI)", "total_roles": 60, "roles": 3, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "3 platform/infra roles incl. Director AI Platforms, Loans Platform (x2)", "why": "Investing in AI- and loans-platform engineering - focused entry point for platform tooling discussions.", "url": "https://sofi.com/careers", "score": 30, "tier": "Watch", "mom": "flat", "mom_delta": 0}, {"account": "Hims & Hers", "industry": "Healthcare / Telehealth", "hq": "San Francisco, CA", "headcount": "1,000-2,000", "funding": "Public (NYSE: HIMS)", "total_roles": 8, "roles": 1, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 1, "signals": "Sr. Platform Engineer open (Kubernetes/Istio/Terraform) | $200M New Albany facility (Q1 2026 ongoing) | Canada expansion (ZAVA 2026)", "why": "First confirmed platform engineering role found with Kubernetes/service-mesh focus - active facility and Canada expansion suggest infra team is building.", "url": "https://jobs.ashbyhq.com/hims-and-hers", "score": 22, "tier": "Watch", "mom": "up", "mom_delta": 10}, {"account": "Flexport", "industry": "Logistics / Freight-Tech", "hq": "San Francisco, CA", "headcount": "2,000-3,000", "funding": "Private, ~$8B", "total_roles": 121, "roles": 1, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "1 Data Infrastructure SWE role (Amsterdam) | Total roles rose 108\u2192121", "why": "Total hiring increased (108\u2192121) but platform-specific roles remain limited - monitor for renewed platform investment.", "url": "https://job-boards.greenhouse.io/flexport", "score": 10, "tier": "Watch", "mom": "down", "mom_delta": -10}, {"account": "Carta", "industry": "Fintech / Cap-Table SaaS", "hq": "San Francisco, CA", "headcount": "1,500-2,000", "funding": "Private, ~$7.4B", "total_roles": 48, "roles": 1, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "signals": "1 Senior SRE; otherwise generic SWE hiring", "why": "Single SRE opening and no broader platform push - keep warm and watch for renewed infra investment.", "url": "https://job-boards.greenhouse.io/carta", "score": 10, "tier": "Watch", "mom": "flat", "mom_delta": 0}];
-const tbody=document.getElementById('rows'),q=document.getElementById('q'),count=document.getElementById('count');
-let seg='all',sortK='score',sortDir=-1;
-const MOM={up:'<span class="mom m-up">▲</span>',down:'<span class="mom m-down">▼</span>',flat:'<span class="mom m-flat">▬</span>',new:'<span class="mom m-new">NEW</span>'};
-function sigChips(s){return s? s.split('|').map(x=>`<span class="p">${x.trim()}</span>`).join('') : '<span class="muted">-</span>';}
-function render(){
-  const t=q.value.trim().toLowerCase();
-  let list=DATA.filter(r=>{
-    if(seg!=='all' && r.tier!==seg)return false;
-    if(!t)return true;
-    return (r.account+' '+r.industry+' '+r.signals+' '+r.hq).toLowerCase().includes(t);
-  });
-  list=list.slice().sort((a,b)=>{
-    let av=a[sortK],bv=b[sortK];
-    if(sortK==='score'||sortK==='roles')return (av-bv)*sortDir;
-    return String(av).localeCompare(String(bv))*sortDir;
-  });
-  tbody.innerHTML=list.map(r=>`<tr>
-    <td><div class="acct">${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.account}</a>`:r.account}</div>
-        <div class="meta">${[r.industry,r.hq,r.headcount,r.funding].filter(Boolean).join(' · ')}</div></td>
-    <td><div class="scorewrap"><span class="scoren">${r.score}</span><span class="tier t-${r.tier}">${r.tier}</span></div></td>
-    <td>${MOM[r.mom]||''} ${r.mom_delta?`<span class="muted" style="font-size:12px">${r.mom_delta>0?'+':''}${r.mom_delta}</span>`:''}</td>
-    <td><span class="roles">${r.roles}</span> <span class="muted">/ ${r.total_roles||0}</span></td>
-    <td class="sig">${sigChips(r.signals)}</td>
-    <td class="why">${r.why||''}</td>
-  </tr>`).join('');
-  count.textContent=list.length+' of '+DATA.length+' accounts';
-}
-document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{seg=b.dataset.seg;document.querySelectorAll('#seg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();});
-document.querySelectorAll('thead th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k){sortDir*=-1}else{sortK=k;sortDir=(k==='score'||k==='roles')?-1:1}document.querySelectorAll('.arw').forEach(a=>a.textContent='');th.querySelector('.arw').textContent=sortDir>0?'▲':'▼';render();});
-q.oninput=render;render();
-</script>
 </body></html>

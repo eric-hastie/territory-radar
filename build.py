@@ -1,40 +1,89 @@
 #!/usr/bin/env python3
-"""Regenerate the Territory Radar site.
+"""Regenerate the Territory Radar site: landing page + three demo territory
+boards + the original (legacy) demo board.
+
+Site layout:
+  index.html                    - landing page: pick an industry
+  data-warehouse/index.html     - Cloud Data Warehousing board (demo vendor: MotherDuck)
+  product-analytics/index.html  - Product Analytics board (demo vendor: PostHog)
+  observability/index.html      - Observability board (unnamed platform)
+  legacy.html                   - the original demo board (June-July 2026)
+  history.html / roles.html     - momentum + open-roles inventory for the legacy board
 
 Inputs:
-  data/latest.csv        - one row per target account, with raw signal components
-                           (incl. Total Open Roles and Relevant Roles).
-  data/roles-latest.csv  - one row per open position across all accounts
-                           (Account, Title, Location, Matched, URL) for review.
-  data/YYYY-MM-DD.csv     - weekly snapshots of latest.csv (for momentum/trends).
+  data/territories/<slug>/latest.csv     - current account rows for each territory
+  data/territories/<slug>/YYYY-MM-DD.csv - weekly snapshots of latest.csv (momentum)
+  data/latest.csv                        - legacy board accounts
+  data/roles-latest.csv                  - legacy open-roles inventory
+  data/YYYY-MM-DD.csv                    - legacy weekly snapshots
 
-Outputs:
-  index.html    - ranked territory board (signal score, tier, momentum)
-  history.html  - momentum view: total + relevant roles and hot accounts over time
-  roles.html    - full open-roles inventory for manual review (spot missed titles)
+No third-party dependencies. Scores and tiers are always recomputed at build
+time from the CSV signal columns, so the CSVs are the single source of truth.
 
-No third-party dependencies.
-
---- RECONFIGURE FOR A NEW ROLE ---
-Edit the CONFIG block (what you sell + signal weights), and point the weekly
-research routine at your real account list. Copy is generated from CONFIG.
+--- WEEKLY CLOUD REFRESH ROUTINE (what the weekly agent should do) ---
+1. For each territory folder in data/territories/ (any or all of them):
+   re-verify every account's signals against its live ATS job board and
+   public sources, rewrite latest.csv in the same column schema, and save an
+   identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
+   dated snapshots are what power the momentum column.
+2. Never edit HTML by hand. Run:  python3 build.py
+   It regenerates every territory board AND the landing page AND the legacy
+   pages in one pass, so a data refresh can never clobber the landing.
+3. Commit and push to main; GitHub Pages serves the result.
+Notes: the legacy board (data/latest.csv + data/*.csv snapshots) may be
+refreshed on the same cadence or left frozen - build.py handles both, and
+skips any board whose latest.csv is missing.
 """
 import csv, json, os, datetime, glob, re
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH = os.path.join(ROOT, "data", "latest.csv")
-ROLES_PATH = os.path.join(ROOT, "data", "roles-latest.csv")
 REPO = "eric-hastie/territory-radar"
 
-# ---------------- CONFIG (edit when you change what you sell) -----------------
-CONFIG = {
+# ------------------------- CONFIG: the demo territories -----------------------
+WEIGHTS = {"roles": 10, "funding": 20, "leadership": 20, "expansion": 12}
+W = WEIGHTS
+
+TERRITORIES = [
+    {
+        "slug": "data-warehouse",
+        "industry": "Cloud Data Warehousing",
+        "vendor": "MotherDuck",
+        "caption": "Run as if selling MotherDuck - a serverless, DuckDB-powered cloud data warehouse.",
+        "vendor_line": "run as if the vendor were <b>MotherDuck</b> - an illustrative demo, not affiliated with or endorsed by MotherDuck",
+        "icp": "Midmarket companies (roughly 150 to 2,500 employees) with a real data and analytics function: actively hiring data engineers, analytics engineers, or data leadership, running a modern data stack, and plausibly feeling cloud warehouse cost or complexity pain. Recent funding, new technical leadership, or expansion moves signal budget and appetite to rethink the analytics stack.",
+        "hot": 60, "warm": 40,
+        "desc": "Demo sales territory for cloud data warehousing: 20 real companies scored on live hiring, funding, and leadership buying signals.",
+    },
+    {
+        "slug": "product-analytics",
+        "industry": "Product Analytics",
+        "vendor": "PostHog",
+        "caption": "Run as if selling PostHog - product analytics, session replay, feature flags, and experiments.",
+        "vendor_line": "run as if the vendor were <b>PostHog</b> - an illustrative demo, not affiliated with or endorsed by PostHog",
+        "icp": "Engineering led, product led software companies with roughly 20 to 500 engineers, where developers pick and champion their own tooling. Typically venture backed (YC seed through growth stage) or strongly revenue funded, and shipping product fast enough to need analytics, feature flags, session replay, and experimentation as core infrastructure rather than afterthoughts. The buyer is the builder: technical founders, product engineers, growth engineers, and first PM or data hires. AI first teams weight extra. Excludes hobbyists, cost driven bootstrappers, and orgs where a central tools committee buys software over engineers' heads.",
+        "hot": 80, "warm": 40,
+        "desc": "Demo sales territory for product analytics: 20 real companies scored on live hiring, funding, and leadership buying signals.",
+    },
+    {
+        "slug": "observability",
+        "industry": "Observability",
+        "vendor": "an unnamed observability platform",
+        "caption": "Run as if selling an unnamed observability platform - logs, metrics, traces, and uptime.",
+        "vendor_line": "run as if the vendor were <b>an unnamed observability platform</b> - an illustrative demo, not modeled on any real vendor",
+        "icp": "Midmarket companies (roughly 200 to 3,000 employees) with production infrastructure pain: scaling cloud and Kubernetes footprints, SRE or platform teams forming or growing, and uptime as direct business risk (consumer apps, fintech, marketplaces, streaming, logistics).",
+        "hot": 80, "warm": 40,
+        "desc": "Demo sales territory for observability: 20 real companies scored on live hiring, funding, and leadership buying signals.",
+    },
+]
+
+# Legacy board config (the original June-July 2026 demo)
+LEGACY = {
     "product": "a cloud infrastructure / DevOps platform (IaC, observability, Kubernetes ops, cloud-cost)",
     "signal_desc": "an account investing in its platform / infrastructure org - hiring SRE, platform, DevOps or infrastructure engineers, raising fresh capital, or bringing on engineering leadership",
-    "weights": {"roles": 10, "funding": 20, "leadership": 20, "expansion": 12},
-    "hot": 80,
-    "warm": 40,
+    "hot": 80, "warm": 40,
 }
-W = CONFIG["weights"]
+
+VERIFIED_HUMAN = "July 13, 2026"   # when the three demo territories were researched
 
 def clean(v):
     return v.replace("—", "-").replace("–", "-") if isinstance(v, str) else v
@@ -49,10 +98,14 @@ def score_of(r):
     return (r["roles"] * W["roles"] + r["funding_sig"] * W["funding"]
             + r["leadership_sig"] * W["leadership"] + r["expansion_sig"] * W["expansion"])
 
-def tier_of(s):
-    return "Hot" if s >= CONFIG["hot"] else "Warm" if s >= CONFIG["warm"] else "Watch"
+def tier_of(s, hot, warm):
+    return "Hot" if s >= hot else "Warm" if s >= warm else "Watch"
 
-def read_csv(path):
+def human_date(iso):
+    d = datetime.date.fromisoformat(iso)
+    return d.strftime("%B %-d, %Y") if os.name != "nt" else d.strftime("%B %d, %Y")
+
+def read_csv(path, hot, warm):
     with open(path, newline="") as f:
         rows = list(csv.DictReader(f))
     out = []
@@ -73,17 +126,17 @@ def read_csv(path):
             "url": clean(x.get("Source URL", "")),
         }
         r["score"] = score_of(r)
-        r["tier"] = tier_of(r["score"])
+        r["tier"] = tier_of(r["score"], hot, warm)
         out.append(r)
     return out
 
-def snapshots():
+def snapshots(data_dir, hot, warm):
     snaps = []
-    for f in sorted(glob.glob(os.path.join(ROOT, "data", "*.csv"))):
+    for f in sorted(glob.glob(os.path.join(data_dir, "*.csv"))):
         m = re.match(r'(\d{4}-\d{2}-\d{2})\.csv$', os.path.basename(f))
         if not m:
             continue
-        recs = read_csv(f)
+        recs = read_csv(f, hot, warm)
         snaps.append({
             "date": m.group(1),
             "accounts": len(recs),
@@ -157,54 +210,80 @@ footer{border-top:1px solid var(--line);padding:28px 0 64px;color:var(--muted);f
 .wk{border-bottom:1px solid var(--line);padding:14px 0}.wk:last-child{border-bottom:0}.wkhead{font-size:14.5px;margin-bottom:8px}
 .wkrow{display:flex;gap:8px;align-items:baseline;margin:4px 0;flex-wrap:wrap}.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);min-width:68px}
 .chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 0}.chip.up{background:var(--hotbg);color:var(--up)}.chip.down{background:var(--watchbg);color:var(--down)}
-.nav a{margin-right:4px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 0}
+@media(max-width:860px){.cards{grid-template-columns:1fr}}
+a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;color:var(--txt);transition:border-color .15s ease,transform .15s ease}
+a.card:hover{border-color:var(--accent);transform:translateY(-2px);text-decoration:none}
+.card .ind{font-size:21px;font-weight:720;letter-spacing:-.015em;margin:0 0 7px}
+.card .cap{color:var(--muted);font-size:13.5px;margin:0 0 16px;line-height:1.5}
+.card .mini{display:flex;gap:16px;font-size:12.5px;color:var(--muted)}
+.card .mini b{color:var(--txt);font-size:16px;font-variant-numeric:tabular-nums}
+.card .mini .hotn b{color:var(--hot)}
+.card .go{margin-top:16px;color:var(--accent);font-size:13.5px;font-weight:600}
 '''
 
-NAV = ('<p class="byline" style="margin-top:6px" class="nav">__NAV__</p>')
-
-# ---------------------------------- index ------------------------------------
-INDEX = r'''<!DOCTYPE html>
+# --------------------------------- landing -----------------------------------
+LANDING = r'''<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Territory Radar - Account buying-signal intelligence for AEs</title>
-<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity.">
+<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Three demo industries: cloud data warehousing, product analytics, observability.">
 <style>__CSS__</style></head><body>
 <header><div class="wrap">
   <p class="eyebrow">B2B Sales · Territory Intelligence</p>
   <h1>Territory Radar</h1>
-  <p class="sub">An automated territory-research tool for Account Executives. It scores the accounts in a sales territory on real buying signals - hiring, funding, and leadership moves - and tracks which ones are heating up, so account planning starts from "why now," not a static list.</p>
-  <p class="byline">Built by <b>Eric Hastie</b> · sample territory · updated __DATEHUMAN__ · <span class="muted">a portfolio project</span></p>
-  <p class="byline" style="margin-top:6px"><b>Territory board</b> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> &nbsp;·&nbsp; <a href="roles.html">All open roles →</a></p>
-  <div class="callout"><b>What this models:</b> an AE selling __PRODUCT__. A <b>buying signal</b> here means __SIGNAL_DESC__. Swap the config and the account list, and the same engine works for any product and territory.</div>
+  <p class="sub">An automated territory-research tool for Account Executives. It scores every account in a sales territory on real buying signals - hiring, funding, leadership moves, and expansion - and tracks which accounts are heating up, so account planning starts from "why now," not a static list.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · demo territories · updated __DATEHUMAN__ · <span class="muted">a portfolio project</span></p>
+</div></header>
+
+<section class="about"><div class="wrap">
+  <h2>Pick an industry</h2>
+  <p>The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores the same universe of companies through that lens. Below are three demo territories I built to show exactly that - same tool, three different products, three different answers to "who do I call first?" (It started life as my remote-AE job-search engine; finding buying signals turns out to be the same problem as finding jobs.)</p>
+  <div class="cards">__CARDS__</div>
+  <div class="callout" style="margin-top:26px"><b>Illustrative demos.</b> Each board is run as if I were an AE selling a named vendor's product (or an unnamed one) - none of these vendors is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Every account's score is a transparent, weighted sum of verified signals: relevant open roles &times; __W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__. Each board explains its own tiers.</p>
+  <p>Still curious where this started? <a href="legacy.html">The original demo board (June-July 2026)</a> - a cloud-infrastructure territory tracked across four weekly snapshots - is still live, with its <a href="history.html">momentum history</a> and <a href="roles.html">open-roles inventory</a>.</p>
+  <p>Built by Eric Hastie · <a href="https://github.com/__REPO__" target="_blank" rel="noopener">source on GitHub</a> · refreshed by a weekly cloud agent.</p>
+</div></footer>
+</body></html>'''
+
+CARD = r'''<a class="card" href="__SLUG__/">
+  <p class="ind">__INDUSTRY__</p>
+  <p class="cap">__CAPTION__</p>
+  <div class="mini"><span><b>__ACCOUNTS__</b> accounts</span><span class="hotn"><b>__HOT__</b> hot right now</span></div>
+  <div class="go">Open the board &rarr;</div>
+</a>'''
+
+# ------------------------------- board (shared) -------------------------------
+BOARD = r'''<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<style>__CSS__</style></head><body>
+<header><div class="wrap">
+  <p class="eyebrow">__EYEBROW__</p>
+  <h1>__H1__</h1>
+  <p class="sub">__SUB__</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · updated __DATEHUMAN__ · <span class="muted">a portfolio project</span></p>
+  <p class="byline" style="margin-top:6px">__NAV__</p>
+  <div class="callout">__CALLOUT__</div>
   <div class="stats">
     <div class="stat"><div class="n">__ACCOUNTS__</div><div class="l">accounts in territory</div></div>
     <div class="stat"><div class="n">__HOT__</div><div class="l">🔥 hot right now</div></div>
     <div class="stat"><div class="n">__ROLES__<span style="color:var(--muted);font-size:16px"> / __TOTALROLES__</span></div><div class="l">relevant / total open roles</div></div>
-    <div class="stat"><div class="n">__MOVERS__</div><div class="l">moved this week</div></div>
+    <div class="stat"><div class="n">__MOVERS__</div><div class="l">__MOVERS_LABEL__</div></div>
   </div>
 </div></header>
 
-<section class="about"><div class="wrap">
-  <h2>About this project</h2>
-  <p>This started as the engine behind a <a href="https://eric-hastie.github.io/remote-ae-job-hunt/" target="_blank" rel="noopener">remote-AE job search</a> - a pipeline that screens companies against a profile, verifies live job postings, and tracks change week over week. That job-hunt build was the prototype; <b>Territory Radar</b> re-points the same engine at the other side of the desk: instead of finding jobs, it finds buying signals across a sales territory. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it.</p>
-  <h2 style="margin-top:30px">How the signal score works</h2>
-  <p>Each account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box:</p>
-  <div class="score-help">
-    <code>relevant open role &times; __W_ROLES__</code>
-    <code>recent funding +__W_FUNDING__</code>
-    <code>new eng leadership +__W_LEADERSHIP__</code>
-    <code>expansion / new region +__W_EXPANSION__</code>
-  </div>
-  <div class="score-help" style="margin-top:8px">
-    <span><span class="tier t-Hot">Hot</span> &nbsp;score &ge; __HOT_T__</span>
-    <span><span class="tier t-Warm">Warm</span> &nbsp;&ge; __WARM__</span>
-    <span><span class="tier t-Watch">Watch</span> &nbsp;below __WARM__</span>
-  </div>
-</div></section>
+__ABOUT__
 
 <div class="wrap">
   <div class="controls">
-    <input id="q" type="search" placeholder="Search account, industry, signal…" autocomplete="off">
+    <input id="q" type="search" placeholder="Search account, signal, HQ…" autocomplete="off">
     <div class="seg" id="seg">
       <button data-seg="all" class="on">All</button>
       <button data-seg="Hot">Hot</button>
@@ -227,8 +306,7 @@ INDEX = r'''<!DOCTYPE html>
 </div>
 
 <footer><div class="wrap">
-  <p><b>Methodology.</b> Sample territory, signals verified __DATEHUMAN__ against company career pages / ATS and public sources; re-verified weekly. Signal counts and firmographics are best-effort from public data. This is illustrative demo data on real companies - a live deployment would run against your actual book of business in a <b>private</b> repo.</p>
-  <p>Prototyped from the remote-AE job-hunt tool. Built by Eric Hastie · auto-refreshed weekly.</p>
+__FOOTER__
 </div></footer>
 
 <script>
@@ -266,6 +344,27 @@ q.oninput=render;render();
 </script>
 </body></html>'''
 
+SCORE_HELP = r'''<section class="about"><div class="wrap">
+  <h2>How the signal score works</h2>
+  <p>Each account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box:</p>
+  <div class="score-help">
+    <code>relevant open role &times; __W_ROLES__</code>
+    <code>recent funding +__W_FUNDING__</code>
+    <code>new leadership +__W_LEADERSHIP__</code>
+    <code>expansion / new region +__W_EXPANSION__</code>
+  </div>
+  <div class="score-help" style="margin-top:8px">
+    <span><span class="tier t-Hot">Hot</span> &nbsp;score &ge; __HOT_T__</span>
+    <span><span class="tier t-Warm">Warm</span> &nbsp;&ge; __WARM__</span>
+    <span><span class="tier t-Watch">Watch</span> &nbsp;below __WARM__</span>
+  </div>
+</div></section>'''
+
+LEGACY_ABOUT = r'''<section class="about"><div class="wrap">
+  <h2>About this project</h2>
+  <p>This started as the engine behind a <a href="https://eric-hastie.github.io/remote-ae-job-hunt/" target="_blank" rel="noopener">remote-AE job search</a> - a pipeline that screens companies against a profile, verifies live job postings, and tracks change week over week. That job-hunt build was the prototype; <b>Territory Radar</b> re-points the same engine at the other side of the desk: instead of finding jobs, it finds buying signals across a sales territory. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it. The site has since grown into <a href="./">three industry demo territories</a>; this page preserves the original board.</p>
+</div></section>''' + SCORE_HELP
+
 # ---------------------------------- history ----------------------------------
 HISTORY = r'''<!DOCTYPE html>
 <html lang="en"><head>
@@ -275,8 +374,8 @@ HISTORY = r'''<!DOCTYPE html>
 <header><div class="wrap">
   <p class="eyebrow">B2B Sales · Territory Intelligence</p>
   <h1>Momentum &amp; History</h1>
-  <p class="sub">How the territory is moving over time. Each weekly run is snapshotted, so you can see which accounts are heating up, which are cooling, and how overall hiring signal in the territory is trending.</p>
-  <p class="byline"><a href="./">← Territory board</a> &nbsp;·&nbsp; <a href="roles.html">All open roles</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span></p>
+  <p class="sub">How the original demo territory moved over time. Each weekly run is snapshotted, so you can see which accounts heated up, which cooled, and how overall hiring signal in the territory trended.</p>
+  <p class="byline"><a href="legacy.html">← The original demo board</a> &nbsp;·&nbsp; <a href="./">All industries</a> &nbsp;·&nbsp; <a href="roles.html">All open roles</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span></p>
   <div class="stats">
     <div class="stat"><div class="n">__WEEKS__</div><div class="l">weekly snapshots</div></div>
     <div class="stat"><div class="n">__HOT__</div><div class="l">hot accounts now</div></div>
@@ -288,7 +387,7 @@ HISTORY = r'''<!DOCTYPE html>
   <section><h2>Hiring signal across the territory</h2><div class="panel"><div id="chart"></div></div></section>
   <section><h2>Weekly movers</h2><div class="panel" id="log"></div></section>
 </div>
-<footer><div class="wrap">Total open roles is the aggregate of every open position across the territory; relevant roles are the subset that match the signal profile. Momentum is the week-over-week change in each account's signal score, from the dated snapshots in <code>data/</code>. Built by Eric Hastie · auto-refreshed weekly.</div></footer>
+<footer><div class="wrap">Total open roles is the aggregate of every open position across the territory; relevant roles are the subset that match the signal profile. Momentum is the week-over-week change in each account's signal score, from the dated snapshots in <code>data/</code>. Built by Eric Hastie.</div></footer>
 <script>
 const M=__METRICS__;
 function drawChart(){
@@ -330,8 +429,8 @@ ROLES = r'''<!DOCTYPE html>
 <header><div class="wrap">
   <p class="eyebrow">B2B Sales · Territory Intelligence</p>
   <h1>All open roles</h1>
-  <p class="sub">Every open position across the territory - the full inventory behind the signal scores. Use the "unmatched" filter to scan for titles that <i>should</i> count as a buying signal but don't yet, then they can be added to the signal profile.</p>
-  <p class="byline"><a href="./">← Territory board</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span></p>
+  <p class="sub">Every open position across the original demo territory - the full inventory behind the signal scores. Use the "unmatched" filter to scan for titles that <i>should</i> count as a buying signal but don't yet, then they can be added to the signal profile.</p>
+  <p class="byline"><a href="legacy.html">← The original demo board</a> &nbsp;·&nbsp; <a href="./">All industries</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span></p>
   <div class="stats">
     <div class="stat"><div class="n">__TOTAL__</div><div class="l">open roles tracked</div></div>
     <div class="stat"><div class="n">__MATCHED__</div><div class="l">count as a signal</div></div>
@@ -359,7 +458,7 @@ ROLES = r'''<!DOCTYPE html>
     <tbody id="rows"></tbody>
   </table></div>
 </div>
-<footer><div class="wrap">"Signal?" marks whether a title matched the current signal profile (SRE / platform / DevOps / infrastructure / cloud / Kubernetes / observability). Spot one that should match? It gets added to the profile and re-scored on the next run. Built by Eric Hastie · auto-refreshed weekly.</div></footer>
+<footer><div class="wrap">"Signal?" marks whether a title matched the original board's signal profile (SRE / platform / DevOps / infrastructure / cloud / Kubernetes / observability). Spot one that should match? It gets added to the profile and re-scored on the next run. Built by Eric Hastie.</div></footer>
 <script>
 const ROLES=__ROLES__;
 const tbody=document.getElementById('rows'),q=document.getElementById('q'),count=document.getElementById('count');
@@ -390,10 +489,10 @@ q.oninput=render;render();
 </script>
 </body></html>'''
 
-def read_roles():
-    if not os.path.exists(ROLES_PATH):
+def read_roles(path):
+    if not os.path.exists(path):
         return []
-    with open(ROLES_PATH, newline="") as f:
+    with open(path, newline="") as f:
         rows = list(csv.DictReader(f))
     out = []
     for x in rows:
@@ -406,42 +505,121 @@ def read_roles():
         })
     return out
 
-def main():
-    today = datetime.date.today()
-    human = today.strftime("%B %-d, %Y") if os.name != "nt" else today.strftime("%B %d, %Y")
+def fill_weights(html, hot, warm):
+    return (html
+            .replace("__W_ROLES__", str(W["roles"]))
+            .replace("__W_FUNDING__", str(W["funding"]))
+            .replace("__W_LEADERSHIP__", str(W["leadership"]))
+            .replace("__W_EXPANSION__", str(W["expansion"]))
+            .replace("__HOT_T__", str(hot))
+            .replace("__WARM__", str(warm)))
 
-    if not os.path.exists(CSV_PATH):
-        print("no data/latest.csv yet - skipping build")
-        return
+def render_board(out_path, board, ctx):
+    movers = sum(1 for r in board if r.get("mom") in ("up", "down"))
+    html = (BOARD
+            .replace("__CSS__", CSS)
+            .replace("__TITLE__", ctx["title"])
+            .replace("__DESC__", ctx["desc"])
+            .replace("__EYEBROW__", ctx["eyebrow"])
+            .replace("__H1__", ctx["h1"])
+            .replace("__SUB__", ctx["sub"])
+            .replace("__NAV__", ctx["nav"])
+            .replace("__CALLOUT__", ctx["callout"])
+            .replace("__ABOUT__", ctx["about"])
+            .replace("__FOOTER__", ctx["footer"])
+            .replace("__DATA__", json.dumps(board))
+            .replace("__DATEHUMAN__", ctx["updated"])
+            .replace("__ACCOUNTS__", str(len(board)))
+            .replace("__HOT__", str(sum(1 for r in board if r["tier"] == "Hot")))
+            .replace("__ROLES__", str(sum(r["roles"] for r in board)))
+            .replace("__TOTALROLES__", str(sum(r["total_roles"] for r in board)))
+            .replace("__MOVERS__", str(movers) if ctx["has_history"] else "-")
+            .replace("__MOVERS_LABEL__", "moved this week" if ctx["has_history"] else "movers (first snapshot)"))
+    html = fill_weights(html, ctx["hot"], ctx["warm"])
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w") as f:
+        f.write(html)
 
-    board = read_csv(CSV_PATH)
-    snaps = snapshots()
+def build_territory(t):
+    data_dir = os.path.join(ROOT, "data", "territories", t["slug"])
+    csv_path = os.path.join(data_dir, "latest.csv")
+    if not os.path.exists(csv_path):
+        print(f"no {csv_path} - skipping {t['slug']}")
+        return None
+    board = read_csv(csv_path, t["hot"], t["warm"])
+    snaps = snapshots(data_dir, t["hot"], t["warm"])
     board = add_momentum(board, snaps)
     board.sort(key=lambda r: r["score"], reverse=True)
-    movers = sum(1 for r in board if r.get("mom") in ("up", "down"))
+    updated = human_date(snaps[-1]["date"]) if snaps else VERIFIED_HUMAN
 
-    idx = (INDEX
-           .replace("__CSS__", CSS)
-           .replace("__DATA__", json.dumps(board))
-           .replace("__DATEHUMAN__", human)
-           .replace("__PRODUCT__", CONFIG["product"])
-           .replace("__SIGNAL_DESC__", CONFIG["signal_desc"])
-           .replace("__ACCOUNTS__", str(len(board)))
-           .replace("__HOT__", str(sum(1 for r in board if r["tier"] == "Hot")))
-           .replace("__ROLES__", str(sum(r["roles"] for r in board)))
-           .replace("__TOTALROLES__", str(sum(r["total_roles"] for r in board)))
-           .replace("__MOVERS__", str(movers))
-           .replace("__W_ROLES__", str(W["roles"]))
-           .replace("__W_FUNDING__", str(W["funding"]))
-           .replace("__W_LEADERSHIP__", str(W["leadership"]))
-           .replace("__W_EXPANSION__", str(W["expansion"]))
-           .replace("__HOT_T__", str(CONFIG["hot"]))
-           .replace("__WARM__", str(CONFIG["warm"])))
-    with open(os.path.join(ROOT, "index.html"), "w") as f:
-        f.write(idx)
-    print(f"built index.html: {len(board)} accounts, "
-          f"{sum(1 for r in board if r['tier']=='Hot')} hot, "
-          f"{sum(r['total_roles'] for r in board)} total roles, {movers} movers")
+    others = [x for x in TERRITORIES if x["slug"] != t["slug"]]
+    nav = ('<a href="../">← All industries</a>'
+           + "".join(f' &nbsp;·&nbsp; <a href="../{o["slug"]}/">{o["industry"]}</a>' for o in others))
+    vendor_clause = t["vendor_line"]
+    ctx = {
+        "title": f'{t["industry"]} - Territory Radar',
+        "desc": t["desc"],
+        "eyebrow": "Territory Radar · Demo Territory",
+        "h1": t["industry"],
+        "sub": (f'Twenty real companies scored on live buying signals for {t["industry"].lower()} - '
+                f'{vendor_clause}.'),
+        "nav": nav,
+        "callout": f'<b>The ICP this board scores against:</b> {t["icp"]}',
+        "about": SCORE_HELP,
+        "footer": (f'<p><b>Methodology.</b> Demo territory of 20 real companies; signals verified {VERIFIED_HUMAN} '
+                   'against live ATS job boards (Greenhouse / Lever / Ashby) and public sources, re-verified weekly. '
+                   'Signal counts and firmographics are best-effort from public data. '
+                   f'This board is {vendor_clause}. All scoring and tiering are this tool\'s own. '
+                   'A live deployment runs against a real book of business in a <b>private</b> repo.</p>'
+                   '<p><a href="../">← All industries</a> · Built by Eric Hastie · auto-refreshed weekly.</p>'),
+        "updated": updated,
+        "hot": t["hot"], "warm": t["warm"],
+        "has_history": len(snaps) >= 2,
+    }
+    render_board(os.path.join(ROOT, t["slug"], "index.html"), board, ctx)
+    hot_n = sum(1 for r in board if r["tier"] == "Hot")
+    print(f'built {t["slug"]}/index.html: {len(board)} accounts, {hot_n} hot')
+    return {"slug": t["slug"], "industry": t["industry"], "caption": t["caption"],
+            "accounts": len(board), "hot": hot_n,
+            "last_date": snaps[-1]["date"] if snaps else None}
+
+def build_legacy(today_human):
+    csv_path = os.path.join(ROOT, "data", "latest.csv")
+    if not os.path.exists(csv_path):
+        print("no data/latest.csv - skipping legacy board")
+        return
+    hot, warm = LEGACY["hot"], LEGACY["warm"]
+    board = read_csv(csv_path, hot, warm)
+    snaps = snapshots(os.path.join(ROOT, "data"), hot, warm)
+    board = add_momentum(board, snaps)
+    board.sort(key=lambda r: r["score"], reverse=True)
+    updated = human_date(snaps[-1]["date"]) if snaps else today_human
+
+    ctx = {
+        "title": "The original demo board (June-July 2026) - Territory Radar",
+        "desc": "The original Territory Radar demo: a cloud infrastructure / DevOps territory of 16 real companies tracked across weekly snapshots.",
+        "eyebrow": "Territory Radar · Original Demo",
+        "h1": "The original demo board (June-July 2026)",
+        "sub": ("The first Territory Radar territory: 16 real mid-market and enterprise companies scored on buying "
+                "signals for a cloud infrastructure / DevOps platform, tracked across weekly snapshots. The project "
+                "has since grown into three industry demo territories - this board is preserved as the original."),
+        "nav": ('<a href="./">← All industries</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> '
+                '&nbsp;·&nbsp; <a href="roles.html">All open roles →</a>'),
+        "callout": (f'<b>What this models:</b> an AE selling {LEGACY["product"]}. A <b>buying signal</b> here means '
+                    f'{LEGACY["signal_desc"]}. Swap the config and the account list, and the same engine works for '
+                    'any product and territory.'),
+        "about": LEGACY_ABOUT,
+        "footer": ('<p><b>Methodology.</b> Sample territory, signals verified against company career pages / ATS and '
+                   'public sources. Signal counts and firmographics are best-effort from public data. This is '
+                   'illustrative demo data on real companies - a live deployment runs against a real book of business '
+                   'in a <b>private</b> repo.</p>'
+                   '<p><a href="./">← All industries</a> · Prototyped from the remote-AE job-hunt tool. Built by Eric Hastie.</p>'),
+        "updated": updated,
+        "hot": hot, "warm": warm,
+        "has_history": len(snaps) >= 2,
+    }
+    render_board(os.path.join(ROOT, "legacy.html"), board, ctx)
+    print(f"built legacy.html: {len(board)} accounts")
 
     # history
     metrics = []
@@ -457,7 +635,7 @@ def main():
         hist = (HISTORY
                 .replace("__CSS__", CSS)
                 .replace("__METRICS__", json.dumps(metrics))
-                .replace("__DATEHUMAN__", human)
+                .replace("__DATEHUMAN__", updated)
                 .replace("__WEEKS__", str(len(metrics)))
                 .replace("__HOT__", str(metrics[-1]["hot"]))
                 .replace("__TOTALROLES__", str(metrics[-1]["total_roles"]))
@@ -467,13 +645,13 @@ def main():
         print(f"built history.html: {len(metrics)} snapshots, net total roles {net:+d}")
 
     # roles inventory
-    roles = read_roles()
+    roles = read_roles(os.path.join(ROOT, "data", "roles-latest.csv"))
     if roles:
         matched = sum(1 for r in roles if r["matched"])
         rl = (ROLES
               .replace("__CSS__", CSS)
               .replace("__ROLES__", json.dumps(roles))
-              .replace("__DATEHUMAN__", human)
+              .replace("__DATEHUMAN__", updated)
               .replace("__TOTAL__", str(len(roles)))
               .replace("__MATCHED__", str(matched))
               .replace("__UNMATCHED__", str(len(roles) - matched))
@@ -482,7 +660,35 @@ def main():
             f.write(rl)
         print(f"built roles.html: {len(roles)} open roles ({matched} matched)")
     else:
-        print("no data/roles-latest.csv yet - skipping roles.html")
+        print("no data/roles-latest.csv - skipping roles.html")
+
+def build_landing(cards_info, today_human):
+    dates = [c["last_date"] for c in cards_info if c and c["last_date"]]
+    updated = human_date(max(dates)) if dates else today_human
+    cards = "".join(
+        CARD.replace("__SLUG__", c["slug"])
+            .replace("__INDUSTRY__", c["industry"])
+            .replace("__CAPTION__", c["caption"])
+            .replace("__ACCOUNTS__", str(c["accounts"]))
+            .replace("__HOT__", str(c["hot"]))
+        for c in cards_info if c)
+    html = (LANDING
+            .replace("__CSS__", CSS)
+            .replace("__CARDS__", cards)
+            .replace("__DATEHUMAN__", updated)
+            .replace("__VERIFIED__", VERIFIED_HUMAN)
+            .replace("__REPO__", REPO))
+    html = fill_weights(html, 0, 0)
+    with open(os.path.join(ROOT, "index.html"), "w") as f:
+        f.write(html)
+    print(f"built index.html (landing): {len([c for c in cards_info if c])} territories")
+
+def main():
+    today = datetime.date.today()
+    today_human = today.strftime("%B %-d, %Y") if os.name != "nt" else today.strftime("%B %d, %Y")
+    cards_info = [build_territory(t) for t in TERRITORIES]
+    build_landing(cards_info, today_human)
+    build_legacy(today_human)
 
 if __name__ == "__main__":
     main()
