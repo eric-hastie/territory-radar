@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Regenerate the Territory Radar site: landing page + three demo territory
-boards + the original (legacy) demo board.
+"""Regenerate the Territory Radar site: landing page + four demo territory
+boards + the original (legacy) demo board, all in the "Monday briefing" look.
 
 Site layout:
   index.html                    - landing page: pick an industry
-  data-warehouse/index.html     - Cloud Data Warehousing board (demo vendor: MotherDuck)
-  product-analytics/index.html  - Product Analytics board (demo vendor: PostHog)
-  observability/index.html      - Observability board (unnamed platform)
+  data-warehouse/index.html     - Cloud Data Warehousing board (unnamed vendor)
+  product-analytics/index.html  - Product Analytics board (unnamed vendor)
+  observability/index.html      - Observability board (unnamed vendor)
+  machine-health/index.html     - Industrial Machine Health board (run as if the
+                                  vendor were TRACTIAN; illustrative, not affiliated)
   legacy.html                   - the original demo board (June-July 2026)
   history.html / roles.html     - momentum + open-roles inventory for the legacy board
 
@@ -19,22 +21,26 @@ Inputs:
 
 No third-party dependencies. Scores and tiers are always recomputed at build
 time from the CSV signal columns, so the CSVs are the single source of truth.
+Each board opens with a Monday-briefing narrative: once a territory has two or
+more dated snapshots it spotlights the biggest week-over-week movers; until
+then it spotlights the strongest live signals (an honest first-snapshot mode).
+The "Happy <day>!" greeting uses the build date's actual day of week.
 
 --- WEEKLY CLOUD REFRESH ROUTINE (what the weekly agent should do) ---
-1. For each territory folder in data/territories/ (any or all of them):
+1. For each of the four territory folders in data/territories/ (any or all):
    re-verify every account's signals against its live ATS job board and
    public sources, rewrite latest.csv in the same column schema, and save an
    identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
-   dated snapshots are what power the momentum column.
+   dated snapshots are what power the momentum column and the movers briefing.
 2. Never edit HTML by hand. Run:  python3 build.py
-   It regenerates every territory board AND the landing page AND the legacy
-   pages in one pass, so a data refresh can never clobber the landing.
+   It regenerates all four territory boards AND the landing page AND the
+   legacy pages in one pass, so a data refresh can never clobber the landing.
 3. Commit and push to main; GitHub Pages serves the result.
 Notes: the legacy board (data/latest.csv + data/*.csv snapshots) may be
 refreshed on the same cadence or left frozen - build.py handles both, and
 skips any board whose latest.csv is missing.
 """
-import csv, json, os, datetime, glob, re
+import csv, json, os, datetime, glob, re, html
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = "eric-hastie/territory-radar"
@@ -47,32 +53,42 @@ TERRITORIES = [
     {
         "slug": "data-warehouse",
         "industry": "Cloud Data Warehousing",
-        "vendor": "MotherDuck",
-        "caption": "Run as if selling MotherDuck - a serverless, DuckDB-powered cloud data warehouse.",
-        "vendor_line": "run as if the vendor were <b>MotherDuck</b> - an illustrative demo, not affiliated with or endorsed by MotherDuck",
+        "caption": "Run as if selling a serverless cloud data warehouse.",
+        "vendor_line": "run as if selling <b>a serverless cloud data warehouse</b> (an illustrative demo, not modeled on any real vendor)",
         "icp": "Midmarket companies (roughly 150 to 2,500 employees) with a real data and analytics function: actively hiring data engineers, analytics engineers, or data leadership, running a modern data stack, and plausibly feeling cloud warehouse cost or complexity pain. Recent funding, new technical leadership, or expansion moves signal budget and appetite to rethink the analytics stack.",
         "hot": 60, "warm": 40,
+        "verified": "July 13, 2026",
         "desc": "Demo sales territory for cloud data warehousing: 20 real companies scored on live hiring, funding, and leadership buying signals.",
     },
     {
         "slug": "product-analytics",
         "industry": "Product Analytics",
-        "vendor": "PostHog",
-        "caption": "Run as if selling PostHog - product analytics, session replay, feature flags, and experiments.",
-        "vendor_line": "run as if the vendor were <b>PostHog</b> - an illustrative demo, not affiliated with or endorsed by PostHog",
+        "caption": "Run as if selling a product analytics platform: analytics, session replay, feature flags, experiments.",
+        "vendor_line": "run as if selling <b>a product analytics platform</b> covering analytics, session replay, feature flags, and experiments (an illustrative demo, not modeled on any real vendor)",
         "icp": "Engineering led, product led software companies with roughly 20 to 500 engineers, where developers pick and champion their own tooling. Typically venture backed (YC seed through growth stage) or strongly revenue funded, and shipping product fast enough to need analytics, feature flags, session replay, and experimentation as core infrastructure rather than afterthoughts. The buyer is the builder: technical founders, product engineers, growth engineers, and first PM or data hires. AI first teams weight extra. Excludes hobbyists, cost driven bootstrappers, and orgs where a central tools committee buys software over engineers' heads.",
         "hot": 80, "warm": 40,
+        "verified": "July 13, 2026",
         "desc": "Demo sales territory for product analytics: 20 real companies scored on live hiring, funding, and leadership buying signals.",
     },
     {
         "slug": "observability",
         "industry": "Observability",
-        "vendor": "an unnamed observability platform",
-        "caption": "Run as if selling an unnamed observability platform - logs, metrics, traces, and uptime.",
-        "vendor_line": "run as if the vendor were <b>an unnamed observability platform</b> - an illustrative demo, not modeled on any real vendor",
+        "caption": "Run as if selling an observability platform: logs, metrics, traces, uptime.",
+        "vendor_line": "run as if selling <b>an observability platform</b> covering logs, metrics, traces, and uptime (an illustrative demo, not modeled on any real vendor)",
         "icp": "Midmarket companies (roughly 200 to 3,000 employees) with production infrastructure pain: scaling cloud and Kubernetes footprints, SRE or platform teams forming or growing, and uptime as direct business risk (consumer apps, fintech, marketplaces, streaming, logistics).",
         "hot": 80, "warm": 40,
+        "verified": "July 13, 2026",
         "desc": "Demo sales territory for observability: 20 real companies scored on live hiring, funding, and leadership buying signals.",
+    },
+    {
+        "slug": "machine-health",
+        "industry": "Industrial Machine Health",
+        "caption": "Run as if the vendor were TRACTIAN: condition monitoring, CMMS, energy management (not affiliated).",
+        "vendor_line": "run as if the vendor were <b>TRACTIAN</b>, selling condition monitoring, CMMS, and energy management to industrial maintenance teams (an illustrative demo, not affiliated with or endorsed by TRACTIAN)",
+        "icp": "Mid-market industrial and manufacturing companies, roughly 200 to 3,000 employees, ideally running multiple plants in North America: food and beverage processing, packaging, automotive suppliers, building products, chemicals, consumer goods, pulp and paper, and metals. The buyers are maintenance managers, reliability engineers, plant engineers, plant managers, and VPs of Operations - teams with real rotating equipment (compressors, conveyors, blow molders, corrugators, extruders, paper machines) and chronic maintenance-staffing pressure, where condition monitoring, CMMS, and energy monitoring pay back fast.",
+        "hot": 40, "warm": 20,
+        "verified": "July 13 to 14, 2026",
+        "desc": "Demo sales territory for industrial machine health: 20 real mid-market manufacturers scored on live maintenance hiring, funding, leadership, and plant-expansion buying signals.",
     },
 ]
 
@@ -83,10 +99,13 @@ LEGACY = {
     "hot": 80, "warm": 40,
 }
 
-VERIFIED_HUMAN = "July 13, 2026"   # when the three demo territories were researched
+VERIFIED_HUMAN = "July 13 and 14, 2026"   # when the four demo territories were researched
+
+TIER_VAR = {"Hot": "var(--hot)", "Warm": "var(--warm)", "Watch": "var(--watch)"}
 
 def clean(v):
-    return v.replace("—", "-").replace("–", "-") if isinstance(v, str) else v
+    # normalize em / en dashes (written as escapes so this file carries none)
+    return v.replace("\u2014", "-").replace("\u2013", "-") if isinstance(v, str) else v
 
 def to_int(v):
     try:
@@ -160,100 +179,172 @@ def add_momentum(board, snaps):
     return board
 
 # ---------------------------------- styles -----------------------------------
+# The "Monday briefing" look: warm cream paper, serif masthead, double rules,
+# terracotta accent - with a warm coffee-dark variant via prefers-color-scheme.
 CSS = r'''
-:root{--bg:#0f1115;--panel:#171a21;--panel2:#1d212a;--line:#2a2f3a;--txt:#e7eaf0;--muted:#9aa3b2;--accent:#6c8cff;--accent2:#41d3a3;
---hot:#ff6b5d;--hotbg:#3a1f1d;--warm:#e3b341;--warmbg:#352d18;--watch:#5a6172;--watchbg:#22262f;--up:#41d3a3;--down:#ff7a7a;}
+:root{
+  --paper:#FAF6EF;--paper2:#F3EDE2;--card:#FFFDF8;--ink:#2A2520;--ink2:#4A4238;--muted:#7A7060;
+  --hairline:#E2D9C9;--rule:#2A2520;--accent:#B4432E;--accent-soft:#B4432E14;--link:#1F6E68;
+  --hot:#B4432E;--warm:#8F6A1D;--watch:#6E6759;--up:#1F6E68;--down:#B4432E;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media(prefers-color-scheme:dark){:root{
+  --paper:#211C17;--paper2:#282219;--card:#2A241D;--ink:#E8DFD2;--ink2:#CFC5B4;--muted:#9C9284;
+  --hairline:#3A3226;--rule:#E8DFD2;--accent:#FF9273;--accent-soft:#FF927318;--link:#5FBFA8;
+  --hot:#FF9273;--warm:#E2B45A;--watch:#A39A8A;--up:#5FBFA8;--down:#FF9273;}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
-header{padding:60px 0 26px;border-bottom:1px solid var(--line)}
-.eyebrow{color:var(--accent2);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:12px;margin:0 0 13px}
-h1{font-size:38px;line-height:1.12;margin:0 0 13px;font-weight:740;letter-spacing:-.02em}
-.sub{color:var(--muted);font-size:18px;max-width:700px;margin:0}
-.byline{margin-top:18px;color:var(--muted);font-size:14px}.byline b{color:var(--txt)}
-.callout{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:14px 16px;margin:22px 0 0;font-size:14px;color:#cdd3de;max-width:760px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0 0}
-@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:29px}}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
-.stat .n{font-size:26px;font-weight:720;letter-spacing:-.02em}.stat .l{color:var(--muted);font-size:12.5px;margin-top:3px}
-section{padding:34px 0 0}h2{font-size:21px;margin:0 0 13px;letter-spacing:-.01em}
-.about p{color:#cdd3de;max-width:780px}
-.score-help{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
-.score-help code{background:var(--panel2);padding:2px 7px;border-radius:6px;color:#cdd3de}
-.controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:20px 0 12px;margin-top:30px;border-bottom:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-#q{flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:11px 14px;border-radius:10px;font-size:14px;outline:none}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.62;-webkit-font-smoothing:antialiased;font-size:17px}
+a{color:var(--link);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--link) 40%,transparent)}
+a:hover{border-bottom-color:var(--link)}
+.wrap{max-width:960px;margin:0 auto;padding:0 22px}
+.num{font-variant-numeric:tabular-nums}
+header{padding:52px 0 0}
+.kicker{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+h1{font-size:42px;line-height:1.08;font-weight:600;letter-spacing:-.015em;margin:0 0 14px}
+.dateline{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0;line-height:1.7}
+.dateline b{color:var(--ink);font-weight:600}
+.doubling{border:0;border-top:3px double var(--rule);margin:26px 0 0;opacity:.75}
+.lede{font-size:20px;line-height:1.55;color:var(--ink);margin:30px 0 6px;max-width:820px}
+.lede .hi{font-style:italic}
+.movers{margin:18px 0 8px}
+.mover{display:flex;gap:18px;padding:22px 0;border-top:1px solid var(--hairline)}
+.mover:first-child{border-top:0}
+.badge{flex:none;width:74px;text-align:center;padding-top:3px}
+.badge .score{font-family:var(--sans);font-size:30px;font-weight:750;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;display:block}
+.badge .delta{font-family:var(--mono);font-size:12.5px;font-weight:600;margin-top:5px;display:block}
+.badge .tierw{display:inline-block;font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-top:7px;padding:2px 8px;border-radius:999px;background:var(--accent-soft)}
+.mover.up .delta{color:var(--up)}.mover.down .delta{color:var(--down)}
+.mover h3{font-size:20px;margin:0 0 6px;font-weight:650;letter-spacing:-.01em}
+.mover h3 .move{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);margin-left:8px;letter-spacing:.02em}
+.mover p{margin:0;color:var(--ink2);font-size:16.5px}
+.alsonote{background:var(--paper2);border-left:3px solid var(--accent);padding:14px 18px;margin:14px 0 0;font-size:15.5px;color:var(--ink2)}
+.alsonote b{font-weight:650;color:var(--ink)}
+section.boardsec{margin-top:44px}
+h2{font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+.secsub{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0 0 16px;max-width:800px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px;font-family:var(--sans)}
+#q{flex:1;min-width:200px;background:var(--card);border:1px solid var(--hairline);color:var(--ink);padding:10px 14px;border-radius:6px;font-size:14px;font-family:var(--sans);outline:none}
 #q:focus{border-color:var(--accent)}
-.seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:4px}
-.seg button{background:transparent;border:0;color:var(--muted);padding:7px 13px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
-.seg button.on{background:var(--accent);color:#0b0d12}
+#q::placeholder{color:var(--muted)}
+.seg{display:flex;gap:4px;background:var(--paper2);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{background:transparent;border:0;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--sans)}
+.seg button.on{background:var(--accent);color:var(--card)}
 .count{color:var(--muted);font-size:13px;white-space:nowrap}
-.tablewrap{overflow-x:auto;margin:16px 0 60px;border:1px solid var(--line);border-radius:12px}
-table{width:100%;border-collapse:collapse;font-size:14px;min-width:920px}
-thead th{position:sticky;top:0;background:var(--panel2);text-align:left;padding:12px 14px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
-thead th:hover{color:var(--txt)}.arw{opacity:.5;font-size:10px}
-tbody td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
-tbody tr:last-child td{border-bottom:0}tbody tr:hover{background:var(--panel)}
-.acct{font-weight:650;font-size:15px}.meta{color:var(--muted);font-size:12.5px;margin-top:2px}
-.scorewrap{display:flex;align-items:center;gap:9px}.scoren{font-size:19px;font-weight:740;font-variant-numeric:tabular-nums}
-.tier{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
-.t-Hot{background:var(--hotbg);color:var(--hot)}.t-Warm{background:var(--warmbg);color:var(--warm)}.t-Watch{background:var(--watchbg);color:var(--watch)}
-.mom{font-weight:700;font-size:14px}.m-up{color:var(--up)}.m-down{color:var(--down)}.m-flat{color:var(--muted)}.m-new{color:var(--accent2);font-size:11px;font-weight:700}
-.roles{font-variant-numeric:tabular-nums;font-weight:650}
-.sig{font-size:12.5px;color:#cdd3de}.sig .p{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:2px 7px;margin:2px 3px 0 0}
-.why{font-size:12.5px;color:var(--muted);font-style:italic;max-width:240px}
-.yes{color:var(--accent2);font-weight:700}.no{color:var(--muted)}
-.muted{color:var(--muted)}
-footer{border-top:1px solid var(--line);padding:28px 0 64px;color:var(--muted);font-size:13px}footer .wrap{max-width:780px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
-.legend{display:flex;gap:18px;margin-top:10px;font-size:12.5px;color:var(--muted)}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
-.wk{border-bottom:1px solid var(--line);padding:14px 0}.wk:last-child{border-bottom:0}.wkhead{font-size:14.5px;margin-bottom:8px}
-.wkrow{display:flex;gap:8px;align-items:baseline;margin:4px 0;flex-wrap:wrap}.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);min-width:68px}
-.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 0}.chip.up{background:var(--hotbg);color:var(--up)}.chip.down{background:var(--watchbg);color:var(--down)}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 0}
-@media(max-width:860px){.cards{grid-template-columns:1fr}}
-a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;color:var(--txt);transition:border-color .15s ease,transform .15s ease}
-a.card:hover{border-color:var(--accent);transform:translateY(-2px);text-decoration:none}
-.card .ind{font-size:21px;font-weight:720;letter-spacing:-.015em;margin:0 0 7px}
-.card .cap{color:var(--muted);font-size:13.5px;margin:0 0 16px;line-height:1.5}
-.card .mini{display:flex;gap:16px;font-size:12.5px;color:var(--muted)}
-.card .mini b{color:var(--txt);font-size:16px;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto;border:1px solid var(--hairline);background:var(--card);border-radius:6px}
+table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:14px;min-width:980px}
+thead th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline);white-space:nowrap}
+thead th[data-k]{cursor:pointer;user-select:none}
+thead th[data-k]:hover{color:var(--ink)}
+.arw{opacity:.6;font-size:10px}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--hairline);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--paper2)}
+td.rk{color:var(--muted);width:34px}
+.co{font-weight:650;font-size:15px;font-family:var(--serif)}
+.co a{color:var(--ink);border-bottom:0}
+.co a:hover{color:var(--link)}
+.meta{color:var(--muted);font-size:12px;margin-top:1px}
+td.sc{white-space:nowrap}
+.scoren{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.tier{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-left:9px}
+.tier i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.t-Hot{color:var(--hot)}.t-Hot i{background:var(--hot)}
+.t-Warm{color:var(--warm)}.t-Warm i{background:var(--warm)}
+.t-Watch{color:var(--watch)}.t-Watch i{background:var(--watch)}
+td.mo{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+.m-up{color:var(--up)}.m-down{color:var(--down)}.m-flat{color:var(--muted)}
+.m-new{color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.1em}
+td.mo small{color:var(--muted);font-weight:500;margin-left:3px}
+td.ro{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.ro b{font-weight:700}td.ro span{color:var(--muted)}
+.sig{font-size:12.5px;color:var(--ink2);min-width:220px}
+.sig .p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:2px 7px;margin:2px 3px 0 0}
+td.why{color:var(--ink2);font-size:13px;line-height:1.5;min-width:240px;font-family:var(--serif);font-style:italic}
+.tablenote{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:10px 2px 0}
+.keyrow{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0;font-family:var(--sans);font-size:12.5px;color:var(--ink2)}
+.keyrow span{background:var(--paper2);border:1px solid var(--hairline);border-radius:999px;padding:4px 12px}
+.keyrow b{font-weight:700}
+.about{margin-top:46px;border-top:1px solid var(--hairline);padding-top:28px}
+.about p{color:var(--ink2);font-size:16px;max-width:820px;margin:0 0 14px}
+.about b{color:var(--ink);font-weight:650}
+footer{margin-top:44px;border-top:3px double var(--rule);padding:24px 0 64px}
+footer p{font-family:var(--sans);font-size:13px;color:var(--muted);max-width:820px;margin:0 0 10px}
+footer b{color:var(--ink2)}
+.byline{font-family:var(--sans);font-size:13.5px;color:var(--ink2);margin-top:16px}
+.byline b{color:var(--ink)}
+.cards{display:grid;grid-template-columns:1fr;gap:14px;margin:26px 0 0}
+@media(min-width:620px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.cards{grid-template-columns:repeat(4,1fr)}}
+a.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--hairline);border-top:3px solid var(--accent);border-radius:6px;padding:20px 18px;color:var(--ink);transition:transform .15s ease,box-shadow .15s ease}
+a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)}
+.card .ind{font-size:19px;font-weight:650;letter-spacing:-.01em;margin:0 0 7px;line-height:1.25}
+.card .cap{font-family:var(--sans);color:var(--muted);font-size:12.5px;margin:0 0 14px;line-height:1.5}
+.card .mini{display:flex;gap:14px;font-family:var(--sans);font-size:12px;color:var(--muted);margin-top:auto}
+.card .mini b{color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
 .card .mini .hotn b{color:var(--hot)}
-.card .go{margin-top:16px;color:var(--accent);font-size:13.5px;font-weight:600}
+.card .go{margin-top:12px;font-family:var(--sans);color:var(--accent);font-size:12.5px;font-weight:600}
+.histsec{margin-top:38px}
+.panel{background:var(--card);border:1px solid var(--hairline);border-radius:6px;padding:18px}
+.legend{display:flex;gap:18px;margin-top:10px;font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.wk{border-bottom:1px solid var(--hairline);padding:14px 0}.wk:last-child{border-bottom:0}
+.wkhead{font-size:15px;margin-bottom:8px}
+.wkrow{display:flex;gap:8px;align-items:baseline;margin:4px 0;flex-wrap:wrap;font-family:var(--sans)}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:80px;font-weight:700}
+.chip{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 0;background:var(--paper2);border:1px solid var(--hairline)}
+.chip.up{color:var(--up)}.chip.down{color:var(--down)}
+.yes{color:var(--up);font-weight:700}.no{color:var(--muted)}
+.muted{color:var(--muted)}
+@media(max-width:600px){h1{font-size:32px}.badge{width:60px}.badge .score{font-size:25px}.mover{gap:12px}}
 '''
 
 # --------------------------------- landing -----------------------------------
 LANDING = r'''<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Territory Radar - Account buying-signal intelligence for AEs</title>
-<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Three demo industries: cloud data warehousing, product analytics, observability.">
+<meta name="color-scheme" content="light dark">
+<title>Territory Radar - The weekly territory briefing for Account Executives</title>
+<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Four demo industries: cloud data warehousing, product analytics, observability, industrial machine health.">
 <style>__CSS__</style></head><body>
 <header><div class="wrap">
-  <p class="eyebrow">B2B Sales · Territory Intelligence</p>
+  <p class="kicker">B2B Sales · Territory Intelligence</p>
   <h1>Territory Radar</h1>
-  <p class="sub">An automated territory-research tool for Account Executives. It scores every account in a sales territory on real buying signals - hiring, funding, leadership moves, and expansion - and tracks which accounts are heating up, so account planning starts from "why now," not a static list.</p>
-  <p class="byline">Built by <b>Eric Hastie</b> · demo territories · updated __DATEHUMAN__ · <span class="muted">a portfolio project</span></p>
+  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; four demo industries, 80 accounts &nbsp;·&nbsp; updated __DATEHUMAN__ &nbsp;·&nbsp; built by Eric Hastie</p>
+  <hr class="doubling">
 </div></header>
 
-<section class="about"><div class="wrap">
-  <h2>Pick an industry</h2>
-  <p>The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores the same universe of companies through that lens. Below are three demo territories I built to show exactly that - same tool, three different products, three different answers to "who do I call first?" (It started life as my remote-AE job-search engine; finding buying signals turns out to be the same problem as finding jobs.)</p>
-  <div class="cards">__CARDS__</div>
-  <div class="callout" style="margin-top:26px"><b>Illustrative demos.</b> Each board is run as if I were an AE selling a named vendor's product (or an unnamed one) - none of these vendors is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
-</div></section>
+<main><div class="wrap">
+  <p class="lede"><span class="hi">__GREETING__</span> Territory Radar reads a whole sales territory every week - live job boards, funding news, leadership moves, expansion announcements - scores every account on a transparent signal model, and hands back a ranked briefing. Account planning starts from "why now," not a static list.</p>
+
+  <section class="boardsec">
+    <h2>Pick an industry</h2>
+    <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Four demo territories below - same tool, four different products, four different answers to "who do I call first?"</p>
+    <div class="cards">__CARDS__</div>
+    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> Three boards are run against unnamed hypothetical products; the fourth is run as if the vendor were TRACTIAN, which is not affiliated with and has not endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
+  </section>
+
+  <section class="about">
+    <h2>Why job postings?</h2>
+    <p>Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it.</p>
+    <p>They're also a pain to actually use. Checking postings by hand across a whole territory - twenty accounts, twenty different job boards, every single week - is tedious, slow, and easy to let slide (I know, because I used to do it that way). Work that valuable and that repetitive is a perfect target for automation, so I automated it: the tool does the checking and hands me the ranked briefing.</p>
+    <p>Every score is a <b>transparent weighted sum</b>, so when someone asks "why is this account ranked third," there's an actual answer (no black box, no vibes).</p>
+  </section>
+</div></main>
 
 <footer><div class="wrap">
-  <p>Every account's score is a transparent, weighted sum of verified signals: relevant open roles &times; __W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__. Each board explains its own tiers.</p>
-  <p>Still curious where this started? <a href="legacy.html">The original demo board (June-July 2026)</a> - a cloud-infrastructure territory tracked across four weekly snapshots - is still live, with its <a href="history.html">momentum history</a> and <a href="roles.html">open-roles inventory</a>.</p>
-  <p>Built by Eric Hastie · <a href="https://github.com/__REPO__" target="_blank" rel="noopener">source on GitHub</a> · refreshed by a weekly cloud agent.</p>
+  <p><b>Scoring.</b> Every account's score is a transparent, weighted sum of verified signals: relevant open roles &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__. Each board explains its own Hot / Warm / Watch tiers.</p>
+  <p><b>The archive.</b> <a href="legacy.html">The original demo board (June-July 2026)</a> - a cloud-infrastructure territory tracked across weekly snapshots - is still live, with its <a href="history.html">momentum history</a> and <a href="roles.html">open-roles inventory</a>.</p>
+  <p><a href="https://github.com/__REPO__" target="_blank" rel="noopener">Source on GitHub</a> · refreshed by a weekly cloud agent.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · auto-refreshed weekly · see you next Monday</p>
 </div></footer>
 </body></html>'''
 
 CARD = r'''<a class="card" href="__SLUG__/">
   <p class="ind">__INDUSTRY__</p>
   <p class="cap">__CAPTION__</p>
-  <div class="mini"><span><b>__ACCOUNTS__</b> accounts</span><span class="hotn"><b>__HOT__</b> hot right now</span></div>
+  <div class="mini"><span><b>__ACCOUNTS__</b> accounts</span><span class="hotn"><b>__HOT__</b> hot</span></div>
   <div class="go">Open the board &rarr;</div>
 </a>'''
 
@@ -261,59 +352,71 @@ CARD = r'''<a class="card" href="__SLUG__/">
 BOARD = r'''<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>__TITLE__</title>
 <meta name="description" content="__DESC__">
 <style>__CSS__</style></head><body>
 <header><div class="wrap">
-  <p class="eyebrow">__EYEBROW__</p>
+  <p class="kicker">__EYEBROW__</p>
   <h1>__H1__</h1>
-  <p class="sub">__SUB__</p>
-  <p class="byline">Built by <b>Eric Hastie</b> · updated __DATEHUMAN__ · <span class="muted">a portfolio project</span></p>
-  <p class="byline" style="margin-top:6px">__NAV__</p>
-  <div class="callout">__CALLOUT__</div>
-  <div class="stats">
-    <div class="stat"><div class="n">__ACCOUNTS__</div><div class="l">accounts in territory</div></div>
-    <div class="stat"><div class="n">__HOT__</div><div class="l">🔥 hot right now</div></div>
-    <div class="stat"><div class="n">__ROLES__<span style="color:var(--muted);font-size:16px"> / __TOTALROLES__</span></div><div class="l">relevant / total open roles</div></div>
-    <div class="stat"><div class="n">__MOVERS__</div><div class="l">__MOVERS_LABEL__</div></div>
-  </div>
+  <p class="dateline"><b>Week of __DATEHUMAN__</b> &nbsp;·&nbsp; signals verified __VERIFIED__ &nbsp;·&nbsp; __ACCOUNTS__ accounts, __HOT__ hot &nbsp;·&nbsp; __ROLES__ relevant / __TOTALROLES__ open roles</p>
+  <p class="dateline" style="margin-top:4px">This board is __VENDORLINE__.</p>
+  <p class="dateline" style="margin-top:8px">__NAV__</p>
+  <hr class="doubling">
 </div></header>
 
-__ABOUT__
+<main><div class="wrap">
+__BRIEFING__
+  <div class="alsonote" style="margin-top:24px"><b>The ICP this board scores against:</b> __ICP__</div>
 
-<div class="wrap">
-  <div class="controls">
-    <input id="q" type="search" placeholder="Search account, signal, HQ…" autocomplete="off">
-    <div class="seg" id="seg">
-      <button data-seg="all" class="on">All</button>
-      <button data-seg="Hot">Hot</button>
-      <button data-seg="Warm">Warm</button>
-      <button data-seg="Watch">Watch</button>
+  <section class="boardsec">
+    <h2>The board</h2>
+    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__. Hot &ge; __HOT_T__, Warm &ge; __WARM__. Click any column to re-sort, or any account for the source behind its signals.</p>
+    <div class="controls">
+      <input id="q" type="search" placeholder="Search account, signal, HQ..." autocomplete="off">
+      <div class="seg" id="seg">
+        <button data-seg="all" class="on">All</button>
+        <button data-seg="Hot">Hot</button>
+        <button data-seg="Warm">Warm</button>
+        <button data-seg="Watch">Watch</button>
+      </div>
+      <span class="count" id="count"></span>
     </div>
-    <span class="count" id="count"></span>
-  </div>
-  <div class="tablewrap"><table>
-    <thead><tr>
-      <th data-k="account">Account <span class="arw"></span></th>
-      <th data-k="score">Signal <span class="arw">▼</span></th>
-      <th data-k="mom">Momentum <span class="arw"></span></th>
-      <th data-k="roles">Roles (rel / total) <span class="arw"></span></th>
-      <th>Key signals</th>
-      <th>Why now</th>
-    </tr></thead>
-    <tbody id="rows"></tbody>
-  </table></div>
-</div>
+    <div class="tablewrap"><table>
+      <thead><tr>
+        <th>#</th>
+        <th data-k="account">Account <span class="arw"></span></th>
+        <th data-k="score">Signal <span class="arw">&#9660;</span></th>
+__MOMTH__
+        <th data-k="roles">Roles rel / total <span class="arw"></span></th>
+        <th>Key signals</th>
+        <th>Why now</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <div class="keyrow" aria-label="Scoring weights">
+      <span>relevant open role <b>&times;__W_ROLES__</b></span>
+      <span>recent funding <b>+__W_FUNDING__</b></span>
+      <span>new leadership <b>+__W_LEADERSHIP__</b></span>
+      <span>expansion / new region <b>+__W_EXPANSION__</b></span>
+      <span>Hot <b>&ge; __HOT_T__</b> · Warm <b>&ge; __WARM__</b> · Watch below</span>
+    </div>
+  </section>
+
+__ABOUT__
+</div></main>
 
 <footer><div class="wrap">
 __FOOTER__
+  <p class="byline">Built by <b>Eric Hastie</b> · auto-refreshed weekly · see you next Monday</p>
 </div></footer>
 
 <script>
 const DATA = __DATA__;
+const HASHIST = __HASHIST__;
 const tbody=document.getElementById('rows'),q=document.getElementById('q'),count=document.getElementById('count');
 let seg='all',sortK='score',sortDir=-1;
-const MOM={up:'<span class="mom m-up">▲</span>',down:'<span class="mom m-down">▼</span>',flat:'<span class="mom m-flat">▬</span>',new:'<span class="mom m-new">NEW</span>'};
+const MOM={up:'<span class="m-up">&#9650;</span>',down:'<span class="m-down">&#9660;</span>',flat:'<span class="m-flat">&#9644;</span>',new:'<span class="m-new">NEW</span>'};
 function sigChips(s){return s? s.split('|').map(x=>`<span class="p">${x.trim()}</span>`).join('') : '<span class="muted">-</span>';}
 function render(){
   const t=q.value.trim().toLowerCase();
@@ -327,78 +430,70 @@ function render(){
     if(sortK==='score'||sortK==='roles')return (av-bv)*sortDir;
     return String(av).localeCompare(String(bv))*sortDir;
   });
-  tbody.innerHTML=list.map(r=>`<tr>
-    <td><div class="acct">${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.account}</a>`:r.account}</div>
+  tbody.innerHTML=list.map((r,i)=>`<tr>
+    <td class="rk num">${i+1}</td>
+    <td><div class="co">${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.account}</a>`:r.account}</div>
         <div class="meta">${[r.industry,r.hq,r.headcount,r.funding].filter(Boolean).join(' · ')}</div></td>
-    <td><div class="scorewrap"><span class="scoren">${r.score}</span><span class="tier t-${r.tier}">${r.tier}</span></div></td>
-    <td>${MOM[r.mom]||''} ${r.mom_delta?`<span class="muted" style="font-size:12px">${r.mom_delta>0?'+':''}${r.mom_delta}</span>`:''}</td>
-    <td><span class="roles">${r.roles}</span> <span class="muted">/ ${r.total_roles||0}</span></td>
+    <td class="sc"><span class="scoren num">${r.score}</span><span class="tier t-${r.tier}"><i></i>${r.tier}</span></td>
+    ${HASHIST?`<td class="mo">${MOM[r.mom]||''}${r.mom_delta?`<small>${r.mom_delta>0?'+':''}${r.mom_delta}</small>`:''}</td>`:''}
+    <td class="ro"><b>${r.roles}</b> <span>/ ${r.total_roles||0}</span></td>
     <td class="sig">${sigChips(r.signals)}</td>
     <td class="why">${r.why||''}</td>
   </tr>`).join('');
   count.textContent=list.length+' of '+DATA.length+' accounts';
 }
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{seg=b.dataset.seg;document.querySelectorAll('#seg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();});
-document.querySelectorAll('thead th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k){sortDir*=-1}else{sortK=k;sortDir=(k==='score'||k==='roles')?-1:1}document.querySelectorAll('.arw').forEach(a=>a.textContent='');th.querySelector('.arw').textContent=sortDir>0?'▲':'▼';render();});
+document.querySelectorAll('thead th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k){sortDir*=-1}else{sortK=k;sortDir=(k==='score'||k==='roles')?-1:1}document.querySelectorAll('.arw').forEach(a=>a.textContent='');th.querySelector('.arw').innerHTML=sortDir>0?'&#9650;':'&#9660;';render();});
 q.oninput=render;render();
 </script>
 </body></html>'''
 
-SCORE_HELP = r'''<section class="about"><div class="wrap">
-  <h2>How the signal score works</h2>
-  <p>Each account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box:</p>
-  <div class="score-help">
-    <code>relevant open role &times; __W_ROLES__</code>
-    <code>recent funding +__W_FUNDING__</code>
-    <code>new leadership +__W_LEADERSHIP__</code>
-    <code>expansion / new region +__W_EXPANSION__</code>
-  </div>
-  <div class="score-help" style="margin-top:8px">
-    <span><span class="tier t-Hot">Hot</span> &nbsp;score &ge; __HOT_T__</span>
-    <span><span class="tier t-Warm">Warm</span> &nbsp;&ge; __WARM__</span>
-    <span><span class="tier t-Watch">Watch</span> &nbsp;below __WARM__</span>
-  </div>
-</div></section>'''
+MOM_TH = '        <th data-k="mom">Momentum <span class="arw"></span></th>'
 
-LEGACY_ABOUT = r'''<section class="about"><div class="wrap">
-  <h2>About this project</h2>
-  <p>This started as the engine behind a <a href="https://eric-hastie.github.io/remote-ae-job-hunt/" target="_blank" rel="noopener">remote-AE job search</a> - a pipeline that screens companies against a profile, verifies live job postings, and tracks change week over week. That job-hunt build was the prototype; <b>Territory Radar</b> re-points the same engine at the other side of the desk: instead of finding jobs, it finds buying signals across a sales territory. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it. The site has since grown into <a href="./">three industry demo territories</a>; this page preserves the original board.</p>
-</div></section>''' + SCORE_HELP
+SCORE_HELP = r'''  <section class="about">
+  <h2>How the signal score works</h2>
+  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__.</p>
+  <p><b>Tiers:</b> <span class="tier t-Hot"><i></i>Hot</span> at score &ge; __HOT_T__, <span class="tier t-Warm"><i></i>Warm</span> at &ge; __WARM__, <span class="tier t-Watch"><i></i>Watch</span> below that. The thresholds flex per territory because a "lot of hiring" means different things in different markets.</p>
+  </section>'''
+
+LEGACY_ABOUT = r'''  <section class="about">
+  <h2>About this board</h2>
+  <p>This is the original Territory Radar territory: 16 real mid-market and enterprise companies scored on buying signals for a cloud infrastructure / DevOps platform, tracked across weekly snapshots since June 2026. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it. The site has since grown into <a href="./">four industry demo territories</a>; this page is preserved because it carries the longest momentum history.</p>
+  </section>''' + SCORE_HELP
 
 # ---------------------------------- history ----------------------------------
 HISTORY = r'''<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>Momentum & History - Territory Radar</title>
 <style>__CSS__</style></head><body>
 <header><div class="wrap">
-  <p class="eyebrow">B2B Sales · Territory Intelligence</p>
+  <p class="kicker">Territory Radar · The Archive</p>
   <h1>Momentum &amp; History</h1>
-  <p class="sub">How the original demo territory moved over time. Each weekly run is snapshotted, so you can see which accounts heated up, which cooled, and how overall hiring signal in the territory trended.</p>
-  <p class="byline"><a href="legacy.html">← The original demo board</a> &nbsp;·&nbsp; <a href="./">All industries</a> &nbsp;·&nbsp; <a href="roles.html">All open roles</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span></p>
-  <div class="stats">
-    <div class="stat"><div class="n">__WEEKS__</div><div class="l">weekly snapshots</div></div>
-    <div class="stat"><div class="n">__HOT__</div><div class="l">hot accounts now</div></div>
-    <div class="stat"><div class="n">__TOTALROLES__</div><div class="l">total open roles now</div></div>
-    <div class="stat"><div class="n">__NETTOTAL__</div><div class="l">total roles vs start</div></div>
-  </div>
+  <p class="dateline"><b>How the original demo territory moved over time.</b> Each weekly run is snapshotted, so you can see which accounts heated up, which cooled, and how overall hiring signal trended.</p>
+  <p class="dateline" style="margin-top:8px"><a href="legacy.html">&larr; The original demo board</a> &nbsp;·&nbsp; <a href="./">All industries</a> &nbsp;·&nbsp; <a href="roles.html">All open roles</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span> &nbsp;·&nbsp; <span class="muted">__WEEKS__ weekly snapshots · __HOT__ hot now · __TOTALROLES__ open roles (__NETTOTAL__ vs start)</span></p>
+  <hr class="doubling">
 </div></header>
-<div class="wrap">
-  <section><h2>Hiring signal across the territory</h2><div class="panel"><div id="chart"></div></div></section>
-  <section><h2>Weekly movers</h2><div class="panel" id="log"></div></section>
-</div>
-<footer><div class="wrap">Total open roles is the aggregate of every open position across the territory; relevant roles are the subset that match the signal profile. Momentum is the week-over-week change in each account's signal score, from the dated snapshots in <code>data/</code>. Built by Eric Hastie.</div></footer>
+<main><div class="wrap">
+  <section class="histsec"><h2>Hiring signal across the territory</h2><div class="panel"><div id="chart"></div></div></section>
+  <section class="histsec"><h2>Weekly movers</h2><div class="panel" id="log"></div></section>
+</div></main>
+<footer><div class="wrap">
+  <p>Total open roles is the aggregate of every open position across the territory; relevant roles are the subset that match the signal profile. Momentum is the week-over-week change in each account's signal score, from the dated snapshots in <code>data/</code>.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · auto-refreshed weekly</p>
+</div></footer>
 <script>
 const M=__METRICS__;
 function drawChart(){
   const w=720,h=300,pad={l:44,r:16,t:16,b:42},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b,n=M.length;
   const maxv=Math.max(...M.map(d=>d.total_roles),1);
   const X=i=>n<=1?pad.l+iw/2:pad.l+iw*i/(n-1),Y=v=>pad.t+ih*(1-v/maxv);
-  const S=[{k:'total_roles',c:'#6c8cff',l:'Total open roles'},{k:'roles',c:'#41d3a3',l:'Relevant roles'}];
+  const S=[{k:'total_roles',c:'var(--link)',l:'Total open roles'},{k:'roles',c:'var(--accent)',l:'Relevant roles'}];
   let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="Hiring signal across the territory over time">`;
-  for(let g=0;g<=4;g++){const v=Math.round(maxv*g/4),yy=Y(v);s+=`<line x1="${pad.l}" y1="${yy}" x2="${w-pad.r}" y2="${yy}" stroke="#2a2f3a"/><text x="${pad.l-8}" y="${yy+4}" fill="#9aa3b2" font-size="11" text-anchor="end">${v}</text>`;}
+  for(let g=0;g<=4;g++){const v=Math.round(maxv*g/4),yy=Y(v);s+=`<line x1="${pad.l}" y1="${yy}" x2="${w-pad.r}" y2="${yy}" stroke="var(--hairline)"/><text x="${pad.l-8}" y="${yy+4}" fill="var(--muted)" font-size="11" text-anchor="end">${v}</text>`;}
   const step=Math.max(1,Math.ceil(n/8));
-  M.forEach((d,i)=>{if(i%step===0||i===n-1)s+=`<text x="${X(i)}" y="${h-pad.b+18}" fill="#9aa3b2" font-size="10" text-anchor="middle">${d.date.slice(5)}</text>`;});
+  M.forEach((d,i)=>{if(i%step===0||i===n-1)s+=`<text x="${X(i)}" y="${h-pad.b+18}" fill="var(--muted)" font-size="10" text-anchor="middle">${d.date.slice(5)}</text>`;});
   S.forEach(se=>{if(n>1)s+=`<polyline points="${M.map((d,i)=>X(i)+','+Y(d[se.k])).join(' ')}" fill="none" stroke="${se.c}" stroke-width="2.5"/>`;M.forEach((d,i)=>s+=`<circle cx="${X(i)}" cy="${Y(d[se.k])}" r="3.5" fill="${se.c}"/>`);});
   s+=`</svg><div class="legend">`+S.map(se=>`<span><i style="background:${se.c}"></i>${se.l}</span>`).join('')+`</div>`;
   document.getElementById('chart').innerHTML=s;
@@ -424,23 +519,20 @@ drawChart();drawLog();
 ROLES = r'''<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>All open roles - Territory Radar</title>
 <style>__CSS__</style></head><body>
 <header><div class="wrap">
-  <p class="eyebrow">B2B Sales · Territory Intelligence</p>
+  <p class="kicker">Territory Radar · The Archive</p>
   <h1>All open roles</h1>
-  <p class="sub">Every open position across the original demo territory - the full inventory behind the signal scores. Use the "unmatched" filter to scan for titles that <i>should</i> count as a buying signal but don't yet, then they can be added to the signal profile.</p>
-  <p class="byline"><a href="legacy.html">← The original demo board</a> &nbsp;·&nbsp; <a href="./">All industries</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span></p>
-  <div class="stats">
-    <div class="stat"><div class="n">__TOTAL__</div><div class="l">open roles tracked</div></div>
-    <div class="stat"><div class="n">__MATCHED__</div><div class="l">count as a signal</div></div>
-    <div class="stat"><div class="n">__UNMATCHED__</div><div class="l">not matched (review)</div></div>
-    <div class="stat"><div class="n">__NACCT__</div><div class="l">accounts covered</div></div>
-  </div>
+  <p class="dateline"><b>Every open position across the original demo territory</b> - the full inventory behind the signal scores. Use the "unmatched" filter to scan for titles that <i>should</i> count as a buying signal but don't yet.</p>
+  <p class="dateline" style="margin-top:8px"><a href="legacy.html">&larr; The original demo board</a> &nbsp;·&nbsp; <a href="./">All industries</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> &nbsp;·&nbsp; <span class="muted">updated __DATEHUMAN__</span> &nbsp;·&nbsp; <span class="muted">__TOTAL__ roles tracked · __MATCHED__ count as a signal · __UNMATCHED__ unmatched · __NACCT__ accounts</span></p>
+  <hr class="doubling">
 </div></header>
-<div class="wrap">
+<main><div class="wrap">
+  <section class="boardsec">
   <div class="controls">
-    <input id="q" type="search" placeholder="Search title, account, location…" autocomplete="off">
+    <input id="q" type="search" placeholder="Search title, account, location..." autocomplete="off">
     <div class="seg" id="seg">
       <button data-seg="all" class="on">All</button>
       <button data-seg="match">Counts as signal</button>
@@ -448,7 +540,7 @@ ROLES = r'''<!DOCTYPE html>
     </div>
     <span class="count" id="count"></span>
   </div>
-  <div class="tablewrap"><table>
+  <div class="tablewrap"><table style="min-width:760px">
     <thead><tr>
       <th data-k="account">Account <span class="arw"></span></th>
       <th data-k="title">Title <span class="arw"></span></th>
@@ -457,8 +549,12 @@ ROLES = r'''<!DOCTYPE html>
     </tr></thead>
     <tbody id="rows"></tbody>
   </table></div>
-</div>
-<footer><div class="wrap">"Signal?" marks whether a title matched the original board's signal profile (SRE / platform / DevOps / infrastructure / cloud / Kubernetes / observability). Spot one that should match? It gets added to the profile and re-scored on the next run. Built by Eric Hastie.</div></footer>
+  </section>
+</div></main>
+<footer><div class="wrap">
+  <p>"Signal?" marks whether a title matched the original board's signal profile (SRE / platform / DevOps / infrastructure / cloud / Kubernetes / observability). Spot one that should match? It gets added to the profile and re-scored on the next run.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · auto-refreshed weekly</p>
+</div></footer>
 <script>
 const ROLES=__ROLES__;
 const tbody=document.getElementById('rows'),q=document.getElementById('q'),count=document.getElementById('count');
@@ -476,15 +572,15 @@ function render(){
     return String(a[sortK]).localeCompare(String(b[sortK]))*sortDir;
   });
   tbody.innerHTML=list.map(r=>`<tr>
-    <td>${r.account}</td>
+    <td class="co">${r.account}</td>
     <td>${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.title}</a>`:r.title}</td>
     <td class="muted">${r.location||''}</td>
-    <td>${r.matched?'<span class="yes">✓ yes</span>':'<span class="no">-</span>'}</td>
+    <td>${r.matched?'<span class="yes">&#10003; yes</span>':'<span class="no">-</span>'}</td>
   </tr>`).join('');
   count.textContent=list.length+' of '+ROLES.length+' roles';
 }
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{seg=b.dataset.seg;document.querySelectorAll('#seg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();});
-document.querySelectorAll('thead th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k){sortDir*=-1}else{sortK=k;sortDir=1}document.querySelectorAll('.arw').forEach(a=>a.textContent='');th.querySelector('.arw').textContent=sortDir>0?'▲':'▼';render();});
+document.querySelectorAll('thead th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k){sortDir*=-1}else{sortK=k;sortDir=1}document.querySelectorAll('.arw').forEach(a=>a.textContent='');th.querySelector('.arw').innerHTML=sortDir>0?'&#9650;':'&#9660;';render();});
 q.oninput=render;render();
 </script>
 </body></html>'''
@@ -505,8 +601,8 @@ def read_roles(path):
         })
     return out
 
-def fill_weights(html, hot, warm):
-    return (html
+def fill_weights(html_s, hot, warm):
+    return (html_s
             .replace("__W_ROLES__", str(W["roles"]))
             .replace("__W_FUNDING__", str(W["funding"]))
             .replace("__W_LEADERSHIP__", str(W["leadership"]))
@@ -514,31 +610,105 @@ def fill_weights(html, hot, warm):
             .replace("__HOT_T__", str(hot))
             .replace("__WARM__", str(warm)))
 
+# ------------------------------ briefing opener -------------------------------
+def greeting():
+    return "Happy " + datetime.date.today().strftime("%A") + "!"
+
+def esc(s):
+    return html.escape(s, quote=False)
+
+def signal_label(r):
+    bits = []
+    if r["roles"]:
+        bits.append(f'{r["roles"]} relevant role{"s" if r["roles"] != 1 else ""} open')
+    if r["funding_sig"]:
+        bits.append("fresh capital")
+    if r["leadership_sig"]:
+        bits.append("new leadership")
+    if r["expansion_sig"]:
+        bits.append("expansion underway")
+    return " + ".join(bits[:2]) if bits else "on the radar"
+
+def mover_block(r, label, delta=None):
+    cls = "up" if (delta or 0) > 0 else "down" if (delta or 0) < 0 else ""
+    tcolor = TIER_VAR[r["tier"]]
+    delta_html = ""
+    if delta is not None and delta != 0:
+        arrow = "&#9650;" if delta > 0 else "&#9660;"
+        delta_html = f'<span class="delta">{arrow} {"+" if delta > 0 else ""}{delta}</span>'
+    return (f'<div class="mover {cls}">'
+            f'<div class="badge"><span class="score num" style="color:{tcolor}">{r["score"]}</span>{delta_html}'
+            f'<span class="tierw" style="color:{tcolor}">{r["tier"]}</span></div>'
+            f'<div><h3><span class="co">{esc(r["account"])}</span><span class="move">{esc(label)}</span></h3>'
+            f'<p>{esc(r["why"] or r["signals"])}</p></div></div>')
+
+def briefing_html(board, has_history):
+    """The editorial opener. With two or more snapshots it narrates the biggest
+    week-over-week movers; on a first snapshot it honestly narrates the
+    strongest live signals instead, and the movers take over automatically
+    once the second snapshot exists."""
+    hi = f'<span class="hi">{greeting()}</span>'
+    if has_history:
+        movers = [r for r in board if r.get("mom") in ("up", "down")]
+        movers.sort(key=lambda r: abs(r.get("mom_delta") or 0), reverse=True)
+        top = movers[:3]
+        if not top:
+            lede = (f'<p class="lede">{hi} A quiet week - no account changed its signal score. '
+                    'The board below still ranks who to call first, and the momentum column shows the longer arc.</p>')
+            return lede
+        n_up = sum(1 for r in board if r.get("mom") == "up")
+        n_down = sum(1 for r in board if r.get("mom") == "down")
+        moved = []
+        if n_up:
+            moved.append(f'{n_up} heating up')
+        if n_down:
+            moved.append(f'{n_down} cooling')
+        lede = (f'<p class="lede">{hi} {n_up + n_down} account{"s" if n_up + n_down != 1 else ""} moved this week '
+                f'({" and ".join(moved)}). Here\'s where I\'d spend the first coffee.</p>')
+        blocks = "".join(mover_block(r, "heating up" if r["mom_delta"] > 0 else "cooling off",
+                                     r["mom_delta"]) for r in top)
+        rest = (n_up + n_down) - len(top)
+        note = ""
+        if rest > 0:
+            note = (f'<div class="alsonote"><b>Also moved:</b> {rest} more account{"s" if rest != 1 else ""} '
+                    'changed score this week - the momentum column below has every arrow.</div>')
+        return lede + f'<div class="movers">{blocks}</div>' + note
+    # first snapshot: no week-over-week yet - narrate the strongest live signals
+    top = board[:3]
+    lede = (f'<p class="lede">{hi} This territory is on its first weekly snapshot, so there\'s no '
+            'week-over-week movement to report yet. Instead, here\'s what\'s moving <i>inside</i> the '
+            'territory right now - the three accounts with the strongest live signals, and why I\'d call them first.</p>')
+    blocks = "".join(mover_block(r, signal_label(r)) for r in top)
+    note = ('<div class="alsonote"><b>Momentum starts next week.</b> Every account below is at its baseline '
+            'score; once the second weekly snapshot lands, real week-over-week movers take over this space automatically.</div>')
+    return lede + f'<div class="movers">{blocks}</div>' + note
+
 def render_board(out_path, board, ctx):
-    movers = sum(1 for r in board if r.get("mom") in ("up", "down"))
-    html = (BOARD
-            .replace("__CSS__", CSS)
-            .replace("__TITLE__", ctx["title"])
-            .replace("__DESC__", ctx["desc"])
-            .replace("__EYEBROW__", ctx["eyebrow"])
-            .replace("__H1__", ctx["h1"])
-            .replace("__SUB__", ctx["sub"])
-            .replace("__NAV__", ctx["nav"])
-            .replace("__CALLOUT__", ctx["callout"])
-            .replace("__ABOUT__", ctx["about"])
-            .replace("__FOOTER__", ctx["footer"])
-            .replace("__DATA__", json.dumps(board))
-            .replace("__DATEHUMAN__", ctx["updated"])
-            .replace("__ACCOUNTS__", str(len(board)))
-            .replace("__HOT__", str(sum(1 for r in board if r["tier"] == "Hot")))
-            .replace("__ROLES__", str(sum(r["roles"] for r in board)))
-            .replace("__TOTALROLES__", str(sum(r["total_roles"] for r in board)))
-            .replace("__MOVERS__", str(movers) if ctx["has_history"] else "-")
-            .replace("__MOVERS_LABEL__", "moved this week" if ctx["has_history"] else "movers (first snapshot)"))
-    html = fill_weights(html, ctx["hot"], ctx["warm"])
+    html_s = (BOARD
+              .replace("__CSS__", CSS)
+              .replace("__TITLE__", ctx["title"])
+              .replace("__DESC__", ctx["desc"])
+              .replace("__EYEBROW__", ctx["eyebrow"])
+              .replace("__H1__", ctx["h1"])
+              .replace("__VENDORLINE__", ctx["vendorline"])
+              .replace("__VERIFIED__", ctx["verified"])
+              .replace("__NAV__", ctx["nav"])
+              .replace("__ICP__", ctx["icp"])
+              .replace("__BRIEFING__", briefing_html(board, ctx["has_history"]))
+              .replace("__ABOUT__", ctx["about"])
+              .replace("__FOOTER__", ctx["footer"])
+              .replace("__MOMTH__", MOM_TH if ctx["has_history"] else "")
+              .replace("__HASHIST__", "true" if ctx["has_history"] else "false")
+              .replace("__DATA__", json.dumps(board))
+              .replace("__DATEHUMAN__", ctx["updated"])
+              .replace("__ACCOUNTS__", str(len(board)))
+              .replace("__HOT__", str(sum(1 for r in board if r["tier"] == "Hot")))
+              .replace("__ROLES__", str(sum(r["roles"] for r in board)))
+              .replace("__TOTALROLES__", str(sum(r["total_roles"] for r in board))))
+    html_s = fill_weights(html_s, ctx["hot"], ctx["warm"])
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as f:
-        f.write(html)
+        f.write(html_s)
 
 def build_territory(t):
     data_dir = os.path.join(ROOT, "data", "territories", t["slug"])
@@ -550,28 +720,29 @@ def build_territory(t):
     snaps = snapshots(data_dir, t["hot"], t["warm"])
     board = add_momentum(board, snaps)
     board.sort(key=lambda r: r["score"], reverse=True)
-    updated = human_date(snaps[-1]["date"]) if snaps else VERIFIED_HUMAN
+    updated = human_date(snaps[-1]["date"]) if snaps else t["verified"]
 
     others = [x for x in TERRITORIES if x["slug"] != t["slug"]]
-    nav = ('<a href="../">← All industries</a>'
+    nav = ('<a href="../">&larr; All industries</a>'
            + "".join(f' &nbsp;·&nbsp; <a href="../{o["slug"]}/">{o["industry"]}</a>' for o in others))
     vendor_clause = t["vendor_line"]
     ctx = {
         "title": f'{t["industry"]} - Territory Radar',
         "desc": t["desc"],
-        "eyebrow": "Territory Radar · Demo Territory",
+        "eyebrow": "Territory Radar · Weekly Briefing",
         "h1": t["industry"],
-        "sub": (f'Twenty real companies scored on live buying signals for {t["industry"].lower()} - '
-                f'{vendor_clause}.'),
+        "vendorline": vendor_clause,
+        "verified": t["verified"],
         "nav": nav,
-        "callout": f'<b>The ICP this board scores against:</b> {t["icp"]}',
+        "icp": t["icp"],
         "about": SCORE_HELP,
-        "footer": (f'<p><b>Methodology.</b> Demo territory of 20 real companies; signals verified {VERIFIED_HUMAN} '
-                   'against live ATS job boards (Greenhouse / Lever / Ashby) and public sources, re-verified weekly. '
-                   'Signal counts and firmographics are best-effort from public data. '
+        "footer": (f'<p><b>Methodology.</b> Demo territory of 20 real companies; signals verified {t["verified"]} '
+                   'against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources, '
+                   're-verified weekly. Signal counts and firmographics are best-effort from public data. '
                    f'This board is {vendor_clause}. All scoring and tiering are this tool\'s own. '
                    'A live deployment runs against a real book of business in a <b>private</b> repo.</p>'
-                   '<p><a href="../">← All industries</a> · Built by Eric Hastie · auto-refreshed weekly.</p>'),
+                   '<p><a href="../">&larr; All industries</a> · <a href="https://github.com/' + REPO +
+                   '" target="_blank" rel="noopener">source on GitHub</a>.</p>'),
         "updated": updated,
         "hot": t["hot"], "warm": t["warm"],
         "has_history": len(snaps) >= 2,
@@ -598,22 +769,23 @@ def build_legacy(today_human):
     ctx = {
         "title": "The original demo board (June-July 2026) - Territory Radar",
         "desc": "The original Territory Radar demo: a cloud infrastructure / DevOps territory of 16 real companies tracked across weekly snapshots.",
-        "eyebrow": "Territory Radar · Original Demo",
-        "h1": "The original demo board (June-July 2026)",
-        "sub": ("The first Territory Radar territory: 16 real mid-market and enterprise companies scored on buying "
-                "signals for a cloud infrastructure / DevOps platform, tracked across weekly snapshots. The project "
-                "has since grown into three industry demo territories - this board is preserved as the original."),
-        "nav": ('<a href="./">← All industries</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> '
-                '&nbsp;·&nbsp; <a href="roles.html">All open roles →</a>'),
-        "callout": (f'<b>What this models:</b> an AE selling {LEGACY["product"]}. A <b>buying signal</b> here means '
-                    f'{LEGACY["signal_desc"]}. Swap the config and the account list, and the same engine works for '
-                    'any product and territory.'),
+        "eyebrow": "Territory Radar · The Archive",
+        "h1": "The original demo board",
+        "vendorline": (f'run as if selling {LEGACY["product"]} - a <b>buying signal</b> here means '
+                       f'{LEGACY["signal_desc"]}'),
+        "verified": "weekly since June 2026",
+        "nav": ('<a href="./">&larr; All industries</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> '
+                '&nbsp;·&nbsp; <a href="roles.html">All open roles &rarr;</a>'),
+        "icp": ("mid-market and enterprise companies investing in their platform / infrastructure org: hiring SRE, "
+                "platform, DevOps or infrastructure engineers, raising fresh capital, or bringing on engineering "
+                "leadership. Swap the config and the account list, and the same engine works for any product and territory."),
         "about": LEGACY_ABOUT,
         "footer": ('<p><b>Methodology.</b> Sample territory, signals verified against company career pages / ATS and '
                    'public sources. Signal counts and firmographics are best-effort from public data. This is '
                    'illustrative demo data on real companies - a live deployment runs against a real book of business '
                    'in a <b>private</b> repo.</p>'
-                   '<p><a href="./">← All industries</a> · Prototyped from the remote-AE job-hunt tool. Built by Eric Hastie.</p>'),
+                   '<p><a href="./">&larr; All industries</a> · <a href="https://github.com/' + REPO +
+                   '" target="_blank" rel="noopener">source on GitHub</a>.</p>'),
         "updated": updated,
         "hot": hot, "warm": warm,
         "has_history": len(snaps) >= 2,
@@ -672,15 +844,16 @@ def build_landing(cards_info, today_human):
             .replace("__ACCOUNTS__", str(c["accounts"]))
             .replace("__HOT__", str(c["hot"]))
         for c in cards_info if c)
-    html = (LANDING
-            .replace("__CSS__", CSS)
-            .replace("__CARDS__", cards)
-            .replace("__DATEHUMAN__", updated)
-            .replace("__VERIFIED__", VERIFIED_HUMAN)
-            .replace("__REPO__", REPO))
-    html = fill_weights(html, 0, 0)
+    html_s = (LANDING
+              .replace("__CSS__", CSS)
+              .replace("__CARDS__", cards)
+              .replace("__GREETING__", greeting())
+              .replace("__DATEHUMAN__", updated)
+              .replace("__VERIFIED__", VERIFIED_HUMAN)
+              .replace("__REPO__", REPO))
+    html_s = fill_weights(html_s, 0, 0)
     with open(os.path.join(ROOT, "index.html"), "w") as f:
-        f.write(html)
+        f.write(html_s)
     print(f"built index.html (landing): {len([c for c in cards_info if c])} territories")
 
 def main():
