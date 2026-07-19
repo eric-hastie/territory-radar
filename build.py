@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the Territory Radar site: landing page + four demo territory
+"""Regenerate the Territory Radar site: landing page + five demo territory
 boards + the original (legacy) demo board, all in the "Monday briefing" look.
 
 Site layout:
@@ -9,6 +9,8 @@ Site layout:
   observability/index.html      - Observability board (unnamed vendor)
   machine-health/index.html     - Industrial Machine Health board (run as if the
                                   vendor were TRACTIAN; illustrative, not affiliated)
+  test-automation/index.html    - Software Test Automation board (run as if the
+                                  vendor were ContextQA; illustrative, not affiliated)
   legacy.html                   - the original demo board (June-July 2026)
   history.html / roles.html     - momentum + open-roles inventory for the legacy board
 
@@ -27,13 +29,13 @@ then it spotlights the strongest live signals (an honest first-snapshot mode).
 The "Happy <day>!" greeting uses the build date's actual day of week.
 
 --- WEEKLY CLOUD REFRESH ROUTINE (what the weekly agent should do) ---
-1. For each of the four territory folders in data/territories/ (any or all):
+1. For each of the five territory folders in data/territories/ (any or all):
    re-verify every account's signals against its live ATS job board and
    public sources, rewrite latest.csv in the same column schema, and save an
    identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
    dated snapshots are what power the momentum column and the movers briefing.
 2. Never edit HTML by hand. Run:  python3 build.py
-   It regenerates all four territory boards AND the landing page AND the
+   It regenerates all five territory boards AND the landing page AND the
    legacy pages in one pass, so a data refresh can never clobber the landing.
 3. Commit and push to main; GitHub Pages serves the result.
 Notes: the legacy board (data/latest.csv + data/*.csv snapshots) may be
@@ -90,6 +92,16 @@ TERRITORIES = [
         "verified": "July 13 to 14, 2026",
         "desc": "Demo sales territory for industrial machine health: 20 real mid-market manufacturers scored on live maintenance hiring, funding, leadership, and plant-expansion buying signals.",
     },
+    {
+        "slug": "test-automation",
+        "industry": "Software Test Automation",
+        "caption": "Run as if the vendor were ContextQA: AI-powered autonomous testing for web, mobile, and API (not affiliated).",
+        "vendor_line": "run as if the vendor were <b>ContextQA</b>, selling AI-powered autonomous testing for web, mobile, and API to QA and engineering teams (an illustrative demo, not affiliated with or endorsed by ContextQA)",
+        "icp": "Mid-market software companies (roughly 100 to 2,000 employees) shipping web and mobile products on fast release cycles, where QA has become the bottleneck: the tell is an active req list for manual QA engineers, SDETs, and test automation engineers, which signals test-coverage pain that AI-powered autonomous testing (web, mobile, API) can absorb. Primary buyers are QA leads and managers, engineering managers, and VPs of Engineering; a QA leadership req, fresh funding, or a new engineering executive is the timing trigger.",
+        "hot": 52, "warm": 22,
+        "verified": "July 19, 2026",
+        "desc": "Demo sales territory for software test automation: 20 real software companies scored on live QA and SDET hiring, funding, and leadership buying signals.",
+    },
 ]
 
 # Legacy board config (the original June-July 2026 demo)
@@ -99,7 +111,7 @@ LEGACY = {
     "hot": 80, "warm": 40,
 }
 
-VERIFIED_HUMAN = "July 13 and 14, 2026"   # when the four demo territories were researched
+VERIFIED_HUMAN = "July 13 to 19, 2026"   # when the five demo territories were researched
 
 TIER_VAR = {"Hot": "var(--hot)", "Warm": "var(--warm)", "Watch": "var(--watch)"}
 
@@ -275,8 +287,8 @@ footer b{color:var(--ink2)}
 .byline{font-family:var(--sans);font-size:13.5px;color:var(--ink2);margin-top:16px}
 .byline b{color:var(--ink)}
 .cards{display:grid;grid-template-columns:1fr;gap:14px;margin:26px 0 0}
-@media(min-width:620px){.cards{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1000px){.cards{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:620px){.cards{grid-template-columns:repeat(2,1fr)}.cards a.card:last-child:nth-child(odd){grid-column:1/-1}}
+@media(min-width:1000px){.cards{grid-template-columns:repeat(3,1fr)}.cards a.card:last-child:nth-child(odd){grid-column:auto}}
 a.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--hairline);border-top:3px solid var(--accent);border-radius:6px;padding:20px 18px;color:var(--ink);transition:transform .15s ease,box-shadow .15s ease}
 a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)}
 .card .ind{font-size:19px;font-weight:650;letter-spacing:-.01em;margin:0 0 7px;line-height:1.25}
@@ -306,12 +318,12 @@ LANDING = r'''<!DOCTYPE html>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Territory Radar - The weekly territory briefing for Account Executives</title>
-<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Four demo industries: cloud data warehousing, product analytics, observability, industrial machine health.">
+<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Five demo industries: cloud data warehousing, product analytics, observability, industrial machine health, software test automation.">
 <style>__CSS__</style></head><body>
 <header><div class="wrap">
   <p class="kicker">B2B Sales · Territory Intelligence</p>
   <h1>Territory Radar</h1>
-  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; four demo industries, 80 accounts &nbsp;·&nbsp; updated __DATEHUMAN__ &nbsp;·&nbsp; built by Eric Hastie</p>
+  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; five demo industries, 100 accounts &nbsp;·&nbsp; updated __DATEHUMAN__ &nbsp;·&nbsp; built by Eric Hastie</p>
   <hr class="doubling">
 </div></header>
 
@@ -320,9 +332,9 @@ LANDING = r'''<!DOCTYPE html>
 
   <section class="boardsec">
     <h2>Pick an industry</h2>
-    <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Four demo territories below - same tool, four different products, four different answers to "who do I call first?"</p>
+    <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Five demo territories below - same tool, five different products, five different answers to "who do I call first?"</p>
     <div class="cards">__CARDS__</div>
-    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> Three boards are run against unnamed hypothetical products; the fourth is run as if the vendor were TRACTIAN, which is not affiliated with and has not endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
+    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> Three boards are run against unnamed hypothetical products; the other two are run as if the vendor were a real company - TRACTIAN for industrial machine health and ContextQA for software test automation - neither of which is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
   </section>
 
   <section class="about">
@@ -458,7 +470,7 @@ SCORE_HELP = r'''  <section class="about">
 
 LEGACY_ABOUT = r'''  <section class="about">
   <h2>About this board</h2>
-  <p>This is the original Territory Radar territory: 16 real mid-market and enterprise companies scored on buying signals for a cloud infrastructure / DevOps platform, tracked across weekly snapshots since June 2026. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it. The site has since grown into <a href="./">four industry demo territories</a>; this page is preserved because it carries the longest momentum history.</p>
+  <p>This is the original Territory Radar territory: 16 real mid-market and enterprise companies scored on buying signals for a cloud infrastructure / DevOps platform, tracked across weekly snapshots since June 2026. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it. The site has since grown into <a href="./">five industry demo territories</a>; this page is preserved because it carries the longest momentum history.</p>
   </section>''' + SCORE_HELP
 
 # ---------------------------------- history ----------------------------------

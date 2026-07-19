@@ -3,7 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Territory Radar - The weekly territory briefing for Account Executives</title>
-<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Four demo industries: cloud data warehousing, product analytics, observability, industrial machine health.">
+<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Five demo industries: cloud data warehousing, product analytics, observability, industrial machine health, software test automation.">
 <style>
 :root{
   --paper:#FAF6EF;--paper2:#F3EDE2;--card:#FFFDF8;--ink:#2A2520;--ink2:#4A4238;--muted:#7A7060;
@@ -98,8 +98,8 @@ footer b{color:var(--ink2)}
 .byline{font-family:var(--sans);font-size:13.5px;color:var(--ink2);margin-top:16px}
 .byline b{color:var(--ink)}
 .cards{display:grid;grid-template-columns:1fr;gap:14px;margin:26px 0 0}
-@media(min-width:620px){.cards{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1000px){.cards{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:620px){.cards{grid-template-columns:repeat(2,1fr)}.cards a.card:last-child:nth-child(odd){grid-column:1/-1}}
+@media(min-width:1000px){.cards{grid-template-columns:repeat(3,1fr)}.cards a.card:last-child:nth-child(odd){grid-column:auto}}
 a.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--hairline);border-top:3px solid var(--accent);border-radius:6px;padding:20px 18px;color:var(--ink);transition:transform .15s ease,box-shadow .15s ease}
 a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)}
 .card .ind{font-size:19px;font-weight:650;letter-spacing:-.01em;margin:0 0 7px;line-height:1.25}
@@ -125,16 +125,16 @@ a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)
 <header><div class="wrap">
   <p class="kicker">B2B Sales · Territory Intelligence</p>
   <h1>Territory Radar</h1>
-  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; four demo industries, 80 accounts &nbsp;·&nbsp; updated July 14, 2026 &nbsp;·&nbsp; built by Eric Hastie</p>
+  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; five demo industries, 100 accounts &nbsp;·&nbsp; updated July 19, 2026 &nbsp;·&nbsp; built by Eric Hastie</p>
   <hr class="doubling">
 </div></header>
 
 <main><div class="wrap">
-  <p class="lede"><span class="hi">Happy Tuesday!</span> Territory Radar reads a whole sales territory every week - live job boards, funding news, leadership moves, expansion announcements - scores every account on a transparent signal model, and hands back a ranked briefing. Account planning starts from "why now," not a static list.</p>
+  <p class="lede"><span class="hi">Happy Sunday!</span> Territory Radar reads a whole sales territory every week - live job boards, funding news, leadership moves, expansion announcements - scores every account on a transparent signal model, and hands back a ranked briefing. Account planning starts from "why now," not a static list.</p>
 
   <section class="boardsec">
     <h2>Pick an industry</h2>
-    <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Four demo territories below - same tool, four different products, four different answers to "who do I call first?"</p>
+    <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Five demo territories below - same tool, five different products, five different answers to "who do I call first?"</p>
     <div class="cards"><a class="card" href="data-warehouse/">
   <p class="ind">Cloud Data Warehousing</p>
   <p class="cap">Run as if selling a serverless cloud data warehouse.</p>
@@ -155,8 +155,13 @@ a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)
   <p class="cap">Run as if the vendor were TRACTIAN: condition monitoring, CMMS, energy management (not affiliated).</p>
   <div class="mini"><span><b>20</b> accounts</span><span class="hotn"><b>7</b> hot</span></div>
   <div class="go">Open the board &rarr;</div>
+</a><a class="card" href="test-automation/">
+  <p class="ind">Software Test Automation</p>
+  <p class="cap">Run as if the vendor were ContextQA: AI-powered autonomous testing for web, mobile, and API (not affiliated).</p>
+  <div class="mini"><span><b>20</b> accounts</span><span class="hotn"><b>5</b> hot</span></div>
+  <div class="go">Open the board &rarr;</div>
 </a></div>
-    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> Three boards are run against unnamed hypothetical products; the fourth is run as if the vendor were TRACTIAN, which is not affiliated with and has not endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified July 13 and 14, 2026 against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
+    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> Three boards are run against unnamed hypothetical products; the other two are run as if the vendor were a real company - TRACTIAN for industrial machine health and ContextQA for software test automation - neither of which is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified July 13 to 19, 2026 against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
   </section>
 
   <section class="about">
