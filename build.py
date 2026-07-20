@@ -43,9 +43,19 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      AE's working state, not generated data. Only the AE (or an explicit
      instruction) moves an account between statuses.
    - Refresh each account's Angle if its signals materially changed.
-   - Any account that is (or newly became) Hot and has no email draft gets
-     the full three-touch sequence: Email Subject / Email Body / Second
-     Touch Email / Third Touch Email / LinkedIn Note, status To contact.
+   - Message content lives in sequences.csv (Account, Level, Email
+     Subject, Email Body, Second Touch Email, Third Touch Email, LinkedIn
+     Note): THREE rows per drafted account, Level = Executive | Director |
+     BTL, so the message matches the buyer's altitude.
+       Executive: CTO / VP Eng - business outcomes, release risk,
+       headcount economics; under ~80 words; no tool lists.
+       Director: Dir QA / Dir Eng / EM - operational: coverage, cycle
+       time, team leverage, the tooling decision.
+       BTL: QA leads / SDETs - peer-to-peer, names the account's actual
+       stack from roles.csv, empathizes with script maintenance and
+       flake, champion-building tone, extra-low-friction CTA.
+   - Any account that is (or newly became) Hot and has no sequences gets
+     all three levels written, status To contact.
      Touch 1 (Email Body): cold-outbound Eric - short lowercase subject,
      body under ~100 words, "Happy [Day], [First] -" opener, spaced
      hyphens, one concrete signal as the hook, low-friction CTA ("worth
@@ -383,6 +393,13 @@ a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)
 .hunt a.p{color:var(--link)}
 details.draft{margin-top:12px;border-top:1px solid var(--hairline);padding-top:10px;font-family:var(--sans)}
 details.draft summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--link)}
+details.seq{margin-top:12px;border:1px solid var(--hairline);border-radius:6px;padding:0 16px 4px;background:var(--paper2)}
+details.seq>summary{cursor:pointer;font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--ink);padding:11px 0}
+details.seq>summary .who{font-weight:500;color:var(--muted);font-size:12.5px}
+details.seq[open]>summary{border-bottom:1px solid var(--hairline)}
+details.seq details.draft{border-top:0;margin-top:2px;padding-top:8px}
+details.seq details.draft+details.draft{border-top:1px solid var(--hairline)}
+details.seq pre.dbody{background:var(--card)}
 .subj{font-size:13px;color:var(--muted);margin:10px 0 6px}.subj b{color:var(--ink)}
 pre.dbody{white-space:pre-wrap;font-family:var(--serif);font-size:15px;line-height:1.55;background:var(--paper2);border:1px solid var(--hairline);border-radius:6px;padding:14px 16px;margin:0 0 8px}
 button.copy{font-family:var(--sans);font-size:12px;font-weight:600;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
@@ -718,7 +735,7 @@ OUTREACH_PAGE = r'''<!DOCTYPE html>
 
 <main><div class="wrap">
   <p class="lede">The <a href="./">board</a> answers "who's heating up and why." This page turns the top of that board into actual pipeline work: the buyer personas to hunt down, one-click people searches, and a first-touch draft grounded in each account's verified signals - ready to personalize and send.</p>
-  <div class="alsonote"><b>How to work it.</b> Drafts use <b>[First]</b> and <b>[Day]</b> placeholders - run the persona search, put a real name in, and adjust to what you find on their profile before sending. When a touch goes out, <b>click the status chip</b> - it flips between To contact and Contacted right on the page (saved in this browser). The canonical status lives in <code style="font-family:var(--mono);font-size:13px">outreach.csv</code>; report what happened (contacted, replied, meeting) and the next build writes it back and regroups the page. Only the top of the board gets a full draft; when an account heats up, its draft gets written that week.</div>
+  <div class="alsonote"><b>How to work it.</b> Each drafted account carries <b>three sequences</b> - Executive, Director, and BTL - so the message matches the altitude of whoever the persona hunt turns up: outcomes and economics for a CTO, coverage and cycle time for a director, the actual stack and the script-maintenance grind for the practitioner. Drafts use <b>[First]</b> and <b>[Day]</b> placeholders - put a real name in and adjust to their profile before sending. When a touch goes out, <b>click the status chip</b> - it flips between To contact and Contacted right on the page (saved in this browser). The canonical status lives in <code style="font-family:var(--mono);font-size:13px">outreach.csv</code>; report what happened (contacted, replied, meeting) and the next build writes it back and regroups the page. Only the top of the board gets sequences; when an account heats up, they get written that week.</div>
 __GROUPS__
 </div></main>
 
@@ -776,13 +793,30 @@ def read_outreach(path):
             "status": clean(x.get("Status", "")) or "Not started",
             "personas": clean(x.get("Personas", "")),
             "angle": clean(x.get("Angle", "")),
-            "subject": clean(x.get("Email Subject", "")),
-            "body": clean(x.get("Email Body", "")),
-            "touch2": clean(x.get("Second Touch Email", "")),
-            "touch3": clean(x.get("Third Touch Email", "")),
-            "linote": clean(x.get("LinkedIn Note", "")),
             "notes": clean(x.get("Notes", "")),
         })
+    return out
+
+SEQ_LEVELS = [
+    ("Executive", "CTO / VP Engineering"),
+    ("Director", "Directors of QA / Engineering, EMs"),
+    ("BTL", "QA leads / SDETs / practitioners"),
+]
+
+def read_sequences(path):
+    """sequences.csv -> {account: {level: {subject, body, touch2, touch3, linote}}}"""
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, newline="") as f:
+        for x in csv.DictReader(f):
+            out.setdefault(clean(x.get("Account", "")), {})[clean(x.get("Level", ""))] = {
+                "subject": clean(x.get("Email Subject", "")),
+                "body": clean(x.get("Email Body", "")),
+                "touch2": clean(x.get("Second Touch Email", "")),
+                "touch3": clean(x.get("Third Touch Email", "")),
+                "linote": clean(x.get("LinkedIn Note", "")),
+            }
     return out
 
 def read_territory_roles(path):
@@ -811,14 +845,12 @@ def persona_links(account, personas):
         q = urllib.parse.quote(f'"{short}" "{p_clean}"')
         chips.append(f'<a class="p" href="https://www.linkedin.com/search/results/people/'
                      f'?keywords={q}" target="_blank" rel="noopener">{esc(label)} &#8599;</a>')
-    news_q = urllib.parse.quote(f'"{short}"')
-    chips.append(f'<a class="p" href="https://news.google.com/search?q={news_q}" '
-                 f'target="_blank" rel="noopener">recent news &#8599;</a>')
     return "".join(chips)
 
-def outreach_card(o, r, idx, roles=None):
+def outreach_card(o, r, idx, roles=None, seqs=None):
     """One account card. r is the board row (score/tier/meta) or None; roles is
-    the account's verified relevant-req list from roles.csv (or None)."""
+    the account's verified relevant-req list from roles.csv; seqs is the
+    account's per-level sequence dict from sequences.csv (or None)."""
     score_html = ""
     meta_bits = []
     if r:
@@ -834,7 +866,7 @@ def outreach_card(o, r, idx, roles=None):
     scls = STATUS_CLASS.get(o["status"], "s-idle")
     toggle = ' data-acct="%s"' % html.escape(o["account"], quote=True) \
         if o["status"] in ("To contact", "Contacted") else ""
-    has_draft = bool(o["body"].strip())
+    has_draft = bool(seqs)
     parts = [f'<div class="acct{"" if has_draft else " compact"}">',
              f'<div class="aline"><span class="co">{esc(o["account"])}</span>'
              f'<span class="status {scls}"{toggle}>{esc(o["status"])}</span>{score_html}</div>']
@@ -861,29 +893,36 @@ def outreach_card(o, r, idx, roles=None):
         stack = ("".join(f'<span class="p">{esc(t)}</span>' for t in tools)
                  if tools else '<span class="muted">none named in the postings</span>')
         parts.append(f'<p class="hunt" style="margin-top:6px"><b>Stack in the reqs:</b> {stack}</p>')
-    if has_draft:
-        parts.append(
+    for lv, (level, who) in enumerate(SEQ_LEVELS):
+        s = (seqs or {}).get(level)
+        if not s or not s["body"].strip():
+            continue
+        p = f'd{idx}v{lv}'
+        inner = [
             f'<details class="draft"><summary>First-touch email</summary>'
-            f'<p class="subj">subject: <b>{esc(o["subject"])}</b></p>'
-            f'<pre class="dbody" id="d{idx}e">{esc(o["body"])}</pre>'
-            f'<button class="copy" data-t="d{idx}e">copy email</button></details>')
-    if o["touch2"].strip():
+            f'<p class="subj">subject: <b>{esc(s["subject"])}</b></p>'
+            f'<pre class="dbody" id="{p}a">{esc(s["body"])}</pre>'
+            f'<button class="copy" data-t="{p}a">copy email</button></details>']
+        if s["touch2"].strip():
+            inner.append(
+                f'<details class="draft"><summary>Second touch - one-question bump, reply in thread (2-4 days later)</summary>'
+                f'<p class="subj">subject: <b>re: {esc(s["subject"])}</b></p>'
+                f'<pre class="dbody" id="{p}b">{esc(s["touch2"])}</pre>'
+                f'<button class="copy" data-t="{p}b">copy reply</button></details>')
+        if s["touch3"].strip():
+            inner.append(
+                f'<details class="draft"><summary>Third touch - proof point, reply in thread (about a week later)</summary>'
+                f'<p class="subj">subject: <b>re: {esc(s["subject"])}</b></p>'
+                f'<pre class="dbody" id="{p}c">{esc(s["touch3"])}</pre>'
+                f'<button class="copy" data-t="{p}c">copy reply</button></details>')
+        if s["linote"].strip():
+            inner.append(
+                f'<details class="draft"><summary>LinkedIn connection note</summary>'
+                f'<pre class="dbody" id="{p}d">{esc(s["linote"])}</pre>'
+                f'<button class="copy" data-t="{p}d">copy note</button></details>')
         parts.append(
-            f'<details class="draft"><summary>Second touch - one-question bump, reply in thread (2-4 days later)</summary>'
-            f'<p class="subj">subject: <b>re: {esc(o["subject"])}</b></p>'
-            f'<pre class="dbody" id="d{idx}f">{esc(o["touch2"])}</pre>'
-            f'<button class="copy" data-t="d{idx}f">copy reply</button></details>')
-    if o["touch3"].strip():
-        parts.append(
-            f'<details class="draft"><summary>Third touch - proof point, reply in thread (about a week later)</summary>'
-            f'<p class="subj">subject: <b>re: {esc(o["subject"])}</b></p>'
-            f'<pre class="dbody" id="d{idx}g">{esc(o["touch3"])}</pre>'
-            f'<button class="copy" data-t="d{idx}g">copy reply</button></details>')
-    if o["linote"].strip():
-        parts.append(
-            f'<details class="draft"><summary>LinkedIn connection note</summary>'
-            f'<pre class="dbody" id="d{idx}l">{esc(o["linote"])}</pre>'
-            f'<button class="copy" data-t="d{idx}l">copy note</button></details>')
+            f'<details class="seq"><summary>{level} sequence '
+            f'<span class="who">· {who}</span></summary>{"".join(inner)}</details>')
     if o["notes"]:
         parts.append(f'<p class="anote"><b>Note:</b> {esc(o["notes"])}</p>')
     parts.append('</div>')
@@ -898,6 +937,8 @@ def build_outreach(t, board, updated):
     by_account = {r["account"]: r for r in board}
     territory_roles = read_territory_roles(
         os.path.join(ROOT, "data", "territories", t["slug"], "roles.csv"))
+    sequences = read_sequences(
+        os.path.join(ROOT, "data", "territories", t["slug"], "sequences.csv"))
     def score_of_row(o):
         r = by_account.get(o["account"])
         return r["score"] if r else 0
@@ -911,7 +952,8 @@ def build_outreach(t, board, updated):
         cards = []
         for o in rows:
             cards.append(outreach_card(o, by_account.get(o["account"]), idx,
-                                       territory_roles.get(o["account"])))
+                                       territory_roles.get(o["account"]),
+                                       sequences.get(o["account"])))
             idx += 1
         groups_html.append(
             f'<section class="qgroup"><h2>{title} <span class="n">· {len(rows)}</span></h2>'
