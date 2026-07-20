@@ -44,15 +44,25 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      instruction) moves an account between statuses.
    - Refresh each account's Angle if its signals materially changed.
    - Any account that is (or newly became) Hot and has no email draft gets
-     one: full Email Subject / Email Body / Follow-up Email / LinkedIn Note,
-     status To contact.
-     Email voice: cold-outbound Eric - short lowercase subject, body under
-     ~100 words, "Happy [Day], [First] -" opener, spaced hyphens, one
-     concrete signal as the hook, low-friction CTA ("worth 20 minutes?" /
-     "whatever's easiest for you").
-     Follow-up Email: a short reply-in-thread bump sent 2-4 days later -
-     2-3 sentences, ONE new angle not in the first email, and a downgraded
-     ask (offer a two-minute clip / short overview instead of a meeting).
+     the full three-touch sequence: Email Subject / Email Body / Second
+     Touch Email / Third Touch Email / LinkedIn Note, status To contact.
+     Touch 1 (Email Body): cold-outbound Eric - short lowercase subject,
+     body under ~100 words, "Happy [Day], [First] -" opener, spaced
+     hyphens, one concrete signal as the hook, low-friction CTA ("worth
+     20 minutes?" / "whatever's easiest for you").
+     Touch 2 (Second Touch Email): a reply-in-thread one-question bump,
+     2-4 days later. Opens "Hey [First] -" (no Happy [Day]). No pitch -
+     one sharp, genuinely curious discovery question tied to the signal
+     (build vs buy, heads vs leverage, who owns the tooling decision).
+     No signature; end on the question.
+     Touch 3 (Third Touch Email): reply in thread about a week later. NO
+     greeting - body starts directly. Lead with a REAL, public ContextQA
+     proof point relevant to the account (e.g. Clari's 10x release-testing
+     customer story; the two-weeks-to-two-days regression story, always
+     caveated "shift-left plus AI") - never invent a stat; if no relevant
+     public proof exists, skip the stat and offer the clip alone. Close
+     with "Happy to share a short clip if that's easier than a call." and
+     sign "Eric".
      LinkedIn Note format: "Hi [First]!" + a noticed/congrats observation
      + the implication (focus on the account's challenge and why a
      conversation makes sense - never "I work in X" / "I sell X") +
@@ -749,7 +759,8 @@ def read_outreach(path):
             "angle": clean(x.get("Angle", "")),
             "subject": clean(x.get("Email Subject", "")),
             "body": clean(x.get("Email Body", "")),
-            "followup": clean(x.get("Follow-up Email", "")),
+            "touch2": clean(x.get("Second Touch Email", "")),
+            "touch3": clean(x.get("Third Touch Email", "")),
             "linote": clean(x.get("LinkedIn Note", "")),
             "notes": clean(x.get("Notes", "")),
         })
@@ -810,12 +821,18 @@ def outreach_card(o, r, idx):
             f'<p class="subj">subject: <b>{esc(o["subject"])}</b></p>'
             f'<pre class="dbody" id="d{idx}e">{esc(o["body"])}</pre>'
             f'<button class="copy" data-t="d{idx}e">copy email</button></details>')
-    if o["followup"].strip():
+    if o["touch2"].strip():
         parts.append(
-            f'<details class="draft"><summary>Second touch - reply in thread (2-4 days later)</summary>'
+            f'<details class="draft"><summary>Second touch - one-question bump, reply in thread (2-4 days later)</summary>'
             f'<p class="subj">subject: <b>re: {esc(o["subject"])}</b></p>'
-            f'<pre class="dbody" id="d{idx}f">{esc(o["followup"])}</pre>'
+            f'<pre class="dbody" id="d{idx}f">{esc(o["touch2"])}</pre>'
             f'<button class="copy" data-t="d{idx}f">copy reply</button></details>')
+    if o["touch3"].strip():
+        parts.append(
+            f'<details class="draft"><summary>Third touch - proof point, reply in thread (about a week later)</summary>'
+            f'<p class="subj">subject: <b>re: {esc(o["subject"])}</b></p>'
+            f'<pre class="dbody" id="d{idx}g">{esc(o["touch3"])}</pre>'
+            f'<button class="copy" data-t="d{idx}g">copy reply</button></details>')
     if o["linote"].strip():
         parts.append(
             f'<details class="draft"><summary>LinkedIn connection note</summary>'
