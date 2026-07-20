@@ -138,6 +138,10 @@ details.seq[open]>summary{border-bottom:1px solid var(--hairline)}
 details.seq details.draft{border-top:0;margin-top:2px;padding-top:8px}
 details.seq details.draft+details.draft{border-top:1px solid var(--hairline)}
 details.seq pre.dbody{background:var(--card)}
+details.seq.special{border-color:var(--hot)}
+details.seq.special>summary{color:var(--hot)}
+.dns{color:var(--hot);font-weight:700;font-size:12px}
+p.alert{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--hot);border:1px solid color-mix(in srgb,var(--hot) 45%,transparent);background:color-mix(in srgb,var(--hot) 8%,transparent);border-radius:6px;padding:9px 13px;margin:10px 0}
 .subj{font-size:13px;color:var(--muted);margin:10px 0 6px}.subj b{color:var(--ink)}
 pre.dbody{white-space:pre-wrap;font-family:var(--serif);font-size:15px;line-height:1.55;background:var(--paper2);border:1px solid var(--hairline);border-radius:6px;padding:14px 16px;margin:0 0 8px}
 button.copy{font-family:var(--sans);font-size:12px;font-weight:600;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
@@ -168,7 +172,7 @@ button.copy.ok{background:var(--up)}
 
   <section class="boardsec">
     <h2>The board</h2>
-    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;10, recent funding +20, new leadership +20, expansion +12. Hot &ge; 80, Warm &ge; 40. Click any column to re-sort, or any account for the source behind its signals.</p>
+    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;10, recent funding +20, new leadership +20, expansion +12, plus people-signal boosts (new senior tech exec &le;4 months or QA-leadership req filled +25, new director +15). Hot &ge; 80, Warm &ge; 40. Click any column to re-sort, or any account for the source behind its signals.</p>
     <div class="controls">
       <input id="q" type="search" placeholder="Search account, signal, HQ..." autocomplete="off">
       <div class="seg" id="seg">
@@ -196,6 +200,9 @@ button.copy.ok{background:var(--up)}
       <span>recent funding <b>+20</b></span>
       <span>new leadership <b>+20</b></span>
       <span>expansion / new region <b>+12</b></span>
+      <span>new senior tech exec in seat (&le;4 mo) <b>+25</b></span>
+      <span>QA-leadership req filled <b>+25</b></span>
+      <span>new director in seat <b>+15</b></span>
       <span>Hot <b>&ge; 80</b> · Warm <b>&ge; 40</b> · Watch below</span>
     </div>
   </section>
@@ -205,7 +212,7 @@ button.copy.ok{background:var(--up)}
   <p>This is the original Territory Radar territory: 16 real mid-market and enterprise companies scored on buying signals for a cloud infrastructure / DevOps platform, tracked across weekly snapshots since June 2026. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it. The site has since grown into <a href="./">five industry demo territories</a>; this page is preserved because it carries the longest momentum history.</p>
   </section>  <section class="about">
   <h2>How the signal score works</h2>
-  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;10, recent funding +20, new leadership +20, and an expansion or new region +12.</p>
+  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;10, recent funding +20, new leadership +20, and an expansion or new region +12. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15.</p>
   <p><b>Tiers:</b> <span class="tier t-Hot"><i></i>Hot</span> at score &ge; 80, <span class="tier t-Warm"><i></i>Warm</span> at &ge; 40, <span class="tier t-Watch"><i></i>Watch</span> below that. The thresholds flex per territory because a "lot of hiring" means different things in different markets.</p>
   </section>
 </div></main>

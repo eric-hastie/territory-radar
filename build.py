@@ -56,35 +56,80 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
        flake, champion-building tone, extra-low-friction CTA.
    - Any account that is (or newly became) Hot and has no sequences gets
      all three levels written, status To contact.
-     Touch 1 (Email Body): cold-outbound Eric - short lowercase subject,
-     body under ~100 words, "Happy [Day], [First] -" opener, spaced
-     hyphens, one concrete signal as the hook, low-friction CTA ("worth
-     20 minutes?" / "whatever's easiest for you").
-     Touch 2 (Second Touch Email): a reply-in-thread one-question bump,
-     2-4 days later. Opens "Hey [First] -" (no Happy [Day]). No pitch -
-     one sharp, genuinely curious discovery question tied to the signal
-     (build vs buy, heads vs leverage, who owns the tooling decision).
-     No signature; end on the question.
-     Touch 3 (Third Touch Email): reply in thread about a week later. NO
-     greeting - body starts directly. Lead with a REAL, public ContextQA
-     proof point relevant to the account (e.g. Clari's 10x release-testing
-     customer story; the two-weeks-to-two-days regression story, always
-     caveated "shift-left plus AI") - never invent a stat; if no relevant
-     public proof exists, skip the stat and offer the clip alone. Close
-     with "Happy to share a short clip if that's easier than a call." and
-     sign "Eric".
-     OFFSHORE VARIANT of touch 3: if the account's QA reqs are offshore,
-     use the offshore-ROI frame instead - compliment the cost-per-coverage
-     strategy first, compare fully-loaded seat economics (salary,
-     management, ramp, attrition, human-speed scripting) to platform
-     coverage, aim at the NEXT req rather than the existing team, never
-     disparage the team, target US economic buyers (never offshore
-     leadership), no invented ROI numbers, same clip-offer close.
-     LinkedIn Note format: "Hi [First]!" + a noticed/congrats observation
-     + the implication (focus on the account's challenge and why a
-     conversation makes sense - never "I work in X" / "I sell X") +
-     "Open to connecting?". Ground every draft in a verified signal from
-     latest.csv - never invent a signal.
+     TOUCH FORMATS BY LEVEL:
+     Executive T1: opens "[First] - " (no Happy [Day]); TIGHT (40-65
+       words); 100% customer-focused - business priorities from research
+       or RISK (QA bottleneck hurting velocity, business risk of bugs:
+       brand / revenue / regulatory); high-level only - never "manual
+       regression", never product coverage detail (no web/mobile/API);
+       at most one short clause naming ContextQA; CTA exactly
+       "Relevant?" or "Top of mind?" - NEVER ask executives for time.
+     Executive T3: no greeting; ties back to the T1 risk/priority; may
+       state how ContextQA mitigates it (still high-level); where
+       compelling (not every account) include the economics idea -
+       solves testing faster and at lower cost than hiring N engineers
+       (never say "budget-friendly"); no sequence-ending language
+       ("last touch" etc.); CTA exactly "If relevant - would love to
+       connect with the right person on your team to discuss."
+     Director/BTL T1: opens "Happy [Day], [First]! "; body under ~100
+       words; one verified signal as hook. BTL T1 CTA: "worth 20
+       minutes?". BTL leans into practitioner benefits: multiplies
+       output, hands back bandwidth for edge cases and exploratory work.
+     DIFFERENTIATION HOOK (Director + BTL): these buyers drown in
+       identical QA-vendor pitches (fast test creation, less
+       maintenance). Position ContextQA as a different category -
+       agentic/autonomous testing, AI agents that exercise the product
+       like a user and build/maintain coverage themselves, handling
+       dynamic flows script-based tools can't. No hype words, no
+       invented stats.
+     Touch 2 (all levels): reply-in-thread one-question bump, 2-4 days
+       later. Opens "Hey [First] - ". One sharp discovery question at
+       that buyer's altitude. No pitch, no signature, end on question.
+       Every question must parse literally - no nonsense.
+     Director/BTL T3: no greeting; REAL public proof point only (Clari
+       10x release-testing story; two-weeks-to-two-days regression story
+       always caveated "shift-left plus AI"); close "Happy to share a
+       short clip if that's easier than a call." and sign "Eric".
+     OFFSHORE VARIANT of exec/director T3 (accounts with offshore QA
+       reqs): offshore-ROI frame - compliment the cost-per-coverage
+       strategy, compare fully-loaded seat economics to platform
+       coverage, aim at the NEXT req, never disparage the team, target
+       US economic buyers, no invented ROI numbers.
+     LinkedIn notes (every level): format "Hi [First], just sent you an
+       email. We usually hear from [teams like theirs, personalized to
+       seniority] when [challenge] - thought it might be valuable to
+       connect, thanks!" (BTL may use a warmer peer variant: "...would
+       love to learn about your testing setup / compare notes"). A note
+       must NEVER repeat its level's T1 email hook - email and invite go
+       out back to back. EXCEPTION: DeepIntent's notes are approved as
+       written - do not regenerate them.
+     BANNED WORDS/PHRASES (all content): "promise", "matrix",
+       "exam-grade scrutiny" (use "regulatory scrutiny"), "genuinely" in
+       LinkedIn notes, hype words, em/en dashes, invented stats. Ground
+       every draft in latest.csv / roles.csv - never invent a signal.
+1b3. PEOPLE SIGNALS - data/territories/<slug>/people_signals.csv
+   (Account,Type,Person,Title,Date,Note). Types and score boosts (applied
+   at build time, shown on the boards):
+     new-exec (+25): CTO / CIO / relevant VP or chief (engineering,
+       software, quality, AI) newly in seat within ~4 MONTHS. Verify via
+       WebSearch during the leadership pass. When one exists: write a
+       DEDICATED sequence for that person (sequences.csv row with
+       Level=Special; use their real first name, congrats + first-90-days
+       framing, exec formats) - the page renders it in red above the
+       Executive sequence titled "Sequence for new <Title> - for <First>"
+       and marks the Executive sequence "do not send to <First>".
+     new-director (+15): same, for new Directors (QA / Eng).
+     qa-role-filled (+25): a QA/QE director or manager REQ that was in
+       last week's roles.csv is GONE from the board this week (position
+       filled = a buyer just landed). Detect by diffing roles.csv against
+       the prior committed version (git show HEAD:...). Date = removal
+       date. Write a Level=Special sequence tailored to the incoming
+       hire; the page shows a red banner with days-since-removal above
+       Find the buyer.
+   Maintenance: drop new-exec/new-director rows once the person passes ~4
+   months in seat (the boost expires; keep the bold overview mention by
+   moving it into Key Signals if still relevant). Never invent a person
+   or date - only verified events enter this file.
    - If a persona named in a draft's Notes (e.g. "check if the QA Manager
      req was filled") can be verified, update the note.
 1b2. RELEVANT-REQ INVENTORY - territories with an outreach.csv also carry
@@ -400,6 +445,10 @@ details.seq[open]>summary{border-bottom:1px solid var(--hairline)}
 details.seq details.draft{border-top:0;margin-top:2px;padding-top:8px}
 details.seq details.draft+details.draft{border-top:1px solid var(--hairline)}
 details.seq pre.dbody{background:var(--card)}
+details.seq.special{border-color:var(--hot)}
+details.seq.special>summary{color:var(--hot)}
+.dns{color:var(--hot);font-weight:700;font-size:12px}
+p.alert{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--hot);border:1px solid color-mix(in srgb,var(--hot) 45%,transparent);background:color-mix(in srgb,var(--hot) 8%,transparent);border-radius:6px;padding:9px 13px;margin:10px 0}
 .subj{font-size:13px;color:var(--muted);margin:10px 0 6px}.subj b{color:var(--ink)}
 pre.dbody{white-space:pre-wrap;font-family:var(--serif);font-size:15px;line-height:1.55;background:var(--paper2);border:1px solid var(--hairline);border-radius:6px;padding:14px 16px;margin:0 0 8px}
 button.copy{font-family:var(--sans);font-size:12px;font-weight:600;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
@@ -487,7 +536,7 @@ __BRIEFING__
 
   <section class="boardsec">
     <h2>The board</h2>
-    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__. Hot &ge; __HOT_T__, Warm &ge; __WARM__. Click any column to re-sort, or any account for the source behind its signals.</p>
+    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__, plus people-signal boosts (new senior tech exec &le;4 months or QA-leadership req filled +25, new director +15). Hot &ge; __HOT_T__, Warm &ge; __WARM__. Click any column to re-sort, or any account for the source behind its signals.</p>
     <div class="controls">
       <input id="q" type="search" placeholder="Search account, signal, HQ..." autocomplete="off">
       <div class="seg" id="seg">
@@ -515,6 +564,9 @@ __MOMTH__
       <span>recent funding <b>+__W_FUNDING__</b></span>
       <span>new leadership <b>+__W_LEADERSHIP__</b></span>
       <span>expansion / new region <b>+__W_EXPANSION__</b></span>
+      <span>new senior tech exec in seat (&le;4 mo) <b>+25</b></span>
+      <span>QA-leadership req filled <b>+25</b></span>
+      <span>new director in seat <b>+15</b></span>
       <span>Hot <b>&ge; __HOT_T__</b> · Warm <b>&ge; __WARM__</b> · Watch below</span>
     </div>
   </section>
@@ -568,7 +620,7 @@ MOM_TH = '        <th data-k="mom">Momentum <span class="arw"></span></th>'
 
 SCORE_HELP = r'''  <section class="about">
   <h2>How the signal score works</h2>
-  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__.</p>
+  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15.</p>
   <p><b>Tiers:</b> <span class="tier t-Hot"><i></i>Hot</span> at score &ge; __HOT_T__, <span class="tier t-Warm"><i></i>Warm</span> at &ge; __WARM__, <span class="tier t-Watch"><i></i>Watch</span> below that. The thresholds flex per territory because a "lot of hiring" means different things in different markets.</p>
   </section>'''
 
@@ -803,6 +855,48 @@ SEQ_LEVELS = [
     ("BTL", "QA leads / SDETs / practitioners"),
 ]
 
+# people_signals.csv: verified person-level events that boost an account's
+# score and unlock a dedicated red sequence. Types:
+#   new-exec        - CTO / CIO / relevant VP or chief (eng, software, quality,
+#                     AI) new in seat within ~4 months            -> +25
+#   new-director    - new Director (QA / Eng) in seat, ~4 months  -> +15
+#   qa-role-filled  - a QA/QE director or manager REQ disappeared from the
+#                     board (position filled); Date = removal date -> +25
+PEOPLE_BOOSTS = {"new-exec": 25, "new-director": 15, "qa-role-filled": 25}
+
+def read_people_signals(path):
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, newline="") as f:
+        for x in csv.DictReader(f):
+            out.setdefault(clean(x.get("Account", "")), []).append({
+                "type": clean(x.get("Type", "")).strip(),
+                "person": clean(x.get("Person", "")),
+                "title": clean(x.get("Title", "")),
+                "date": clean(x.get("Date", "")).strip(),
+                "note": clean(x.get("Note", "")),
+            })
+    return out
+
+def signal_month(date_s):
+    """'2026-05' or '2026-05-12' -> 'May 2026' (best effort)."""
+    try:
+        parts = date_s.split("-")
+        d = datetime.date(int(parts[0]), int(parts[1]), 1)
+        return d.strftime("%B %Y")
+    except (ValueError, IndexError):
+        return date_s
+
+def apply_people_boosts(board, people, hot, warm):
+    for r in board:
+        sigs = people.get(r["account"], [])
+        boost = sum(PEOPLE_BOOSTS.get(s["type"], 0) for s in sigs)
+        if boost:
+            r["score"] += boost
+            r["tier"] = tier_of(r["score"], hot, warm)
+    return board
+
 def read_sequences(path):
     """sequences.csv -> {account: {level: {subject, body, touch2, touch3, linote}}}"""
     out = {}
@@ -847,10 +941,19 @@ def persona_links(account, personas):
                      f'?keywords={q}" target="_blank" rel="noopener">{esc(label)} &#8599;</a>')
     return "".join(chips)
 
-def outreach_card(o, r, idx, roles=None, seqs=None):
+def days_ago(date_s):
+    try:
+        d = datetime.date.fromisoformat(date_s)
+        return (datetime.date.today() - d).days
+    except ValueError:
+        return None
+
+def outreach_card(o, r, idx, roles=None, seqs=None, psigs=None):
     """One account card. r is the board row (score/tier/meta) or None; roles is
     the account's verified relevant-req list from roles.csv; seqs is the
-    account's per-level sequence dict from sequences.csv (or None)."""
+    account's per-level sequence dict from sequences.csv; psigs is the
+    account's people_signals rows (or None)."""
+    psigs = psigs or []
     score_html = ""
     meta_bits = []
     if r:
@@ -874,6 +977,17 @@ def outreach_card(o, r, idx, roles=None, seqs=None):
         parts.append(f'<div class="meta">{esc(meta)}</div>')
     if o["angle"]:
         parts.append(f'<p class="angle">{esc(o["angle"])}</p>')
+    for s in psigs:
+        if s["type"] in ("new-exec", "new-director"):
+            parts.append(f'<p class="angle"><b>New {esc(s["title"])} as of '
+                         f'{esc(signal_month(s["date"]))}: {esc(s["person"])}.</b></p>')
+    for s in psigs:
+        if s["type"] == "qa-role-filled":
+            n = days_ago(s["date"])
+            ago = f' - {n} days ago' if n is not None else ""
+            parts.append(f'<p class="alert">{esc(s["title"])} posting removed '
+                         f'{esc(s["date"])}{ago}; check LinkedIn to find the new '
+                         f'{esc(s["title"])}. Use the dedicated sequence below.</p>')
     parts.append(f'<p class="hunt"><b>Find the buyer:</b> {persona_links(o["account"], o["personas"])}</p>')
     if r and r["url"]:
         ats = ("Greenhouse" if "greenhouse" in r["url"] else "Lever" if "lever.co" in r["url"]
@@ -893,7 +1007,20 @@ def outreach_card(o, r, idx, roles=None, seqs=None):
         stack = ("".join(f'<span class="p">{esc(t)}</span>' for t in tools)
                  if tools else '<span class="muted">none named in the postings</span>')
         parts.append(f'<p class="hunt" style="margin-top:6px"><b>Stack in the reqs:</b> {stack}</p>')
-    for lv, (level, who) in enumerate(SEQ_LEVELS):
+    new_exec = next((s for s in psigs if s["type"] == "new-exec"), None)
+    filled = next((s for s in psigs if s["type"] in ("qa-role-filled", "new-director")), None)
+    levels = []
+    if (seqs or {}).get("Special") and (new_exec or filled):
+        sig = new_exec or filled
+        label = f'Sequence for new {sig["title"]}'
+        if new_exec:
+            label += f' - for {sig["person"].split()[0]}'
+        levels.append(("Special", label, "", "seq special", ""))
+    for level, who in SEQ_LEVELS:
+        dns = (f'do not send to {new_exec["person"].split()[0]}'
+               if level == "Executive" and new_exec else "")
+        levels.append((level, f'{level} sequence', who, "seq", dns))
+    for lv, (level, label, who, cls, dns) in enumerate(levels):
         s = (seqs or {}).get(level)
         if not s or not s["body"].strip():
             continue
@@ -920,16 +1047,19 @@ def outreach_card(o, r, idx, roles=None, seqs=None):
                 f'<details class="draft"><summary>LinkedIn connection note</summary>'
                 f'<pre class="dbody" id="{p}d">{esc(s["linote"])}</pre>'
                 f'<button class="copy" data-t="{p}d">copy note</button></details>')
+        who_html = f' <span class="who">· {who}</span>' if who else ""
+        dns_html = f' <span class="dns">· {esc(dns)}</span>' if dns else ""
         parts.append(
-            f'<details class="seq"><summary>{level} sequence '
-            f'<span class="who">· {who}</span></summary>{"".join(inner)}</details>')
+            f'<details class="{cls}"><summary>{esc(label)}{who_html}{dns_html}'
+            f'</summary>{"".join(inner)}</details>')
     if o["notes"]:
         parts.append(f'<p class="anote"><b>Note:</b> {esc(o["notes"])}</p>')
     parts.append('</div>')
     return "".join(parts)
 
-def build_outreach(t, board, updated):
+def build_outreach(t, board, updated, people=None):
     """Render <slug>/outreach.html if the territory has an outreach.csv."""
+    people = people or {}
     path = os.path.join(ROOT, "data", "territories", t["slug"], "outreach.csv")
     queue = read_outreach(path)
     if not queue:
@@ -953,7 +1083,8 @@ def build_outreach(t, board, updated):
         for o in rows:
             cards.append(outreach_card(o, by_account.get(o["account"]), idx,
                                        territory_roles.get(o["account"]),
-                                       sequences.get(o["account"])))
+                                       sequences.get(o["account"]),
+                                       people.get(o["account"])))
             idx += 1
         groups_html.append(
             f'<section class="qgroup"><h2>{title} <span class="n">· {len(rows)}</span></h2>'
@@ -1097,6 +1228,8 @@ def build_territory(t):
         print(f"no {csv_path} - skipping {t['slug']}")
         return None
     board = read_csv(csv_path, t["hot"], t["warm"])
+    people = read_people_signals(os.path.join(data_dir, "people_signals.csv"))
+    board = apply_people_boosts(board, people, t["hot"], t["warm"])
     snaps = snapshots(data_dir, t["hot"], t["warm"])
     board = add_momentum(board, snaps)
     board.sort(key=lambda r: r["score"], reverse=True)
@@ -1131,7 +1264,7 @@ def build_territory(t):
     }
     render_board(os.path.join(ROOT, t["slug"], "index.html"), board, ctx)
     if has_queue:
-        build_outreach(t, board, updated)
+        build_outreach(t, board, updated, people)
     hot_n = sum(1 for r in board if r["tier"] == "Hot")
     print(f'built {t["slug"]}/index.html: {len(board)} accounts, {hot_n} hot')
     return {"slug": t["slug"], "industry": t["industry"], "caption": t["caption"],
