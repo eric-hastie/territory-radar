@@ -787,6 +787,14 @@ def outreach_card(o, r, idx):
     if o["angle"]:
         parts.append(f'<p class="angle">{esc(o["angle"])}</p>')
     parts.append(f'<p class="hunt"><b>Find the buyer:</b> {persona_links(o["account"], o["personas"])}</p>')
+    if r and r["url"]:
+        ats = ("Greenhouse" if "greenhouse" in r["url"] else "Lever" if "lever.co" in r["url"]
+               else "Ashby" if "ashbyhq" in r["url"] else "Workday" if "myworkdayjobs" in r["url"]
+               else "Workable" if "workable" in r["url"] else "careers site")
+        label = f'{r["roles"]} relevant / {r["total_roles"]} open roles on {ats}'
+        parts.append(f'<p class="hunt" style="margin-top:6px"><b>Jobs board:</b> '
+                     f'<a class="p" href="{html.escape(r["url"], quote=True)}" target="_blank" '
+                     f'rel="noopener">{label} &#8599;</a></p>')
     if has_draft:
         parts.append(
             f'<details class="draft"><summary>First-touch email</summary>'
