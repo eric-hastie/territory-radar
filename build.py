@@ -34,6 +34,10 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
    public sources, rewrite latest.csv in the same column schema, and save an
    identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
    dated snapshots are what power the momentum column and the movers briefing.
+   Some territories (test-automation) carry an extra trailing "Est Devs"
+   column (rough estimated developer count) and use an estimated RANGE like
+   "200-500" in Headcount - keep both when rewriting, refresh only on real
+   evidence.
 1b. ACTION QUEUE - if the folder has an outreach.csv, maintain it:
    - PRESERVE the Status and Notes columns exactly as found; they are the
      AE's working state, not generated data. Only the AE (or an explicit
@@ -119,10 +123,10 @@ TERRITORIES = [
         "industry": "Software Test Automation",
         "caption": "Run as if the vendor were ContextQA: AI-powered autonomous testing for web, mobile, and API (not affiliated).",
         "vendor_line": "run as if the vendor were <b>ContextQA</b>, selling AI-powered autonomous testing for web, mobile, and API to QA and engineering teams (an illustrative demo, not affiliated with or endorsed by ContextQA)",
-        "icp": "Mid-market software companies (roughly 100 to 2,000 employees) shipping web and mobile products on fast release cycles, where QA has become the bottleneck: the tell is an active req list for manual QA engineers, SDETs, and test automation engineers, which signals test-coverage pain that AI-powered autonomous testing (web, mobile, API) can absorb. Primary buyers are QA leads and managers, engineering managers, and VPs of Engineering; a QA leadership req, fresh funding, or a new engineering executive is the timing trigger.",
+        "icp": "Mid-market software companies (roughly 200 to 2,000 employees) building high-stakes, compliance-heavy, or complex-integration products - logistics and supply chain, BFSI (banking, financial services, insurance), HR tech and payroll, CRM and customer platforms, health tech - where testing is genuinely painful and release risk is real money. They ship web and mobile products on fast release cycles, and the tell is an active req list for QA engineers, SDETs, and test automation engineers: test-coverage pain that AI-powered autonomous testing (web, mobile, API) can absorb. Primary buyers are QA leads and managers, engineering managers, and VPs of Engineering; a QA leadership req, fresh funding, or a new engineering executive is the timing trigger.",
         "hot": 52, "warm": 22,
-        "verified": "July 19, 2026",
-        "desc": "Demo sales territory for software test automation: 20 real software companies scored on live QA and SDET hiring, funding, and leadership buying signals.",
+        "verified": "July 19 to 20, 2026",
+        "desc": "Demo sales territory for software test automation: 50 real software companies in high-stakes verticals scored on live QA and SDET hiring, funding, and leadership buying signals.",
     },
 ]
 
@@ -174,6 +178,7 @@ def read_csv(path, hot, warm):
             "funding_sig": to_int(x.get("Funding Signal", 0)),
             "leadership_sig": to_int(x.get("Leadership Signal", 0)),
             "expansion_sig": to_int(x.get("Expansion Signal", 0)),
+            "est_devs": clean(x.get("Est Devs", "")),
             "signals": clean(x.get("Key Signals", "")),
             "why": clean(x.get("Why Now", "")),
             "url": clean(x.get("Source URL", "")),
@@ -334,6 +339,8 @@ a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)
 .status.s-now{color:var(--accent)}
 .status.s-active{color:var(--up)}
 .status.s-idle{color:var(--muted)}
+.status[data-acct]{cursor:pointer}
+.status[data-acct]:hover{border-color:currentColor}
 .angle{color:var(--ink2);font-size:15.5px;margin:8px 0 10px;line-height:1.5}
 .hunt{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:0}
 .hunt a.p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:3px 9px;margin:3px 4px 0 0;color:var(--link)}
@@ -366,7 +373,7 @@ LANDING = r'''<!DOCTYPE html>
 <header><div class="wrap">
   <p class="kicker">B2B Sales · Territory Intelligence</p>
   <h1>Territory Radar</h1>
-  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; five demo industries, 100 accounts &nbsp;·&nbsp; updated __DATEHUMAN__ &nbsp;·&nbsp; built by Eric Hastie</p>
+  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; five demo industries, __NACCTS__ accounts &nbsp;·&nbsp; updated __DATEHUMAN__ &nbsp;·&nbsp; built by Eric Hastie</p>
   <hr class="doubling">
 </div></header>
 
@@ -674,7 +681,7 @@ OUTREACH_PAGE = r'''<!DOCTYPE html>
 
 <main><div class="wrap">
   <p class="lede">The <a href="./">board</a> answers "who's heating up and why." This page turns the top of that board into actual pipeline work: the buyer personas to hunt down, one-click people searches, and a first-touch draft grounded in each account's verified signals - ready to personalize and send.</p>
-  <div class="alsonote"><b>How to work it.</b> Drafts use <b>[First]</b> and <b>[Day]</b> placeholders - run the persona search, put a real name in, and adjust to what you find on their profile before sending. Statuses live in <code style="font-family:var(--mono);font-size:13px">outreach.csv</code>; when something happens (contacted, replied, meeting), update the row - or just tell the refresh agent - and this page regroups on the next build. Only the top of the board gets a full draft; when an account heats up, its draft gets written that week.</div>
+  <div class="alsonote"><b>How to work it.</b> Drafts use <b>[First]</b> and <b>[Day]</b> placeholders - run the persona search, put a real name in, and adjust to what you find on their profile before sending. When a touch goes out, <b>click the status chip</b> - it flips between To contact and Contacted right on the page (saved in this browser). The canonical status lives in <code style="font-family:var(--mono);font-size:13px">outreach.csv</code>; report what happened (contacted, replied, meeting) and the next build writes it back and regroups the page. Only the top of the board gets a full draft; when an account heats up, its draft gets written that week.</div>
 __GROUPS__
 </div></main>
 
@@ -690,6 +697,18 @@ document.querySelectorAll('button.copy').forEach(b=>b.onclick=()=>{
     const old=b.textContent;b.textContent='copied!';b.classList.add('ok');
     setTimeout(()=>{b.textContent=old;b.classList.remove('ok')},1600);
   });
+});
+const KEY='trq-status-'+location.pathname;
+const saved=JSON.parse(localStorage.getItem(KEY)||'{}');
+document.querySelectorAll('.status[data-acct]').forEach(ch=>{
+  const a=ch.dataset.acct;
+  const apply=v=>{ch.textContent=v;
+    ch.classList.toggle('s-active',v==='Contacted');
+    ch.classList.toggle('s-now',v==='To contact');};
+  if(saved[a])apply(saved[a]);
+  ch.title='Click to toggle: To contact / Contacted (saved in this browser until the CSV catches up)';
+  ch.onclick=()=>{const v=ch.textContent.trim()==='To contact'?'Contacted':'To contact';
+    apply(v);saved[a]=v;localStorage.setItem(KEY,JSON.stringify(saved));};
 });
 </script>
 </body></html>'''
@@ -745,16 +764,24 @@ def persona_links(account, personas):
 def outreach_card(o, r, idx):
     """One account card. r is the board row (score/tier/meta) or None."""
     score_html = ""
+    meta_bits = []
     if r:
         tcolor = TIER_VAR[r["tier"]]
         score_html = (f'<span class="sc"><span class="scoren num" style="color:{tcolor}">{r["score"]}</span>'
                       f'<span class="tier t-{r["tier"]}"><i></i>{r["tier"]}</span></span>')
-    meta = " · ".join(b for b in ([r["industry"], r["hq"]] if r else []) if b)
+        meta_bits = [r["industry"], r["hq"]]
+        if r["headcount"]:
+            meta_bits.append(f'{r["headcount"]} employees')
+        if r.get("est_devs"):
+            meta_bits.append(f'~{r["est_devs"]} devs (est.)')
+    meta = " · ".join(b for b in meta_bits if b)
     scls = STATUS_CLASS.get(o["status"], "s-idle")
+    toggle = ' data-acct="%s"' % html.escape(o["account"], quote=True) \
+        if o["status"] in ("To contact", "Contacted") else ""
     has_draft = bool(o["body"].strip())
     parts = [f'<div class="acct{"" if has_draft else " compact"}">',
              f'<div class="aline"><span class="co">{esc(o["account"])}</span>'
-             f'<span class="status {scls}">{esc(o["status"])}</span>{score_html}</div>']
+             f'<span class="status {scls}"{toggle}>{esc(o["status"])}</span>{score_html}</div>']
     if meta:
         parts.append(f'<div class="meta">{esc(meta)}</div>')
     if o["angle"]:
@@ -1072,6 +1099,7 @@ def build_landing(cards_info, today_human):
         for c in cards_info if c)
     html_s = (LANDING
               .replace("__CSS__", CSS)
+              .replace("__NACCTS__", str(sum(c["accounts"] for c in cards_info if c)))
               .replace("__CARDS__", cards)
               .replace("__GREETING__", greeting())
               .replace("__DATEHUMAN__", updated)
