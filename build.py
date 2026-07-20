@@ -77,6 +77,17 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      latest.csv - never invent a signal.
    - If a persona named in a draft's Notes (e.g. "check if the QA Manager
      req was filled") can be verified, update the note.
+1b2. RELEVANT-REQ INVENTORY - territories with an outreach.csv also carry
+   data/territories/<slug>/roles.csv (Account,Title,Location,URL,Tools):
+   one row per relevant open req, where Tools is a pipe-separated list of
+   testing tools/frameworks named in that posting's description (Selenium,
+   Playwright, Cypress, Appium, JMeter, ...). Rebuild it each run from the
+   same board fetches used for the counts (Greenhouse ?content=true, Lever
+   JSON, Ashby posting-api all include descriptions). Keep it consistent
+   with latest.csv's Relevant Roles counts. Software roles only - exclude
+   hardware/RF/validation/system-test titles and interns. Accounts on
+   Workday/Workable (no public JSON API) simply have no rows here; the
+   page omits the req list for them automatically.
 1c. GROW THE TERRITORY (only territories that have an outreach.csv) - each
    week hunt for up to 3 NEW companies that match the territory's ICP and
    newly show a trigger (fresh funding, new QA / eng-leadership req,
@@ -773,6 +784,22 @@ def read_outreach(path):
         })
     return out
 
+def read_territory_roles(path):
+    """roles.csv -> {account: [{title, location, url, tools}]}. Accounts absent
+    from the file were not API-verifiable (Workday/Workable boards)."""
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, newline="") as f:
+        for x in csv.DictReader(f):
+            out.setdefault(clean(x.get("Account", "")), []).append({
+                "title": clean(x.get("Title", "")),
+                "location": clean(x.get("Location", "")),
+                "url": clean(x.get("URL", "")),
+                "tools": [t.strip() for t in clean(x.get("Tools", "")).split("|") if t.strip()],
+            })
+    return out
+
 def persona_links(account, personas):
     short = account.split(" (")[0].strip()
     chips = []
@@ -788,8 +815,9 @@ def persona_links(account, personas):
                  f'target="_blank" rel="noopener">recent news &#8599;</a>')
     return "".join(chips)
 
-def outreach_card(o, r, idx):
-    """One account card. r is the board row (score/tier/meta) or None."""
+def outreach_card(o, r, idx, roles=None):
+    """One account card. r is the board row (score/tier/meta) or None; roles is
+    the account's verified relevant-req list from roles.csv (or None)."""
     score_html = ""
     meta_bits = []
     if r:
@@ -822,6 +850,16 @@ def outreach_card(o, r, idx):
         parts.append(f'<p class="hunt" style="margin-top:6px"><b>Jobs board:</b> '
                      f'<a class="p" href="{html.escape(r["url"], quote=True)}" target="_blank" '
                      f'rel="noopener">{label} &#8599;</a></p>')
+    if roles:
+        req_links = "".join(
+            f'<a class="p" href="{html.escape(j["url"], quote=True)}" target="_blank" '
+            f'rel="noopener" title="{html.escape(j["location"], quote=True)}">'
+            f'{esc(j["title"])} &#8599;</a>' for j in roles)
+        parts.append(f'<p class="hunt" style="margin-top:6px"><b>Relevant reqs:</b> {req_links}</p>')
+        tools = sorted({t for j in roles for t in j["tools"]})
+        stack = ("".join(f'<span class="p">{esc(t)}</span>' for t in tools)
+                 if tools else '<span class="muted">none named in the postings</span>')
+        parts.append(f'<p class="hunt" style="margin-top:6px"><b>Stack in the reqs:</b> {stack}</p>')
     if has_draft:
         parts.append(
             f'<details class="draft"><summary>First-touch email</summary>'
@@ -857,6 +895,8 @@ def build_outreach(t, board, updated):
     if not queue:
         return False
     by_account = {r["account"]: r for r in board}
+    territory_roles = read_territory_roles(
+        os.path.join(ROOT, "data", "territories", t["slug"], "roles.csv"))
     def score_of_row(o):
         r = by_account.get(o["account"])
         return r["score"] if r else 0
@@ -869,7 +909,8 @@ def build_outreach(t, board, updated):
             continue
         cards = []
         for o in rows:
-            cards.append(outreach_card(o, by_account.get(o["account"]), idx))
+            cards.append(outreach_card(o, by_account.get(o["account"]), idx,
+                                       territory_roles.get(o["account"])))
             idx += 1
         groups_html.append(
             f'<section class="qgroup"><h2>{title} <span class="n">· {len(rows)}</span></h2>'
