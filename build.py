@@ -63,6 +63,13 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      public proof exists, skip the stat and offer the clip alone. Close
      with "Happy to share a short clip if that's easier than a call." and
      sign "Eric".
+     OFFSHORE VARIANT of touch 3: if the account's QA reqs are offshore,
+     use the offshore-ROI frame instead - compliment the cost-per-coverage
+     strategy first, compare fully-loaded seat economics (salary,
+     management, ramp, attrition, human-speed scripting) to platform
+     coverage, aim at the NEXT req rather than the existing team, never
+     disparage the team, target US economic buyers (never offshore
+     leadership), no invented ROI numbers, same clip-offer close.
      LinkedIn Note format: "Hi [First]!" + a noticed/congrats observation
      + the implication (focus on the account's challenge and why a
      conversation makes sense - never "I work in X" / "I sell X") +
