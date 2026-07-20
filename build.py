@@ -44,12 +44,20 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      instruction) moves an account between statuses.
    - Refresh each account's Angle if its signals materially changed.
    - Any account that is (or newly became) Hot and has no email draft gets
-     one: full Email Subject / Email Body / LinkedIn Note, status To contact.
-     Voice: cold-outbound Eric - short lowercase subject, body under ~100
-     words, "Happy [Day], [First] -" opener, spaced hyphens, one concrete
-     signal as the hook, low-friction CTA ("worth 20 minutes?" /
-     "whatever's easiest for you"). Ground every draft in a verified signal
-     from latest.csv - never invent a signal.
+     one: full Email Subject / Email Body / Follow-up Email / LinkedIn Note,
+     status To contact.
+     Email voice: cold-outbound Eric - short lowercase subject, body under
+     ~100 words, "Happy [Day], [First] -" opener, spaced hyphens, one
+     concrete signal as the hook, low-friction CTA ("worth 20 minutes?" /
+     "whatever's easiest for you").
+     Follow-up Email: a short reply-in-thread bump sent 2-4 days later -
+     2-3 sentences, ONE new angle not in the first email, and a downgraded
+     ask (offer a two-minute clip / short overview instead of a meeting).
+     LinkedIn Note format: "Hi [First]!" + a noticed/congrats observation
+     + the implication (focus on the account's challenge and why a
+     conversation makes sense - never "I work in X" / "I sell X") +
+     "Open to connecting?". Ground every draft in a verified signal from
+     latest.csv - never invent a signal.
    - If a persona named in a draft's Notes (e.g. "check if the QA Manager
      req was filled") can be verified, update the note.
 1c. GROW THE TERRITORY (only territories that have an outreach.csv) - each
@@ -741,6 +749,7 @@ def read_outreach(path):
             "angle": clean(x.get("Angle", "")),
             "subject": clean(x.get("Email Subject", "")),
             "body": clean(x.get("Email Body", "")),
+            "followup": clean(x.get("Follow-up Email", "")),
             "linote": clean(x.get("LinkedIn Note", "")),
             "notes": clean(x.get("Notes", "")),
         })
@@ -801,6 +810,12 @@ def outreach_card(o, r, idx):
             f'<p class="subj">subject: <b>{esc(o["subject"])}</b></p>'
             f'<pre class="dbody" id="d{idx}e">{esc(o["body"])}</pre>'
             f'<button class="copy" data-t="d{idx}e">copy email</button></details>')
+    if o["followup"].strip():
+        parts.append(
+            f'<details class="draft"><summary>Second touch - reply in thread (2-4 days later)</summary>'
+            f'<p class="subj">subject: <b>re: {esc(o["subject"])}</b></p>'
+            f'<pre class="dbody" id="d{idx}f">{esc(o["followup"])}</pre>'
+            f'<button class="copy" data-t="d{idx}f">copy reply</button></details>')
     if o["linote"].strip():
         parts.append(
             f'<details class="draft"><summary>LinkedIn connection note</summary>'
