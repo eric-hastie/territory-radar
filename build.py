@@ -34,6 +34,27 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
    public sources, rewrite latest.csv in the same column schema, and save an
    identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
    dated snapshots are what power the momentum column and the movers briefing.
+1b. ACTION QUEUE - if the folder has an outreach.csv, maintain it:
+   - PRESERVE the Status and Notes columns exactly as found; they are the
+     AE's working state, not generated data. Only the AE (or an explicit
+     instruction) moves an account between statuses.
+   - Refresh each account's Angle if its signals materially changed.
+   - Any account that is (or newly became) Hot and has no email draft gets
+     one: full Email Subject / Email Body / LinkedIn Note, status To contact.
+     Voice: cold-outbound Eric - short lowercase subject, body under ~100
+     words, "Happy [Day], [First] -" opener, spaced hyphens, one concrete
+     signal as the hook, low-friction CTA ("worth 20 minutes?" /
+     "whatever's easiest for you"). Ground every draft in a verified signal
+     from latest.csv - never invent a signal.
+   - If a persona named in a draft's Notes (e.g. "check if the QA Manager
+     req was filled") can be verified, update the note.
+1c. GROW THE TERRITORY - each week hunt for up to 3 NEW companies that match
+   the territory's ICP and newly show a trigger (fresh funding, new QA /
+   eng-leadership req, expansion). Verify against their live ATS board, then
+   append them to latest.csv (momentum will show them as NEW) and add an
+   outreach.csv row (status Not started, personas + angle only). Companies
+   with zero relevant signal may be dropped after 4+ consecutive quiet weeks
+   - note the drop in the commit message.
 2. Never edit HTML by hand. Run:  python3 build.py
    It regenerates all five territory boards AND the landing page AND the
    legacy pages in one pass, so a data refresh can never clobber the landing.
@@ -42,7 +63,7 @@ Notes: the legacy board (data/latest.csv + data/*.csv snapshots) may be
 refreshed on the same cadence or left frozen - build.py handles both, and
 skips any board whose latest.csv is missing.
 """
-import csv, json, os, datetime, glob, re, html
+import csv, json, os, datetime, glob, re, html, urllib.parse
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = "eric-hastie/territory-radar"
@@ -301,6 +322,27 @@ a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)
 .panel{background:var(--card);border:1px solid var(--hairline);border-radius:6px;padding:18px}
 .legend{display:flex;gap:18px;margin-top:10px;font-family:var(--sans);font-size:12.5px;color:var(--muted)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.qgroup{margin-top:38px}
+.qgroup h2 .n{color:var(--muted);font-weight:500;font-size:17px}
+.acct{background:var(--card);border:1px solid var(--hairline);border-radius:6px;padding:18px 20px;margin:14px 0}
+.acct.compact{padding:14px 20px}
+.aline{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.aline .co{font-size:18px}
+.aline .sc{margin-left:auto;white-space:nowrap}
+.status{display:inline-block;font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1px solid var(--hairline);background:var(--paper2)}
+.status.s-now{color:var(--accent)}
+.status.s-active{color:var(--up)}
+.status.s-idle{color:var(--muted)}
+.angle{color:var(--ink2);font-size:15.5px;margin:8px 0 10px;line-height:1.5}
+.hunt{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:0}
+.hunt a.p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:3px 9px;margin:3px 4px 0 0;color:var(--link)}
+details.draft{margin-top:12px;border-top:1px solid var(--hairline);padding-top:10px;font-family:var(--sans)}
+details.draft summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--link)}
+.subj{font-size:13px;color:var(--muted);margin:10px 0 6px}.subj b{color:var(--ink)}
+pre.dbody{white-space:pre-wrap;font-family:var(--serif);font-size:15px;line-height:1.55;background:var(--paper2);border:1px solid var(--hairline);border-radius:6px;padding:14px 16px;margin:0 0 8px}
+button.copy{font-family:var(--sans);font-size:12px;font-weight:600;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
+button.copy.ok{background:var(--up)}
+.anote{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:10px 0 0}
 .wk{border-bottom:1px solid var(--hairline);padding:14px 0}.wk:last-child{border-bottom:0}
 .wkhead{font-size:15px;margin-bottom:8px}
 .wkrow{display:flex;gap:8px;align-items:baseline;margin:4px 0;flex-wrap:wrap;font-family:var(--sans)}
@@ -613,6 +655,173 @@ def read_roles(path):
         })
     return out
 
+# ------------------------------- action queue --------------------------------
+OUTREACH_PAGE = r'''<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Action Queue - __INDUSTRY__ - Territory Radar</title>
+<meta name="description" content="The working outreach queue for the __INDUSTRY__ demo territory: buyer personas, one-click people searches, and signal-grounded first-touch drafts.">
+<style>__CSS__</style></head><body>
+<header><div class="wrap">
+  <p class="kicker">Territory Radar · Action Queue</p>
+  <h1>This week's outreach</h1>
+  <p class="dateline"><b>__INDUSTRY__</b> &nbsp;·&nbsp; week of __DATEHUMAN__ &nbsp;·&nbsp; __COUNTS__</p>
+  <p class="dateline" style="margin-top:8px">__NAV__</p>
+  <hr class="doubling">
+</div></header>
+
+<main><div class="wrap">
+  <p class="lede">The <a href="./">board</a> answers "who's heating up and why." This page turns the top of that board into actual pipeline work: the buyer personas to hunt down, one-click people searches, and a first-touch draft grounded in each account's verified signals - ready to personalize and send.</p>
+  <div class="alsonote"><b>How to work it.</b> Drafts use <b>[First]</b> and <b>[Day]</b> placeholders - run the persona search, put a real name in, and adjust to what you find on their profile before sending. Statuses live in <code style="font-family:var(--mono);font-size:13px">outreach.csv</code>; when something happens (contacted, replied, meeting), update the row - or just tell the refresh agent - and this page regroups on the next build. Only the top of the board gets a full draft; when an account heats up, its draft gets written that week.</div>
+__GROUPS__
+</div></main>
+
+<footer><div class="wrap">
+  <p><b>Methodology.</b> Every draft's hook is a signal verified on the <a href="./">territory board</a> - nothing is invented. This board is __VENDORLINE__. The drafts are illustrative demo copy in my own outbound voice, not sent mail.</p>
+  <p><a href="./">&larr; Back to the board</a> · <a href="../">All industries</a> · <a href="https://github.com/__REPO__" target="_blank" rel="noopener">source on GitHub</a>.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · auto-refreshed weekly · see you next Monday</p>
+</div></footer>
+<script>
+document.querySelectorAll('button.copy').forEach(b=>b.onclick=()=>{
+  const el=document.getElementById(b.dataset.t);
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    const old=b.textContent;b.textContent='copied!';b.classList.add('ok');
+    setTimeout(()=>{b.textContent=old;b.classList.remove('ok')},1600);
+  });
+});
+</script>
+</body></html>'''
+
+STATUS_CLASS = {"To contact": "s-now", "Contacted": "s-active", "Replied": "s-active",
+                "Meeting": "s-active", "Hold": "s-idle", "Not started": "s-idle"}
+
+QUEUE_GROUPS = [
+    ("Contact this week", ["To contact"],
+     "Hot accounts with a draft ready. Hunt the persona, drop in a name, personalize, send."),
+    ("In motion", ["Contacted", "Replied", "Meeting"],
+     "Touched and waiting, or moving. Keep the thread warm."),
+    ("On hold", ["Hold"],
+     "Deliberately paused - the notes say why."),
+    ("The bench", ["Not started"],
+     "Signal on the board but not yet worth a draft. Personas and the angle are pre-staged so promotion is a five-minute job, not a research project."),
+]
+
+def read_outreach(path):
+    if not os.path.exists(path):
+        return []
+    with open(path, newline="") as f:
+        rows = list(csv.DictReader(f))
+    out = []
+    for x in rows:
+        out.append({
+            "account": clean(x.get("Account", "")),
+            "status": clean(x.get("Status", "")) or "Not started",
+            "personas": clean(x.get("Personas", "")),
+            "angle": clean(x.get("Angle", "")),
+            "subject": clean(x.get("Email Subject", "")),
+            "body": clean(x.get("Email Body", "")),
+            "linote": clean(x.get("LinkedIn Note", "")),
+            "notes": clean(x.get("Notes", "")),
+        })
+    return out
+
+def persona_links(account, personas):
+    short = account.split(" (")[0].strip()
+    chips = []
+    for p in [x.strip() for x in personas.split("|") if x.strip()]:
+        label = p
+        # searches work better without our parenthetical annotations
+        p_clean = re.sub(r"\s*\(.*?\)", "", p).strip()
+        q = urllib.parse.quote(f'"{short}" "{p_clean}"')
+        chips.append(f'<a class="p" href="https://www.linkedin.com/search/results/people/'
+                     f'?keywords={q}" target="_blank" rel="noopener">{esc(label)} &#8599;</a>')
+    news_q = urllib.parse.quote(f'"{short}"')
+    chips.append(f'<a class="p" href="https://news.google.com/search?q={news_q}" '
+                 f'target="_blank" rel="noopener">recent news &#8599;</a>')
+    return "".join(chips)
+
+def outreach_card(o, r, idx):
+    """One account card. r is the board row (score/tier/meta) or None."""
+    score_html = ""
+    if r:
+        tcolor = TIER_VAR[r["tier"]]
+        score_html = (f'<span class="sc"><span class="scoren num" style="color:{tcolor}">{r["score"]}</span>'
+                      f'<span class="tier t-{r["tier"]}"><i></i>{r["tier"]}</span></span>')
+    meta = " · ".join(b for b in ([r["industry"], r["hq"]] if r else []) if b)
+    scls = STATUS_CLASS.get(o["status"], "s-idle")
+    has_draft = bool(o["body"].strip())
+    parts = [f'<div class="acct{"" if has_draft else " compact"}">',
+             f'<div class="aline"><span class="co">{esc(o["account"])}</span>'
+             f'<span class="status {scls}">{esc(o["status"])}</span>{score_html}</div>']
+    if meta:
+        parts.append(f'<div class="meta">{esc(meta)}</div>')
+    if o["angle"]:
+        parts.append(f'<p class="angle">{esc(o["angle"])}</p>')
+    parts.append(f'<p class="hunt"><b>Find the buyer:</b> {persona_links(o["account"], o["personas"])}</p>')
+    if has_draft:
+        parts.append(
+            f'<details class="draft"><summary>First-touch email</summary>'
+            f'<p class="subj">subject: <b>{esc(o["subject"])}</b></p>'
+            f'<pre class="dbody" id="d{idx}e">{esc(o["body"])}</pre>'
+            f'<button class="copy" data-t="d{idx}e">copy email</button></details>')
+    if o["linote"].strip():
+        parts.append(
+            f'<details class="draft"><summary>LinkedIn connection note</summary>'
+            f'<pre class="dbody" id="d{idx}l">{esc(o["linote"])}</pre>'
+            f'<button class="copy" data-t="d{idx}l">copy note</button></details>')
+    if o["notes"]:
+        parts.append(f'<p class="anote"><b>Note:</b> {esc(o["notes"])}</p>')
+    parts.append('</div>')
+    return "".join(parts)
+
+def build_outreach(t, board, updated):
+    """Render <slug>/outreach.html if the territory has an outreach.csv."""
+    path = os.path.join(ROOT, "data", "territories", t["slug"], "outreach.csv")
+    queue = read_outreach(path)
+    if not queue:
+        return False
+    by_account = {r["account"]: r for r in board}
+    def score_of_row(o):
+        r = by_account.get(o["account"])
+        return r["score"] if r else 0
+    groups_html = []
+    idx = 0
+    for title, statuses, sub in QUEUE_GROUPS:
+        rows = sorted([o for o in queue if o["status"] in statuses],
+                      key=score_of_row, reverse=True)
+        if not rows:
+            continue
+        cards = []
+        for o in rows:
+            cards.append(outreach_card(o, by_account.get(o["account"]), idx))
+            idx += 1
+        groups_html.append(
+            f'<section class="qgroup"><h2>{title} <span class="n">· {len(rows)}</span></h2>'
+            f'<p class="secsub">{sub}</p>{"".join(cards)}</section>')
+    n_now = sum(1 for o in queue if o["status"] == "To contact")
+    n_active = sum(1 for o in queue if o["status"] in ("Contacted", "Replied", "Meeting"))
+    counts = f'{n_now} to contact this week'
+    if n_active:
+        counts += f' · {n_active} in motion'
+    counts += f' · {len(queue)} accounts tracked'
+    others = [x for x in TERRITORIES if x["slug"] != t["slug"]]
+    nav = (f'<a href="./">&larr; {t["industry"]} board</a> &nbsp;·&nbsp; <a href="../">All industries</a>'
+           + "".join(f' &nbsp;·&nbsp; <a href="../{o["slug"]}/">{o["industry"]}</a>' for o in others))
+    html_s = (OUTREACH_PAGE
+              .replace("__CSS__", CSS)
+              .replace("__INDUSTRY__", t["industry"])
+              .replace("__DATEHUMAN__", updated)
+              .replace("__COUNTS__", counts)
+              .replace("__NAV__", nav)
+              .replace("__GROUPS__", "".join(groups_html))
+              .replace("__VENDORLINE__", t["vendor_line"])
+              .replace("__REPO__", REPO))
+    with open(os.path.join(ROOT, t["slug"], "outreach.html"), "w") as f:
+        f.write(html_s)
+    print(f'built {t["slug"]}/outreach.html: {n_now} to contact, {len(queue)} tracked')
+    return True
+
 def fill_weights(html_s, hot, warm):
     return (html_s
             .replace("__W_ROLES__", str(W["roles"]))
@@ -735,7 +944,9 @@ def build_territory(t):
     updated = human_date(snaps[-1]["date"]) if snaps else t["verified"]
 
     others = [x for x in TERRITORIES if x["slug"] != t["slug"]]
-    nav = ('<a href="../">&larr; All industries</a>'
+    has_queue = os.path.exists(os.path.join(data_dir, "outreach.csv"))
+    queue_link = '<a href="outreach.html"><b>This week\'s action queue &rarr;</b></a> &nbsp;·&nbsp; ' if has_queue else ''
+    nav = (queue_link + '<a href="../">&larr; All industries</a>'
            + "".join(f' &nbsp;·&nbsp; <a href="../{o["slug"]}/">{o["industry"]}</a>' for o in others))
     vendor_clause = t["vendor_line"]
     ctx = {
@@ -760,6 +971,8 @@ def build_territory(t):
         "has_history": len(snaps) >= 2,
     }
     render_board(os.path.join(ROOT, t["slug"], "index.html"), board, ctx)
+    if has_queue:
+        build_outreach(t, board, updated)
     hot_n = sum(1 for r in board if r["tier"] == "Hot")
     print(f'built {t["slug"]}/index.html: {len(board)} accounts, {hot_n} hot')
     return {"slug": t["slug"], "industry": t["industry"], "caption": t["caption"],
