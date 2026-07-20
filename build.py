@@ -379,7 +379,8 @@ a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)
 .status[data-acct]:hover{border-color:currentColor}
 .angle{color:var(--ink2);font-size:15.5px;margin:8px 0 10px;line-height:1.5}
 .hunt{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:0}
-.hunt a.p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:3px 9px;margin:3px 4px 0 0;color:var(--link)}
+.hunt .p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:3px 9px;margin:3px 5px 0 0}
+.hunt a.p{color:var(--link)}
 details.draft{margin-top:12px;border-top:1px solid var(--hairline);padding-top:10px;font-family:var(--sans)}
 details.draft summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--link)}
 .subj{font-size:13px;color:var(--muted);margin:10px 0 6px}.subj b{color:var(--ink)}
