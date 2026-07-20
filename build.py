@@ -48,9 +48,10 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      from latest.csv - never invent a signal.
    - If a persona named in a draft's Notes (e.g. "check if the QA Manager
      req was filled") can be verified, update the note.
-1c. GROW THE TERRITORY - each week hunt for up to 3 NEW companies that match
-   the territory's ICP and newly show a trigger (fresh funding, new QA /
-   eng-leadership req, expansion). Verify against their live ATS board, then
+1c. GROW THE TERRITORY (only territories that have an outreach.csv) - each
+   week hunt for up to 3 NEW companies that match the territory's ICP and
+   newly show a trigger (fresh funding, new QA / eng-leadership req,
+   expansion). Verify against their live ATS board, then
    append them to latest.csv (momentum will show them as NEW) and add an
    outreach.csv row (status Not started, personas + angle only). Companies
    with zero relevant signal may be dropped after 4+ consecutive quiet weeks
