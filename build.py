@@ -51,9 +51,11 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      instruction) moves an account between statuses.
    - Refresh each account's Angle if its signals materially changed.
    - Message content lives in sequences.csv (Account, Level, Email
-     Subject, Email Body, Second Touch Email, Third Touch Email, LinkedIn
-     Note): THREE rows per drafted account, Level = Executive | Director |
-     BTL, so the message matches the buyer's altitude.
+     Subject, Email Body, Second Touch Email, Third Touch Email, Fourth
+     Touch Email, LinkedIn Note): THREE rows per drafted account, Level =
+     Executive | Director | BTL, so the message matches the buyer's
+     altitude. Fourth Touch Email is EXECUTIVE-ONLY (blank on
+     Director/BTL rows - they run three touches).
        Executive: CTO / VP Eng - business outcomes, release risk,
        headcount economics; under ~80 words; no tool lists.
        Director: Dir QA / Dir Eng / EM - operational: coverage, cycle
@@ -85,6 +87,11 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      Executive T3: reply-in-thread one-question bump: opens
        "Hey [First] - ", one sharp exec-altitude question, no pitch,
        no signature, ends on the question.
+     Executive T4: no greeting; REAL public proof point only (Clari 10x
+       release-testing story; two-weeks-to-two-days regression story
+       always caveated "shift-left plus AI"); ties back to the T1 risk;
+       no sequence-ending language; CTA exactly "If relevant - would
+       love to connect with the right person on your team to discuss."
      Director/BTL T1: opens "Happy [Day], [First]! "; body under ~100
        words; one verified signal as hook. BTL T1 CTA: "worth 20
        minutes?". BTL leans into practitioner benefits: multiplies
@@ -934,7 +941,7 @@ def apply_people_boosts(board, people, hot, warm):
     return board
 
 def read_sequences(path):
-    """sequences.csv -> {account: {level: {subject, body, touch2, touch3, linote}}}"""
+    """sequences.csv -> {account: {level: {subject, body, touch2, touch3, touch4, linote}}}"""
     out = {}
     if not os.path.exists(path):
         return out
@@ -945,6 +952,7 @@ def read_sequences(path):
                 "body": clean(x.get("Email Body", "")),
                 "touch2": clean(x.get("Second Touch Email", "")),
                 "touch3": clean(x.get("Third Touch Email", "")),
+                "touch4": clean(x.get("Fourth Touch Email", "")),
                 "linote": clean(x.get("LinkedIn Note", "")),
             }
     return out
@@ -1072,18 +1080,31 @@ def outreach_card(o, r, idx, roles=None, seqs=None, psigs=None):
             f'<p class="subj">subject: <b>{esc(s["subject"])}</b></p>'
             f'<pre class="dbody" id="{p}a">{esc(s["body"])}</pre>'
             f'<button class="copy" data-t="{p}a">copy email</button></details>']
+        exec_seq = level == "Executive"
         if s["touch2"].strip():
+            l2 = ("Second touch - impact + how ContextQA helps, reply in thread (2-4 days later)"
+                  if exec_seq else
+                  "Second touch - one-question bump, reply in thread (2-4 days later)")
             inner.append(
-                f'<details class="draft"><summary>Second touch - one-question bump, reply in thread (2-4 days later)</summary>'
+                f'<details class="draft"><summary>{l2}</summary>'
                 f'<p class="subj">subject: <b>re: {esc(s["subject"])}</b></p>'
                 f'<pre class="dbody" id="{p}b">{esc(s["touch2"])}</pre>'
                 f'<button class="copy" data-t="{p}b">copy reply</button></details>')
         if s["touch3"].strip():
+            l3 = ("Third touch - one-question bump, reply in thread"
+                  if exec_seq else
+                  "Third touch - proof point, reply in thread (about a week later)")
             inner.append(
-                f'<details class="draft"><summary>Third touch - proof point, reply in thread (about a week later)</summary>'
+                f'<details class="draft"><summary>{l3}</summary>'
                 f'<p class="subj">subject: <b>re: {esc(s["subject"])}</b></p>'
                 f'<pre class="dbody" id="{p}c">{esc(s["touch3"])}</pre>'
                 f'<button class="copy" data-t="{p}c">copy reply</button></details>')
+        if s.get("touch4", "").strip():
+            inner.append(
+                f'<details class="draft"><summary>Fourth touch - proof point, reply in thread (about a week later)</summary>'
+                f'<p class="subj">subject: <b>re: {esc(s["subject"])}</b></p>'
+                f'<pre class="dbody" id="{p}e">{esc(s["touch4"])}</pre>'
+                f'<button class="copy" data-t="{p}e">copy reply</button></details>')
         if s["linote"].strip():
             inner.append(
                 f'<details class="draft"><summary>LinkedIn connection note</summary>'
