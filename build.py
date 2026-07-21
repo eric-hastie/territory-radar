@@ -66,24 +66,37 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
    - Any account that is (or newly became) Hot and has no sequences gets
      all three levels written, status To contact.
      TOUCH FORMATS BY LEVEL:
-     Executive T1 (spec v3, 2026-07-20 - supersedes all earlier exec
+     Executive T1 (spec v3.1, 2026-07-20 - supersedes all earlier exec
        formats): opens "[First] - "; TIGHT (40-65 words incl. CTA);
        STRICTLY what we know or can imply about the business and the
        risk it faces (velocity risk, bug risk with low test coverage) -
        and every risk statement is followed by its impact / negative
        consequence, never left hanging; ZERO ContextQA mention; zero
-       product detail; nothing in-the-weeds ("bug ticket" is too deep
-       for an exec); CTA = a thoughtful tailored question, e.g. "Do you
-       have a plan in place to mitigate X, or counting on filling those
-       N roles before testing hurts release velocity?" or "Have you
-       considered a next-gen AI solution in lieu of adding headcount to
-       fill the QA gap?" - NEVER "Relevant?" / "Top of mind?", NEVER
-       ask an executive for time.
-     Executive T2: opens "[First] - "; a short impact statement (what
-       goes wrong if the QA problem stays unsolved) then the FIRST
-       ContextQA mention, framed: "These are the scenarios ContextQA
-       was built to handle - the first AI-native solution that [solves
-       the risk, kept high-level] for [type of company]." Signed Eric.
+       product detail. ATL RULE (Skip Miller, Selling Above and Below
+       the Line): DUMB IT DOWN for executives - every line must make
+       sense to someone who never worked in engineering; say "bugs"
+       never "regressions", state consequences as customers / revenue /
+       risk, no process language ("bug ticket", "shows up in the
+       quarter" = too deep / awkward). CTA = a thoughtful tailored
+       question offering the tool-vs-headcount choice, e.g. "Have you
+       considered solving with a tool instead of adding headcount?" /
+       "Open to AI tooling to close that gap, or committed to hiring
+       your way there?" / "Do you have a plan in the meantime, or is
+       everything on hold until that seat is filled?" - say "AI
+       tooling" or "AI solution", NEVER "next-gen"; NEVER "Relevant?" /
+       "Top of mind?"; NEVER ask an executive for time.
+     Executive T2: opens "[First] - "; ~40 words; a short plain impact
+       statement (what goes wrong if the QA problem stays unsolved)
+       then the FIRST ContextQA mention as a VARIATION of the canonical
+       line: "ContextQA has a novel, AI-native approach that [allows
+       teams to scale test coverage quickly / benefit fit to the
+       account], without adding headcount." NEVER "the first AI-native
+       solution" (retired 2026-07-20). CTA "Worth a chat?" (a sharper
+       contextual variant like "Worth adding to the eval?" is allowed
+       when the account earns it). Signed Eric.
+     DASH RULE (all exec touches): at most TWO spaced hyphens " - "
+       per email INCLUDING the "[First] - " opener; three reads as
+       AI-written.
      Executive T3: reply-in-thread one-question bump: opens
        "Hey [First] - ", one sharp exec-altitude question, no pitch,
        no signature, ends on the question.
