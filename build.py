@@ -48,7 +48,12 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
 1b. ACTION QUEUE - if the folder has an outreach.csv, maintain it:
    - PRESERVE the Status and Notes columns exactly as found; they are the
      AE's working state, not generated data. Only the AE (or an explicit
-     instruction) moves an account between statuses.
+     instruction) moves an account between statuses. Status values are
+     ONLY: To contact / Contacted / Replied / Meeting / Hold / Not
+     started. A tier (Hot/Warm/Watch) is NEVER a status - when an
+     account changes tier, Status stays untouched (2026-07-21 the
+     weekly agent wrote "Hot" into Alarm.com's Status and its sequences
+     vanished from the queue page).
    - Refresh each account's Angle if its signals materially changed.
    - Message content lives in sequences.csv (Account, Level, Email
      Subject, Email Body, Second Touch Email, Third Touch Email, Fourth
