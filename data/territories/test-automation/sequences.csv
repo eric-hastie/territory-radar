@@ -94,7 +94,7 @@ Dialpad,BTL,"two suite generations, two device clouds","Happy [Day], [First]! Di
 Eric","Hey [First] - real question: is the Selenium-to-Playwright transition an active migration with a finish line, or are both suites permanent residents at this point?","One data point from a team shipping at a similar pace: Clari improved release testing speed 10x with ContextQA - public customer story. In day-to-day terms that's fewer cross-cloud reruns and less time keeping two suite generations honest while the agentic roadmap ships. Happy to share a short clip if that's easier than a call.
 
 Eric",,"Hi [First], just sent you an email. We usually hear from SDETs on voice and mobile products when weekly AI releases turn regression into a treadmill - would love to learn about your testing setup and compare notes, thanks!"
-Ethos Technologies,Executive,the bar gets set once,"[First] - looks like you're going public at 57% growth while still hiring your first QA team. Growth like that ships code faster than a new team can test it - and for a public insurance company, bugs get expensive fast. Have you considered AI tooling to fill the gap while the team gets built?
+Ethos Technologies,Executive,"public company, brand-new qa team","[First] - looks like you're going public at 57% growth while still hiring your first QA team. Growth like that ships code faster than a new team can test it - and for a public insurance company, bugs get expensive fast. Have you considered AI tooling to fill the gap while the team gets built?
 
 Eric","[First] - a quality function built manual-first spends years catching up to the product. ContextQA has a novel, AI-native approach that gives a brand-new QA org enterprise-grade coverage from day one. Worth a chat?
 
