@@ -34,10 +34,17 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
    public sources, rewrite latest.csv in the same column schema, and save an
    identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
    dated snapshots are what power the momentum column and the movers briefing.
-   Some territories (test-automation) carry an extra trailing "Est Devs"
-   column (rough estimated developer count) and use an estimated RANGE like
-   "200-500" in Headcount - keep both when rewriting, refresh only on real
-   evidence.
+   Some territories (test-automation) carry extra trailing "Est Devs" and
+   "Est Testers" columns (rough estimated developer / dedicated-QA counts)
+   and use an estimated RANGE like "200-500" in Headcount - keep all of
+   these when rewriting, refresh only on real evidence. New accounts get
+   both estimates researched at add-time (LinkedIn title sampling, req
+   history as a floor, industry priors: modern SaaS ~10-15 devs per tester,
+   regulated/enterprise ~5-8; sample offshore hubs too) - record the full
+   estimate in ratio_research.csv (Account, Est Testers, Testers Range,
+   Est Devs, Ratio, Confidence, Evidence) in the same folder. build.py
+   computes the dev:tester ratio and applies the coverage-gap score boost
+   (>=12:1 +10, >=8:1 +5) and the >=12:1 messaging flag automatically.
 1b. ACTION QUEUE - if the folder has an outreach.csv, maintain it:
    - PRESERVE the Status and Notes columns exactly as found; they are the
      AE's working state, not generated data. Only the AE (or an explicit
@@ -242,9 +249,28 @@ def to_int(v):
     except (ValueError, TypeError):
         return 0
 
+# Dev:tester ratio boost (test-automation): a territory row that carries both
+# Est Devs and Est Testers gets a coverage-gap boost. Thresholds, not
+# percentiles, so the cutoff is stable and explainable as the territory grows.
+RATIO_BOOSTS = [(12, 10), (8, 5)]   # ratio >= 12:1 -> +10, >= 8:1 -> +5
+RATIO_FLAG_AT = 12                  # messaging flag on the queue card
+
+def ratio_of(r):
+    """Estimated devs per dedicated tester, or None if either estimate is
+    missing. Older snapshots without Est Testers simply score without it."""
+    devs, testers = to_int(r.get("est_devs")), to_int(r.get("est_testers"))
+    return round(devs / testers, 1) if devs and testers else None
+
+def ratio_boost(r):
+    ratio = ratio_of(r)
+    if ratio is None:
+        return 0
+    return next((b for t, b in RATIO_BOOSTS if ratio >= t), 0)
+
 def score_of(r):
     return (r["roles"] * W["roles"] + r["funding_sig"] * W["funding"]
-            + r["leadership_sig"] * W["leadership"] + r["expansion_sig"] * W["expansion"])
+            + r["leadership_sig"] * W["leadership"] + r["expansion_sig"] * W["expansion"]
+            + ratio_boost(r))
 
 def tier_of(s, hot, warm):
     return "Hot" if s >= hot else "Warm" if s >= warm else "Watch"
@@ -270,6 +296,7 @@ def read_csv(path, hot, warm):
             "leadership_sig": to_int(x.get("Leadership Signal", 0)),
             "expansion_sig": to_int(x.get("Expansion Signal", 0)),
             "est_devs": clean(x.get("Est Devs", "")),
+            "est_testers": clean(x.get("Est Testers", "")),
             "signals": clean(x.get("Key Signals", "")),
             "why": clean(x.get("Why Now", "")),
             "url": clean(x.get("Source URL", "")),
@@ -449,6 +476,7 @@ details.seq.special{border-color:var(--hot)}
 details.seq.special>summary{color:var(--hot)}
 .dns{color:var(--hot);font-weight:700;font-size:12px}
 p.alert{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--hot);border:1px solid color-mix(in srgb,var(--hot) 45%,transparent);background:color-mix(in srgb,var(--hot) 8%,transparent);border-radius:6px;padding:9px 13px;margin:10px 0}
+p.ratioflag{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--warm);border:1px solid color-mix(in srgb,var(--warm) 45%,transparent);background:color-mix(in srgb,var(--warm) 8%,transparent);border-radius:6px;padding:9px 13px;margin:10px 0}
 .subj{font-size:13px;color:var(--muted);margin:10px 0 6px}.subj b{color:var(--ink)}
 pre.dbody{white-space:pre-wrap;font-family:var(--serif);font-size:15px;line-height:1.55;background:var(--paper2);border:1px solid var(--hairline);border-radius:6px;padding:14px 16px;margin:0 0 8px}
 button.copy{font-family:var(--sans);font-size:12px;font-weight:600;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
@@ -536,7 +564,7 @@ __BRIEFING__
 
   <section class="boardsec">
     <h2>The board</h2>
-    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__, plus people-signal boosts (new senior tech exec &le;4 months or QA-leadership req filled +25, new director +15). Hot &ge; __HOT_T__, Warm &ge; __WARM__. Click any column to re-sort, or any account for the source behind its signals.</p>
+    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__, plus people-signal boosts (new senior tech exec &le;4 months or QA-leadership req filled +25, new director +15) and a dev:tester coverage-gap boost where both estimates exist (&ge;12:1 +10, &ge;8:1 +5). Hot &ge; __HOT_T__, Warm &ge; __WARM__. Click any column to re-sort, or any account for the source behind its signals.</p>
     <div class="controls">
       <input id="q" type="search" placeholder="Search account, signal, HQ..." autocomplete="off">
       <div class="seg" id="seg">
@@ -620,7 +648,7 @@ MOM_TH = '        <th data-k="mom">Momentum <span class="arw"></span></th>'
 
 SCORE_HELP = r'''  <section class="about">
   <h2>How the signal score works</h2>
-  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15.</p>
+  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15. Territories that carry developer and tester estimates also add a coverage-gap boost from the estimated dev:tester ratio - +10 at 12:1 or wider, +5 at 8:1 - fixed thresholds rather than percentiles, so the cutoff stays stable and explainable as the territory grows. Both counts are labeled estimates (LinkedIn title sampling, req history, and industry norms), so the ratio feeds coarse buckets, never precise ranking.</p>
   <p><b>Tiers:</b> <span class="tier t-Hot"><i></i>Hot</span> at score &ge; __HOT_T__, <span class="tier t-Warm"><i></i>Warm</span> at &ge; __WARM__, <span class="tier t-Watch"><i></i>Watch</span> below that. The thresholds flex per territory because a "lot of hiring" means different things in different markets.</p>
   </section>'''
 
@@ -956,6 +984,7 @@ def outreach_card(o, r, idx, roles=None, seqs=None, psigs=None):
     psigs = psigs or []
     score_html = ""
     meta_bits = []
+    rr = ratio_of(r) if r else None
     if r:
         tcolor = TIER_VAR[r["tier"]]
         score_html = (f'<span class="sc"><span class="scoren num" style="color:{tcolor}">{r["score"]}</span>'
@@ -965,6 +994,8 @@ def outreach_card(o, r, idx, roles=None, seqs=None, psigs=None):
             meta_bits.append(f'{r["headcount"]} employees')
         if r.get("est_devs"):
             meta_bits.append(f'~{r["est_devs"]} devs (est.)')
+        if rr is not None:
+            meta_bits.append(f'~{rr:g}:1 dev:tester (est.)')
     meta = " · ".join(b for b in meta_bits if b)
     scls = STATUS_CLASS.get(o["status"], "s-idle")
     toggle = ' data-acct="%s"' % html.escape(o["account"], quote=True) \
@@ -988,6 +1019,9 @@ def outreach_card(o, r, idx, roles=None, seqs=None, psigs=None):
             parts.append(f'<p class="alert">{esc(s["title"])} posting removed '
                          f'{esc(s["date"])}{ago}; check LinkedIn to find the new '
                          f'{esc(s["title"])}. Use the dedicated sequence below.</p>')
+    if rr is not None and rr >= RATIO_FLAG_AT:
+        parts.append(f'<p class="ratioflag">~{rr:g} devs per tester (est.) - '
+                     'the outnumbered-maintainers angle applies at Director and BTL.</p>')
     parts.append(f'<p class="hunt"><b>Find the buyer:</b> {persona_links(o["account"], o["personas"])}</p>')
     if r and r["url"]:
         ats = ("Greenhouse" if "greenhouse" in r["url"] else "Lever" if "lever.co" in r["url"]
