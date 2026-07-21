@@ -149,8 +149,15 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
        software, quality, AI) newly in seat within ~4 MONTHS. Verify via
        WebSearch during the leadership pass. When one exists: write a
        DEDICATED sequence for that person (sequences.csv row with
-       Level=Special; use their real first name, congrats + first-90-days
-       framing, exec formats) - the page renders it in red above the
+       Level=Special; use their real first name). Greeting is EXACTLY
+       "congrats on the new role!" - for AI-titled execs (Chief AI
+       Officer etc.) use "congrats on the new role... and RIP to your
+       inbox [sobbing emoji]". NEVER "congrats on the new mandate" or
+       any mandate-speak. NO FLUFF anywhere in exec-altitude copy: no
+       trailing justification clauses ("Asking because...", "worth
+       making deliberately"), no consultant patter; observation, risk
+       with impact, question - nothing else. Exec formats + dash rule
+       apply. - the page renders it in red above the
        Executive sequence titled "Sequence for new <Title> - for <First>"
        and marks the Executive sequence "do not send to <First>".
      new-director (+15): same, for new Directors (QA / Eng).
