@@ -94,7 +94,7 @@ Dialpad,BTL,"two suite generations, two device clouds","Happy [Day], [First]! Di
 Eric","Hey [First] - real question: is the Selenium-to-Playwright transition an active migration with a finish line, or are both suites permanent residents at this point?","One data point from a team shipping at a similar pace: Clari improved release testing speed 10x with ContextQA - public customer story. In day-to-day terms that's fewer cross-cloud reruns and less time keeping two suite generations honest while the agentic roadmap ships. Happy to share a short clip if that's easier than a call.
 
 Eric",,"Hi [First], just sent you an email. We usually hear from SDETs on voice and mobile products when weekly AI releases turn regression into a treadmill - would love to learn about your testing setup and compare notes, thanks!"
-Ethos Technologies,Executive,the bar gets set once,"[First] - going public at 57% growth means every quality slip is now a credibility event, and you're standing up the QA function from scratch - the bar gets set once. Given any thought to setting it with AI tooling rather than headcount alone?
+Ethos Technologies,Executive,the bar gets set once,"[First] - looks like you're going public at 57% growth while still hiring your first QA team. Growth like that ships code faster than a new team can test it - and for a public insurance company, bugs get expensive fast. Have you considered AI tooling to fill the gap while the team gets built?
 
 Eric","[First] - a quality function built manual-first spends years catching up to the product. ContextQA has a novel, AI-native approach that gives a brand-new QA org enterprise-grade coverage from day one. Worth a chat?
 
@@ -277,7 +277,7 @@ Eric","Hey Pablo - does quality automation sit inside the innovation agenda, or 
 Eric",,"Hi Pablo, just sent you an email - congrats on the new role. We usually hear from innovation leaders when the quality function needs to move at AI speed without growing headcount - thought it might be valuable to connect, thanks!"
 Socure,Executive,"96 roles, one on quality","[First] - 96 open roles and one on quality, with Qlarifi mid-integration and a 30-market push underway. Banks buy Socure for accuracy - if it slips now, renewals and regulators notice first. Do you have a plan to protect it, or is that one seat the plan?
 
-Eric","[First] - absorbing an acquisition while entering 30 markets is when quality is easiest to lose. ContextQA has a novel, AI-native approach that holds the bar through M&A, without leaning on a single hire. Worth a chat?
+Eric","[First] - absorbing an acquisition while entering 30 markets is when quality is easiest to lose. ContextQA has a novel, AI-native approach that keeps quality steady through M&A, without leaning on a single hire. Worth a chat?
 
 Eric","Hey [First] - with Qlarifi integrating and 30-plus new markets coming online, is quality expected to scale on one open seat, or is there a leverage plan behind it?","Accuracy is the product at Socure - banks renew on it, and regulators audit it. Integration plus international expansion is exactly when it's easiest to lose, and one open quality seat won't hold that line alone. A QA leader ContextQA featured cut regression testing from two weeks to two days (shift-left plus AI) - the cycle time it takes to keep accuracy ahead of that much change. If relevant - would love to connect with the right person on your team to discuss.
 
