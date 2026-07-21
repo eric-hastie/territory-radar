@@ -64,20 +64,27 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
    - Any account that is (or newly became) Hot and has no sequences gets
      all three levels written, status To contact.
      TOUCH FORMATS BY LEVEL:
-     Executive T1: opens "[First] - " (no Happy [Day]); TIGHT (40-65
-       words); 100% customer-focused - business priorities from research
-       or RISK (QA bottleneck hurting velocity, business risk of bugs:
-       brand / revenue / regulatory); high-level only - never "manual
-       regression", never product coverage detail (no web/mobile/API);
-       at most one short clause naming ContextQA; CTA exactly
-       "Relevant?" or "Top of mind?" - NEVER ask executives for time.
-     Executive T3: no greeting; ties back to the T1 risk/priority; may
-       state how ContextQA mitigates it (still high-level); where
-       compelling (not every account) include the economics idea -
-       solves testing faster and at lower cost than hiring N engineers
-       (never say "budget-friendly"); no sequence-ending language
-       ("last touch" etc.); CTA exactly "If relevant - would love to
-       connect with the right person on your team to discuss."
+     Executive T1 (spec v3, 2026-07-20 - supersedes all earlier exec
+       formats): opens "[First] - "; TIGHT (40-65 words incl. CTA);
+       STRICTLY what we know or can imply about the business and the
+       risk it faces (velocity risk, bug risk with low test coverage) -
+       and every risk statement is followed by its impact / negative
+       consequence, never left hanging; ZERO ContextQA mention; zero
+       product detail; nothing in-the-weeds ("bug ticket" is too deep
+       for an exec); CTA = a thoughtful tailored question, e.g. "Do you
+       have a plan in place to mitigate X, or counting on filling those
+       N roles before testing hurts release velocity?" or "Have you
+       considered a next-gen AI solution in lieu of adding headcount to
+       fill the QA gap?" - NEVER "Relevant?" / "Top of mind?", NEVER
+       ask an executive for time.
+     Executive T2: opens "[First] - "; a short impact statement (what
+       goes wrong if the QA problem stays unsolved) then the FIRST
+       ContextQA mention, framed: "These are the scenarios ContextQA
+       was built to handle - the first AI-native solution that [solves
+       the risk, kept high-level] for [type of company]." Signed Eric.
+     Executive T3: reply-in-thread one-question bump: opens
+       "Hey [First] - ", one sharp exec-altitude question, no pitch,
+       no signature, ends on the question.
      Director/BTL T1: opens "Happy [Day], [First]! "; body under ~100
        words; one verified signal as hook. BTL T1 CTA: "worth 20
        minutes?". BTL leans into practitioner benefits: multiplies
@@ -89,15 +96,16 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
        like a user and build/maintain coverage themselves, handling
        dynamic flows script-based tools can't. No hype words, no
        invented stats.
-     Touch 2 (all levels): reply-in-thread one-question bump, 2-4 days
-       later. Opens "Hey [First] - ". One sharp discovery question at
-       that buyer's altitude. No pitch, no signature, end on question.
-       Every question must parse literally - no nonsense.
+     Touch 2 (Director/BTL): reply-in-thread one-question bump, 2-4
+       days later. Opens "Hey [First] - ". One sharp discovery question
+       at that buyer's altitude. No pitch, no signature, end on
+       question. Every question must parse literally - no nonsense.
+       (Executive T2/T3 formats are defined above and differ.)
      Director/BTL T3: no greeting; REAL public proof point only (Clari
        10x release-testing story; two-weeks-to-two-days regression story
        always caveated "shift-left plus AI"); close "Happy to share a
        short clip if that's easier than a call." and sign "Eric".
-     OFFSHORE VARIANT of exec/director T3 (accounts with offshore QA
+     OFFSHORE VARIANT of director T3 (accounts with offshore QA
        reqs): offshore-ROI frame - compliment the cost-per-coverage
        strategy, compare fully-loaded seat economics to platform
        coverage, aim at the NEXT req, never disparage the team, target
