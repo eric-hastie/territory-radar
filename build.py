@@ -7,10 +7,8 @@ Site layout:
   data-warehouse/index.html     - Cloud Data Warehousing board (unnamed vendor)
   product-analytics/index.html  - Product Analytics board (unnamed vendor)
   observability/index.html      - Observability board (unnamed vendor)
-  machine-health/index.html     - Industrial Machine Health board (run as if the
-                                  vendor were TRACTIAN; illustrative, not affiliated)
-  test-automation/index.html    - Software Test Automation board (run as if the
-                                  vendor were ContextQA; illustrative, not affiliated)
+  machine-health/index.html     - Industrial Machine Health board (unnamed vendor)
+  test-automation/index.html    - Software Test Automation board (unnamed vendor)
   legacy.html                   - the original demo board (June-July 2026)
   history.html / roles.html     - momentum + open-roles inventory for the legacy board
 
@@ -26,7 +24,6 @@ time from the CSV signal columns, so the CSVs are the single source of truth.
 Each board opens with a Monday-briefing narrative: once a territory has two or
 more dated snapshots it spotlights the biggest week-over-week movers; until
 then it spotlights the strongest live signals (an honest first-snapshot mode).
-The "Happy <day>!" greeting uses the build date's actual day of week.
 
 --- WEEKLY CLOUD REFRESH ROUTINE (what the weekly agent should do) ---
 1. For each of the five territory folders in data/territories/ (any or all):
@@ -76,7 +73,7 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
        STRICTLY what we know or can imply about the business and the
        risk it faces (velocity risk, bug risk with low test coverage) -
        and every risk statement is followed by its impact / negative
-       consequence, never left hanging; ZERO ContextQA mention; zero
+       consequence, never left hanging; ZERO vendor mention; zero
        product detail. ATL RULE (Skip Miller, Selling Above and Below
        the Line): DUMB IT DOWN for executives - every line must make
        sense to someone who never worked in engineering; say "bugs"
@@ -92,8 +89,8 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
        "Top of mind?"; NEVER ask an executive for time.
      Executive T2: opens "[First] - "; ~40 words; a short plain impact
        statement (what goes wrong if the QA problem stays unsolved)
-       then the FIRST ContextQA mention as a VARIATION of the canonical
-       line: "ContextQA has a novel, AI-native approach that [allows
+       then the FIRST vendor mention as a VARIATION of the canonical
+       line: "The platform has a novel, AI-native approach that [allows
        teams to scale test coverage quickly / benefit fit to the
        account], without adding headcount." NEVER "the first AI-native
        solution" (retired 2026-07-20). CTA "Worth a chat?" (a sharper
@@ -126,7 +123,7 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
        output, hands back bandwidth for edge cases and exploratory work.
      DIFFERENTIATION HOOK (Director + BTL): these buyers drown in
        identical QA-vendor pitches (fast test creation, less
-       maintenance). Position ContextQA as a different category -
+       maintenance). Position the platform as a different category -
        agentic/autonomous testing, AI agents that exercise the product
        like a user and build/maintain coverage themselves, handling
        dynamic flows script-based tools can't. No hype words, no
@@ -259,8 +256,8 @@ TERRITORIES = [
     {
         "slug": "machine-health",
         "industry": "Industrial Machine Health",
-        "caption": "Run as if the vendor were TRACTIAN: condition monitoring, CMMS, energy management (not affiliated).",
-        "vendor_line": "run as if the vendor were <b>TRACTIAN</b>, selling condition monitoring, CMMS, and energy management to industrial maintenance teams (an illustrative demo, not affiliated with or endorsed by TRACTIAN)",
+        "caption": "Run as if selling an industrial machine health platform: condition monitoring, CMMS, energy management.",
+        "vendor_line": "run as if selling <b>an industrial machine health platform</b> covering condition monitoring, CMMS, and energy management for industrial maintenance teams (an illustrative demo, not modeled on any real vendor)",
         "icp": "Mid-market industrial and manufacturing companies, roughly 200 to 3,000 employees, ideally running multiple plants in North America: food and beverage processing, packaging, automotive suppliers, building products, chemicals, consumer goods, pulp and paper, and metals. The buyers are maintenance managers, reliability engineers, plant engineers, plant managers, and VPs of Operations - teams with real rotating equipment (compressors, conveyors, blow molders, corrugators, extruders, paper machines) and chronic maintenance-staffing pressure, where condition monitoring, CMMS, and energy monitoring pay back fast.",
         "hot": 40, "warm": 20,
         "verified": "July 13 to 14, 2026",
@@ -269,8 +266,8 @@ TERRITORIES = [
     {
         "slug": "test-automation",
         "industry": "Software Test Automation",
-        "caption": "Run as if the vendor were ContextQA: AI-powered autonomous testing for web, mobile, and API (not affiliated).",
-        "vendor_line": "run as if the vendor were <b>ContextQA</b>, selling AI-powered autonomous testing for web, mobile, and API to QA and engineering teams (an illustrative demo, not affiliated with or endorsed by ContextQA)",
+        "caption": "Run as if selling an AI-powered test automation platform: autonomous testing for web, mobile, and API.",
+        "vendor_line": "run as if selling <b>an AI-powered test automation platform</b> covering autonomous testing for web, mobile, and API for QA and engineering teams (an illustrative demo, not modeled on any real vendor)",
         "icp": "Mid-market software companies (roughly 200 to 2,000 employees) building high-stakes, compliance-heavy, or complex-integration products - logistics and supply chain, BFSI (banking, financial services, insurance), HR tech and payroll, CRM and customer platforms, health tech - where testing is genuinely painful and release risk is real money. They ship web and mobile products on fast release cycles, and the tell is an active req list for QA engineers, SDETs, and test automation engineers: test-coverage pain that AI-powered autonomous testing (web, mobile, API) can absorb. Primary buyers are QA leads and managers, engineering managers, and VPs of Engineering; a QA leadership req, fresh funding, or a new engineering executive is the timing trigger.",
         "hot": 52, "warm": 22,
         "verified": "July 19 to 20, 2026",
@@ -559,13 +556,13 @@ LANDING = r'''<!DOCTYPE html>
 </div></header>
 
 <main><div class="wrap">
-  <p class="lede"><span class="hi">__GREETING__</span> Territory Radar reads a whole sales territory every week - live job boards, funding news, leadership moves, expansion announcements - scores every account on a transparent signal model, and hands back a ranked briefing. Account planning starts from "why now," not a static list.</p>
+  <p class="lede">Territory Radar reads a whole sales territory every week - live job boards, funding news, leadership moves, expansion announcements - scores every account on a transparent signal model, and hands back a ranked briefing. Account planning starts from "why now," not a static list.</p>
 
   <section class="boardsec">
     <h2>Pick an industry</h2>
     <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Five demo territories below - same tool, five different products, five different answers to "who do I call first?"</p>
     <div class="cards">__CARDS__</div>
-    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> Three boards are run against unnamed hypothetical products; the other two are run as if the vendor were a real company - TRACTIAN for industrial machine health and ContextQA for software test automation - neither of which is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
+    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> All five boards are run against unnamed hypothetical products; no real vendor is named, and none is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
   </section>
 
   <section class="about">
@@ -1117,7 +1114,7 @@ def outreach_card(o, r, idx, roles=None, seqs=None, psigs=None):
             f'<button class="copy" data-t="{p}a">copy email</button></details>']
         exec_seq = level == "Executive"
         if s["touch2"].strip():
-            l2 = ("Second touch - impact + how ContextQA helps, reply in thread (2-4 days later)"
+            l2 = ("Second touch - impact + how the platform helps, reply in thread (2-4 days later)"
                   if exec_seq else
                   "Second touch - one-question bump, reply in thread (2-4 days later)")
             inner.append(
@@ -1220,9 +1217,6 @@ def fill_weights(html_s, hot, warm):
             .replace("__WARM__", str(warm)))
 
 # ------------------------------ briefing opener -------------------------------
-def greeting():
-    return "Happy " + datetime.date.today().strftime("%A") + "!"
-
 def esc(s):
     return html.escape(s, quote=False)
 
@@ -1256,13 +1250,12 @@ def briefing_html(board, has_history):
     week-over-week movers; on a first snapshot it honestly narrates the
     strongest live signals instead, and the movers take over automatically
     once the second snapshot exists."""
-    hi = f'<span class="hi">{greeting()}</span>'
     if has_history:
         movers = [r for r in board if r.get("mom") in ("up", "down")]
         movers.sort(key=lambda r: abs(r.get("mom_delta") or 0), reverse=True)
         top = movers[:3]
         if not top:
-            lede = (f'<p class="lede">{hi} A quiet week - no account changed its signal score. '
+            lede = (f'<p class="lede">A quiet week - no account changed its signal score. '
                     'The board below still ranks who to call first, and the momentum column shows the longer arc.</p>')
             return lede
         n_up = sum(1 for r in board if r.get("mom") == "up")
@@ -1272,7 +1265,7 @@ def briefing_html(board, has_history):
             moved.append(f'{n_up} heating up')
         if n_down:
             moved.append(f'{n_down} cooling')
-        lede = (f'<p class="lede">{hi} {n_up + n_down} account{"s" if n_up + n_down != 1 else ""} moved this week '
+        lede = (f'<p class="lede">{n_up + n_down} account{"s" if n_up + n_down != 1 else ""} moved this week '
                 f'({" and ".join(moved)}). Here\'s where I\'d spend the first coffee.</p>')
         blocks = "".join(mover_block(r, "heating up" if r["mom_delta"] > 0 else "cooling off",
                                      r["mom_delta"]) for r in top)
@@ -1284,7 +1277,7 @@ def briefing_html(board, has_history):
         return lede + f'<div class="movers">{blocks}</div>' + note
     # first snapshot: no week-over-week yet - narrate the strongest live signals
     top = board[:3]
-    lede = (f'<p class="lede">{hi} This territory is on its first weekly snapshot, so there\'s no '
+    lede = (f'<p class="lede">This territory is on its first weekly snapshot, so there\'s no '
             'week-over-week movement to report yet. Instead, here\'s what\'s moving <i>inside</i> the '
             'territory right now - the three accounts with the strongest live signals, and why I\'d call them first.</p>')
     blocks = "".join(mover_block(r, signal_label(r)) for r in top)
@@ -1463,7 +1456,6 @@ def build_landing(cards_info, today_human):
               .replace("__CSS__", CSS)
               .replace("__NACCTS__", str(sum(c["accounts"] for c in cards_info if c)))
               .replace("__CARDS__", cards)
-              .replace("__GREETING__", greeting())
               .replace("__DATEHUMAN__", updated)
               .replace("__VERIFIED__", VERIFIED_HUMAN)
               .replace("__REPO__", REPO))
