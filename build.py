@@ -102,6 +102,16 @@ The "Happy <day>!" greeting uses the build date's actual day of week.
      DASH RULE (all exec touches): at most TWO spaced hyphens " - "
        per email INCLUDING the "[First] - " opener; three reads as
        AI-written.
+     HEADCOUNT-ECONOMICS RULE: before writing any exec email, ask whose
+       money the headcount is. At PRODUCT companies QA seats are cost -
+       the tool-vs-headcount CTA works. At SERVICES firms (agencies,
+       outsourcers, consultancies) seats are REVENUE - never pitch
+       against filling them; pitch AI tooling as capacity the existing
+       bench can sell while recruiting catches up, or as part of the
+       firm's own offer. Services proof point: the public CODE Exitos
+       testimonial (nearshore dev studio, keeps pace with fast releases,
+       QA freed for higher-value work) - peer proof beats product-company
+       stories at these accounts.
      Executive T3: reply-in-thread one-question bump: opens
        "Hey [First] - ", one sharp exec-altitude question, no pitch,
        no signature, ends on the question.
