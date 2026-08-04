@@ -15,13 +15,14 @@ Judi Health (formerly Capital Rx),QA Manager,"Charlotte, North Carolina, United 
 Judi Health (formerly Capital Rx),Technical QA Analyst II,"Charlotte, North Carolina, United States; Denver, Colorado, United States; New York, New York, United States",https://job-boards.greenhouse.io/judihealth/jobs/5100517008,
 Cin7,Senior QA Engineer - Automation & AI,"Ahmedabad, IN",https://jobs.lever.co/cin7/7ec88dd8-4680-4bba-8e91-4950c7e7b5be,Playwright | Cypress | Postman | RestAssured | TestRail | Zephyr | JMeter | Gatling | k6
 Ethos Technologies,"Senior Software Engineer, Test","Bangalore, India",https://job-boards.greenhouse.io/ethoslife/jobs/8496092002,TestNG
+Ethos Technologies,Senior Manager QA,"Bangalore, India",https://boards.greenhouse.io/ethoslife,
 Sidecar Health,Senior Software Development Engineer in Test,Remote,https://job-boards.greenhouse.io/sidecarhealth/jobs/6007228004,
 Alarm.com,Quality Engineer,"Tysons, Virginia",https://job-boards.greenhouse.io/alarmcom/jobs/8567187002,Selenium | Playwright | Cypress | Postman
 Alarm.com,Quality Engineer I,"Tysons, Virginia",https://job-boards.greenhouse.io/alarmcom/jobs/8394361002,
 Alarm.com,Quality Engineer (Video),"Tysons, Virginia",https://job-boards.greenhouse.io/alarmcom/jobs/8606157002,
 Alarm.com,Software QA Specialist II,"Liberty Lake, Washington",https://job-boards.greenhouse.io/alarmcom/jobs/8612752002,
 Tatari,Manual QA Engineer (AdTech - DSP/SSP),Ukraine ,https://job-boards.greenhouse.io/tatari/jobs/8449239002,Postman
-Tatari,Manual QA Engineer (AdTech – DSP/SSP),Poland,https://job-boards.greenhouse.io/tatari/jobs/8456767002,Postman
+Tatari,Manual QA Engineer (AdTech - DSP/SSP),Poland,https://job-boards.greenhouse.io/tatari/jobs/8456767002,Postman
 Nylas,QA/UAT Engineer,"Remote - Toronto, Ontario",https://jobs.ashbyhq.com/nylas/9482fb3b-0a08-424f-b024-80ccec258d3f,Playwright | Cypress | Selenium | Postman | k6
 Globality,Software Development Engineer in Test,"Bozeman, Montana, United States",https://job-boards.greenhouse.io/globalityinc/jobs/8612817002,Cypress | JUnit | PyTest | Cucumber
 Microblink,QA Engineer,"Zagreb, Croatia",https://job-boards.greenhouse.io/microblink/jobs/5173580007,Playwright | Appium | Postman | BrowserStack
@@ -31,7 +32,6 @@ Tuesday Health,Software Development Engineer in Test (SDET),Remote,https://job-b
 Diligent,Staff Software Engineer in Test,"Budapest, Hungary",https://job-boards.greenhouse.io/diligentcorporation/jobs/6061312004,Playwright
 Finite State,QA Engineering Manager,United States or Canada,https://job-boards.greenhouse.io/finitestate/jobs/5811251004,
 Finite State,Senior QA Engineer - AI/ML,Singapore,https://job-boards.greenhouse.io/finitestate/jobs/6020077004,Selenium | Playwright | Cypress | PyTest | Postman
-SmartRent,Software Development Engineer in Test,"Orlando, Florida; United States",https://job-boards.greenhouse.io/smartrent/jobs/5982663004,Playwright | Appium
 Assured Insurance Technologies,Staff Software Development Engineer in Test (SDET),Remote,https://jobs.ashbyhq.com/assured/71ef71b7-8bc5-4c7b-9d52-593e7ebf34d2,
 iCapital,AI Software Developer in Test - Vice President,"Salt Lake City, Utah, United States",https://job-boards.greenhouse.io/icapitalnetwork/jobs/8446777002,PyTest | Postman | JMeter
 Vestmark,Senior QA Engineer,"Boston, MA (Hybrid)",https://job-boards.greenhouse.io/vestmark/jobs/8023318,Postman | Zephyr | Locust
@@ -39,11 +39,7 @@ Vestmark,Software Development Engineer in Test,"Boston, MA (Hybrid)",https://job
 Ridgeline,"Senior Quality Engineer, Performance and Analytics","New York, NY; Reno, NV; San Ramon, CA",https://boards.greenhouse.io/ridgeline/jobs/7763603003?gh_jid=7763603003,
 Ridgeline,"Staff Quality Engineer, Portfolio Accounting","Reno, NV; New York, NY",https://boards.greenhouse.io/ridgeline/jobs/7767773003?gh_jid=7767773003,
 Fireblocks,Senior QA Engineer (Financial Apps),"Belgrade, Belgrade, Serbia; Berlin, Berlin, Germany; Georgia; Praha, Prague, Czech Republic; United Kingdom; Warszawa, Masovian Voivodeship, Poland",https://www.fireblocks.com/careers/4682157006?gh_jid=4682157006,
-Incode Technologies,QA Analyst,Serbia,https://job-boards.greenhouse.io/incode/jobs/6009995004,Postman | TestRail
-Jumio,SDE IV - QA,India (remote),https://job-boards.greenhouse.io/jumio/jobs/4708282005,Selenium | Playwright | Postman | JMeter | Gatling | Locust | Pact | k6
 Dialpad,QA Automation Engineer,"Bengaluru, India",https://job-boards.greenhouse.io/dialpad/jobs/8407056002,Selenium | Playwright | TestNG | Postman | REST Assured
-Dialpad,Software Development Engineer in Test,"Kitchener, Canada",https://job-boards.greenhouse.io/dialpad/jobs/8407048002,BrowserStack | LambdaTest
-Dialpad,Software Development Engineer in Test,"Vancouver, Canada",https://job-boards.greenhouse.io/dialpad/jobs/8521223002,BrowserStack | LambdaTest
 Dialpad,Sr. SDET,"Kitchener, Canada",https://job-boards.greenhouse.io/dialpad/jobs/8495374002,
 Dialpad,Sr. Software Development Engineer in Test,"Vancouver, Canada",https://job-boards.greenhouse.io/dialpad/jobs/8475155002,
 Dialpad,Sr. Software Development Engineer in Test,"Kitchener, Canada",https://job-boards.greenhouse.io/dialpad/jobs/8567954002,
@@ -71,17 +67,13 @@ Netomi,Software Development Engineer In Test - I,Remote - India,https://jobs.lev
 Collective Health,Senior Software Engineer in Test (AI Agentic Systems),"Lehi, UT | Plano, TX",https://jobs.collectivehealth.com/apply/?gh_jid=8003335,PyTest
 Litmos,Senior Software Engineer in Test,India,https://job-boards.eu.greenhouse.io/litmos/jobs/4871686101,Playwright
 HackerRank,Software Development Engineer in Test II,"Hybrid in Bangalore, India",https://job-boards.greenhouse.io/hackerrank/jobs/7771695,Playwright | Postman | Cucumber
-Legion Technologies,Cloud Release Quality Manager,"Remote, United States ",https://job-boards.greenhouse.io/legion/jobs/7801711003,Playwright
+Legion Technologies,Cloud Release Quality Manager,"Remote, United States ",https://job-boards.greenhouse.io/legion/jobs/7801711003,Playwright
 Legion Technologies,"Manager, Quality Assurance","Hybrid, Bangalore or Pune, India",https://job-boards.greenhouse.io/legion/jobs/7760446003,Selenium | Playwright | TestNG | JUnit | Postman
-QGenda,Quality Assurance (QA) Engineer,Atlanta,https://job-boards.greenhouse.io/qgenda/jobs/5282477008,
 ZayZoon,QA Test Developer,Calgary,https://jobs.ashbyhq.com/zayzoon/ff98b378-a374-4f15-a1c1-54e4e2e7c7f2,Playwright | WebdriverIO | Postman | Mocha
 ZayZoon,Intermediate QA Test Developer,Calgary,https://jobs.ashbyhq.com/zayzoon/0b441c45-ca32-4952-89ed-386ca0007419,Playwright | WebdriverIO | Postman | Mocha
 Platform Science,Senior Quality Engineer - Automation,"Chennai, Tamil Nadu, India",https://job-boards.greenhouse.io/platformscience/jobs/7579288003,Selenium | TestRail
 Platform Science,Software Development Engineer in Test Pleno,Londrina,https://job-boards.greenhouse.io/platformscience/jobs/7662856003,Selenium | Playwright | Cypress | JUnit | REST Assured | TestRail | qTest | Gatling | Jest | Jasmine | k6
 Platform Science,Software Test Engineer,"Belgium; Leuven, Flemish Brabant, Belgium",https://job-boards.greenhouse.io/platformscience/jobs/7773395003,Selenium | Playwright
-Netradyne,Engineer - QA,Bangalore,https://www.netradyne.com/company/careers?gh_jid=4677349005,
-Netradyne,Senior Engineer - SDET (Device),Bangalore,https://www.netradyne.com/company/careers?gh_jid=4689592005,
-Netradyne,Senior SDET,Bangalore,https://www.netradyne.com/company/careers?gh_jid=4676066005,Selenium | Appium | TestNG | REST Assured | JMeter
 TraceLink,Senior Software Engineer in Test - Agentic AI,APAC - India - Pune,https://www.tracelink.com/about/culture-and-careers/jobs?gh_jid=5086199007,TestNG
 TraceLink,Software Engineer in Test III,APAC - India - Pune,https://www.tracelink.com/about/culture-and-careers/jobs?gh_jid=5188694007,
 TraceLink,Software Engineer in Test III- Agentic AI,APAC - India - Pune,https://www.tracelink.com/about/culture-and-careers/jobs?gh_jid=5086201007,TestNG
