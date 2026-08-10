@@ -313,12 +313,15 @@ TERRITORIES = [
         "industry": "AI Code Review",
         "caption": "Run as if selling an AI code review and engineering analytics platform: automated pull-request review, bug and security-risk detection, delivery analytics.",
         "vendor_line": "run as if selling <b>an AI code review and engineering analytics platform</b> covering automated pull-request review, bug and security-risk detection, and delivery analytics for engineering teams",
-        "icp": "Software and technology companies with substantial engineering organizations shipping frequently, where pull-request review is a throughput bottleneck and code quality or security risk carries real cost. Two halves: high-growth venture-backed software (Series C through pre-IPO infrastructure, developer tooling, and AI-native product companies), and regulated or compliance-heavy technology (fintech and payments, healthtech, insurtech, govtech, security and identity) where review evidence carries audit weight. The buyers are CTOs, VPs of Engineering, Heads of Platform, Heads of Developer Experience, and Heads of Application Security. The timing trigger is an open req list for backend, platform, staff, developer-experience, or application-security engineers.",
-        # This territory scores far higher than the others because a code review
-        # platform genuinely sells to the whole engineering org, so the relevant
-        # role net is wide (5 to 59 here, against 1 to 6 elsewhere). Thresholds
-        # are set from this board's own distribution, not borrowed.
-        "hot": 180, "warm": 100,
+        "icp": "Software and technology companies with substantial engineering organizations shipping frequently, where pull-request review is a throughput bottleneck and code quality or security risk carries real cost. Two halves: high-growth venture-backed software (Series C through pre-IPO infrastructure, developer tooling, and AI-native product companies), and regulated or compliance-heavy technology (fintech and payments, healthtech, insurtech, govtech, security and identity) where review evidence carries audit weight. The buyers are CTOs, VPs of Engineering, Heads of Platform, Heads of Developer Experience, and Heads of Application Security. The timing trigger is a narrow one: an open req for a developer-experience or developer-productivity engineer, an application or product security engineer, or a staff-and-above platform engineer. General backend hiring is deliberately not counted.",
+        # A relevant role here means one of three title families only: developer
+        # experience, application security, or staff-and-above platform. The
+        # first cut counted general backend hiring too, which put counts at 5 to
+        # 59 and made the roles term ~88% of every score on its own, so the
+        # board ranked engineering-org size rather than buying signal. Narrowing
+        # brings counts to 0 to 10, in line with the other territories, and lets
+        # the funding, leadership and expansion flags actually compete.
+        "hot": 50, "warm": 30,
         "limit": 20,
         "verified": "August 10, 2026",
         "desc": "Demo sales territory for AI code review: 20 real software companies scored on live engineering and application-security hiring, funding, and leadership buying signals.",
