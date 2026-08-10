@@ -41,6 +41,17 @@ score and truncates to that many accounts. test-automation is capped at 20. If
 a refresh writes more rows than the cap, the extra rows stay in the CSV but
 never reach the board - do not "fix" this by raising the cap.
 
+SIX LIVE TERRITORIES, AND FREEZING: the site holds at six live territories.
+Adding one means retiring one, and Eric picks which - never choose for him.
+A retired territory is FROZEN, not deleted: set "frozen": True on its
+TERRITORIES entry and leave everything else in place. Freezing means the board
+still builds at its original URL (so no inbound link breaks), gains a banner
+saying it is no longer refreshed, drops off the landing page and out of the
+landing counts, disappears from the other boards' industry nav, loses its
+action queue, and gets listed under "Frozen territories" on the archive page.
+A frozen territory MUST NOT be refreshed by the weekly routine - remove its
+slug from the routine prompt at the same time you set the flag.
+
 --- WEEKLY CLOUD REFRESH ROUTINE (what the weekly agent should do) ---
 1. For each territory folder in data/territories/ (any or all):
    re-verify every account's signals against its live ATS job board and
@@ -512,6 +523,8 @@ td.ro b{font-weight:700}td.ro span{color:var(--muted)}
 .sig .p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:2px 7px;margin:2px 3px 0 0}
 td.why{color:var(--ink2);font-size:13px;line-height:1.5;min-width:240px;font-family:var(--serif);font-style:italic}
 .tablenote{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:10px 2px 0}
+.frozenlist{margin:12px 0 0;padding-left:20px;color:var(--ink2);font-size:16px}
+.frozenlist li{margin:0 0 6px}
 .keyrow{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0;font-family:var(--sans);font-size:12.5px;color:var(--ink2)}
 .keyrow span{background:var(--paper2);border:1px solid var(--hairline);border-radius:999px;padding:4px 12px}
 .keyrow b{font-weight:700}
@@ -649,6 +662,7 @@ BOARD = r'''<!DOCTYPE html>
 </div></header>
 
 <main><div class="wrap">
+__FROZEN__
 __BRIEFING__
   <div class="alsonote" style="margin-top:24px"><b>The ICP this board scores against:</b> __ICP__</div>
 
@@ -736,6 +750,15 @@ q.oninput=render;render();
 
 MOM_TH = '        <th data-k="mom">Momentum <span class="arw"></span></th>'
 
+# Shown at the top of a retired territory's board. The board keeps its URL so
+# nothing that ever linked to it breaks; it just stops being refreshed and
+# stops appearing on the landing page.
+FROZEN_BANNER = ('  <div class="alsonote"><b>This territory is frozen.</b> It is no longer '
+                 'refreshed weekly, and it is not listed on the landing page. The research '
+                 'behind it is real and is kept here rather than deleted. Current territories '
+                 'are on the <a href="../">live boards</a>; the rest of the record is in the '
+                 '<a href="../archive/">build archive</a>.</div>')
+
 SCORE_HELP = r'''  <section class="about">
   <h2>How the signal score works</h2>
   <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15. Territories that carry developer and tester counts also add a coverage-gap boost from the dev:tester ratio - +10 at 12:1 or wider, +5 at 8:1 - fixed thresholds rather than percentiles, so the cutoff stays stable and explainable as the territory grows. Those two counts come from my own Sales Navigator title-filter counts, never from an industry rule of thumb, and an account I have not counted gets no boost rather than a guessed one. The ratio feeds coarse buckets, never precise ranking.</p>
@@ -785,6 +808,7 @@ ARCHIVE = r'''<!DOCTYPE html>
     __MOMENTUM__
   </section>
 
+__FROZENSEC__
   <section class="boardsec">
     <h2>The original demo board</h2>
     <p class="secsub">The first Territory Radar territory: 16 mid-market and enterprise companies scored for a cloud infrastructure and DevOps platform, tracked across weekly snapshots since June 2026. It carries the longest continuous history on the project and is frozen rather than refreshed.</p>
@@ -1290,7 +1314,7 @@ def build_outreach(t, board, updated, people=None):
     if n_active:
         counts += f' · {n_active} in motion'
     counts += f' · {len(queue)} accounts tracked'
-    others = [x for x in TERRITORIES if x["slug"] != t["slug"]]
+    others = [x for x in TERRITORIES if x["slug"] != t["slug"] and not x.get("frozen")]
     nav = (f'<a href="./">&larr; {t["industry"]} board</a> &nbsp;·&nbsp; <a href="../">All industries</a>'
            + "".join(f' &nbsp;·&nbsp; <a href="../{o["slug"]}/">{o["industry"]}</a>' for o in others))
     html_s = (OUTREACH_PAGE
@@ -1393,6 +1417,7 @@ def render_board(out_path, board, ctx):
               .replace("__VERIFIED__", ctx["verified"])
               .replace("__NAV__", ctx["nav"])
               .replace("__ICP__", ctx["icp"])
+              .replace("__FROZEN__", FROZEN_BANNER if ctx.get("frozen") else "")
               .replace("__BRIEFING__", briefing_html(board, ctx["has_history"]))
               .replace("__ABOUT__", ctx["about"])
               .replace("__FOOTER__", ctx["footer"])
@@ -1429,10 +1454,12 @@ def build_territory(t):
         board = board[:t["limit"]]
     updated = human_date(snaps[-1]["date"]) if snaps else t["verified"]
 
-    others = [x for x in TERRITORIES if x["slug"] != t["slug"]]
-    has_queue = os.path.exists(os.path.join(data_dir, "outreach.csv"))
+    others = [x for x in TERRITORIES if x["slug"] != t["slug"] and not x.get("frozen")]
+    frozen = bool(t.get("frozen"))
+    has_queue = os.path.exists(os.path.join(data_dir, "outreach.csv")) and not frozen
     queue_link = '<a href="outreach.html"><b>This week\'s action queue &rarr;</b></a> &nbsp;·&nbsp; ' if has_queue else ''
-    nav = (queue_link + '<a href="../">&larr; All industries</a>'
+    back = '<a href="../archive/">&larr; Build archive</a>' if frozen else '<a href="../">&larr; All industries</a>'
+    nav = (queue_link + back
            + "".join(f' &nbsp;·&nbsp; <a href="../{o["slug"]}/">{o["industry"]}</a>' for o in others))
     vendor_clause = t["vendor_line"]
     ctx = {
@@ -1454,6 +1481,7 @@ def build_territory(t):
                    '" target="_blank" rel="noopener">source on GitHub</a>.</p>'),
         "updated": updated,
         "hot": t["hot"], "warm": t["warm"],
+        "frozen": frozen,
         # Public boards read as a current snapshot: no momentum column, no
         # week-over-week narration. The snapshot history still accumulates on
         # disk and is surfaced on archive/index.html instead.
@@ -1463,7 +1491,8 @@ def build_territory(t):
     if has_queue:
         build_outreach(t, board, updated, people)
     hot_n = sum(1 for r in board if r["tier"] == "Hot")
-    print(f'built {t["slug"]}/index.html: {len(board)} accounts, {hot_n} hot')
+    print(f'built {t["slug"]}/index.html: {len(board)} accounts, {hot_n} hot'
+          + (' [FROZEN]' if frozen else ''))
     # Momentum is still computed and stored; it just renders on the archive page
     # now instead of on the public board.
     movers = sorted(
@@ -1473,7 +1502,8 @@ def build_territory(t):
     return {"slug": t["slug"], "industry": t["industry"], "caption": t["caption"],
             "accounts": len(board), "hot": hot_n,
             "last_date": snaps[-1]["date"] if snaps else None,
-            "researched": t.get("verified"), "n_snaps": len(snaps), "movers": movers}
+            "researched": t.get("verified"), "n_snaps": len(snaps), "movers": movers,
+            "frozen": frozen}
 
 def build_legacy(today_human):
     csv_path = os.path.join(ROOT, "data", "latest.csv")
@@ -1559,14 +1589,17 @@ def build_archive(cards_info, today_human):
     """Everything the public boards no longer carry: research provenance, the
     week-over-week momentum, the frozen original board, and the build record.
     Regenerated on every run so it never drifts from the live site."""
-    live = [c for c in cards_info if c]
+    built = [c for c in cards_info if c]
+    live = [c for c in built if not c.get("frozen")]
+    retired = [c for c in built if c.get("frozen")]
 
     prov = "".join(
-        f'<tr><td><a href="../{c["slug"]}/">{esc(c["industry"])}</a></td>'
-        f'<td class="num">{c["accounts"]}</td><td class="num">{c["hot"]}</td>'
+        f'<tr><td><a href="../{c["slug"]}/">{esc(c["industry"])}</a>'
+        + ('  <span class="status s-idle">frozen</span>' if c.get("frozen") else '')
+        + f'</td><td class="num">{c["accounts"]}</td><td class="num">{c["hot"]}</td>'
         f'<td>{esc(c["researched"] or "not recorded")}</td>'
         f'<td class="num">{c["n_snaps"]}</td></tr>'
-        for c in live)
+        for c in built)
 
     blocks = []
     for c in live:
@@ -1612,10 +1645,28 @@ def build_archive(cards_info, today_human):
         'the board a list to read rather than a call list to work, and it was the only territory out of step '
         'with the others.</p>')
 
+    if retired:
+        items = "".join(
+            f'<li><a href="../{c["slug"]}/">{esc(c["industry"])}</a> - '
+            f'{c["accounts"]} accounts, {c["hot"]} hot at the time it was frozen.</li>'
+            for c in retired)
+        frozensec = (
+            '  <section class="boardsec">\n'
+            '    <h2>Frozen territories</h2>\n'
+            '    <p class="secsub">The site holds at six live territories. When a new one is '
+            'built, an existing one is retired here rather than deleted: the research behind it '
+            'was real, and the board keeps its original URL so nothing that ever linked to it '
+            'breaks. Frozen boards are no longer refreshed weekly.</p>\n'
+            f'    <ul class="frozenlist">{items}</ul>\n'
+            '  </section>')
+    else:
+        frozensec = ""
+
     html_s = (ARCHIVE
               .replace("__CSS__", CSS)
               .replace("__DATEHUMAN__", today_human)
               .replace("__PROVROWS__", prov)
+              .replace("__FROZENSEC__", frozensec)
               .replace("__MOMENTUM__", momentum)
               .replace("__CHANGELOG__", changelog)
               .replace("__REPO__", REPO))
@@ -1627,7 +1678,10 @@ def build_archive(cards_info, today_human):
     print(f"built archive/index.html: {len(live)} territories")
 
 def build_landing(cards_info, today_human):
-    dates = [c["last_date"] for c in cards_info if c and c["last_date"]]
+    # Frozen territories keep their board and their URL but leave the landing
+    # page: they are not current territories and should not be counted as ones.
+    live = [c for c in cards_info if c and not c.get("frozen")]
+    dates = [c["last_date"] for c in live if c["last_date"]]
     updated = human_date(max(dates)) if dates else today_human
     cards = "".join(
         CARD.replace("__SLUG__", c["slug"])
@@ -1635,8 +1689,7 @@ def build_landing(cards_info, today_human):
             .replace("__CAPTION__", c["caption"])
             .replace("__ACCOUNTS__", str(c["accounts"]))
             .replace("__HOT__", str(c["hot"]))
-        for c in cards_info if c)
-    live = [c for c in cards_info if c]
+        for c in live)
     html_s = (LANDING
               .replace("__CSS__", CSS)
               .replace("__NACCTS__", str(sum(c["accounts"] for c in live)))
@@ -1648,7 +1701,7 @@ def build_landing(cards_info, today_human):
     html_s = fill_weights(html_s, 0, 0)
     with open(os.path.join(ROOT, "index.html"), "w") as f:
         f.write(html_s)
-    print(f"built index.html (landing): {len([c for c in cards_info if c])} territories")
+    print(f"built index.html (landing): {len(live)} live territories")
 
 def main():
     today = datetime.date.today()
