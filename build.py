@@ -48,16 +48,23 @@ never reach the board - do not "fix" this by raising the cap.
    identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
    dated snapshots are what power the momentum column and the movers briefing.
    Some territories (test-automation) carry extra trailing "Est Devs" and
-   "Est Testers" columns (rough estimated developer / dedicated-QA counts)
-   and use an estimated RANGE like "200-500" in Headcount - keep all of
-   these when rewriting, refresh only on real evidence. New accounts get
-   both estimates researched at add-time (LinkedIn title sampling, req
-   history as a floor, industry priors: modern SaaS ~10-15 devs per tester,
-   regulated/enterprise ~5-8; sample offshore hubs too) - record the full
-   estimate in ratio_research.csv (Account, Est Testers, Testers Range,
-   Est Devs, Ratio, Confidence, Evidence) in the same folder. build.py
-   computes the dev:tester ratio and applies the coverage-gap score boost
-   (>=12:1 +10, >=8:1 +5) and the >=12:1 messaging flag automatically.
+   "Est Testers" columns - keep them when rewriting.
+
+   *** NEVER ESTIMATE ENGINEERING HEADCOUNT. This is absolute. ***
+   Do not derive "Est Devs" or "Est Testers" from total headcount, from the
+   number of open reqs, from funding stage, from a devs-per-tester industry
+   prior, or from any other heuristic. These two columns are populated ONLY
+   by Eric, from his own LinkedIn Sales Navigator title-filter counts. For a
+   new account, leave both fields EMPTY and say plainly in your summary that
+   the dev:tester metric cannot be computed until he supplies the counts.
+   An empty cell is the correct answer; an inferred one is a defect that
+   silently moves an account's score. The same rule applies to Headcount:
+   publish a figure only if the company itself published it.
+
+   Where Eric has supplied real counts, build.py computes the dev:tester
+   ratio and applies the coverage-gap score boost (>=12:1 +10, >=8:1 +5)
+   and the >=12:1 messaging flag automatically. Rows without counts simply
+   receive no boost.
 1b. ACTION QUEUE - if the folder has an outreach.csv, maintain it:
    - PRESERVE the Status and Notes columns exactly as found; they are the
      AE's working state, not generated data. Only the AE (or an explicit
@@ -243,7 +250,7 @@ TERRITORIES = [
         "slug": "data-warehouse",
         "industry": "Cloud Data Warehousing",
         "caption": "Run as if selling a serverless cloud data warehouse.",
-        "vendor_line": "run as if selling <b>a serverless cloud data warehouse</b> (an illustrative demo, not modeled on any real vendor)",
+        "vendor_line": "run as if selling <b>a serverless cloud data warehouse</b>",
         "icp": "Midmarket companies (roughly 150 to 2,500 employees) with a real data and analytics function: actively hiring data engineers, analytics engineers, or data leadership, running a modern data stack, and plausibly feeling cloud warehouse cost or complexity pain. Recent funding, new technical leadership, or expansion moves signal budget and appetite to rethink the analytics stack.",
         "hot": 60, "warm": 40,
         "verified": "July 13, 2026",
@@ -253,7 +260,7 @@ TERRITORIES = [
         "slug": "product-analytics",
         "industry": "Product Analytics",
         "caption": "Run as if selling a product analytics platform: analytics, session replay, feature flags, experiments.",
-        "vendor_line": "run as if selling <b>a product analytics platform</b> covering analytics, session replay, feature flags, and experiments (an illustrative demo, not modeled on any real vendor)",
+        "vendor_line": "run as if selling <b>a product analytics platform</b> covering analytics, session replay, feature flags, and experiments",
         "icp": "Engineering led, product led software companies with roughly 20 to 500 engineers, where developers pick and champion their own tooling. Typically venture backed (YC seed through growth stage) or strongly revenue funded, and shipping product fast enough to need analytics, feature flags, session replay, and experimentation as core infrastructure rather than afterthoughts. The buyer is the builder: technical founders, product engineers, growth engineers, and first PM or data hires. AI first teams weight extra. Excludes hobbyists, cost driven bootstrappers, and orgs where a central tools committee buys software over engineers' heads.",
         "hot": 80, "warm": 40,
         "verified": "July 13, 2026",
@@ -263,7 +270,7 @@ TERRITORIES = [
         "slug": "observability",
         "industry": "Observability",
         "caption": "Run as if selling an observability platform: logs, metrics, traces, uptime.",
-        "vendor_line": "run as if selling <b>an observability platform</b> covering logs, metrics, traces, and uptime (an illustrative demo, not modeled on any real vendor)",
+        "vendor_line": "run as if selling <b>an observability platform</b> covering logs, metrics, traces, and uptime",
         "icp": "Midmarket companies (roughly 200 to 3,000 employees) with production infrastructure pain: scaling cloud and Kubernetes footprints, SRE or platform teams forming or growing, and uptime as direct business risk (consumer apps, fintech, marketplaces, streaming, logistics).",
         "hot": 80, "warm": 40,
         "verified": "July 13, 2026",
@@ -273,7 +280,7 @@ TERRITORIES = [
         "slug": "machine-health",
         "industry": "Industrial Machine Health",
         "caption": "Run as if selling an industrial machine health platform: condition monitoring, CMMS, energy management.",
-        "vendor_line": "run as if selling <b>an industrial machine health platform</b> covering condition monitoring, CMMS, and energy management for industrial maintenance teams (an illustrative demo, not modeled on any real vendor)",
+        "vendor_line": "run as if selling <b>an industrial machine health platform</b> covering condition monitoring, CMMS, and energy management for industrial maintenance teams",
         "icp": "Mid-market industrial and manufacturing companies, roughly 200 to 3,000 employees, ideally running multiple plants in North America: food and beverage processing, packaging, automotive suppliers, building products, chemicals, consumer goods, pulp and paper, and metals. The buyers are maintenance managers, reliability engineers, plant engineers, plant managers, and VPs of Operations - teams with real rotating equipment (compressors, conveyors, blow molders, corrugators, extruders, paper machines) and chronic maintenance-staffing pressure, where condition monitoring, CMMS, and energy monitoring pay back fast.",
         "hot": 40, "warm": 20,
         "verified": "July 13 to 14, 2026",
@@ -283,12 +290,27 @@ TERRITORIES = [
         "slug": "test-automation",
         "industry": "Software Test Automation",
         "caption": "Run as if selling an AI-powered test automation platform: autonomous testing for web, mobile, and API.",
-        "vendor_line": "run as if selling <b>an AI-powered test automation platform</b> covering autonomous testing for web, mobile, and API for QA and engineering teams (an illustrative demo, not modeled on any real vendor)",
+        "vendor_line": "run as if selling <b>an AI-powered test automation platform</b> covering autonomous testing for web, mobile, and API for QA and engineering teams",
         "icp": "Mid-market software companies (roughly 200 to 2,000 employees) building high-stakes, compliance-heavy, or complex-integration products - logistics and supply chain, BFSI (banking, financial services, insurance), HR tech and payroll, CRM and customer platforms, health tech - where testing is genuinely painful and release risk is real money. They ship web and mobile products on fast release cycles, and the tell is an active req list for QA engineers, SDETs, and test automation engineers: test-coverage pain that AI-powered autonomous testing (web, mobile, API) can absorb. Primary buyers are QA leads and managers, engineering managers, and VPs of Engineering; a QA leadership req, fresh funding, or a new engineering executive is the timing trigger.",
         "hot": 52, "warm": 22,
         "limit": 20,
         "verified": "July 19 to 20, 2026",
         "desc": "Demo sales territory for software test automation: 20 real software companies in high-stakes verticals scored on live QA and SDET hiring, funding, and leadership buying signals.",
+    },
+    {
+        "slug": "code-review",
+        "industry": "AI Code Review",
+        "caption": "Run as if selling an AI code review and engineering analytics platform: automated pull-request review, bug and security-risk detection, delivery analytics.",
+        "vendor_line": "run as if selling <b>an AI code review and engineering analytics platform</b> covering automated pull-request review, bug and security-risk detection, and delivery analytics for engineering teams",
+        "icp": "Software and technology companies with substantial engineering organizations shipping frequently, where pull-request review is a throughput bottleneck and code quality or security risk carries real cost. Two halves: high-growth venture-backed software (Series C through pre-IPO infrastructure, developer tooling, and AI-native product companies), and regulated or compliance-heavy technology (fintech and payments, healthtech, insurtech, govtech, security and identity) where review evidence carries audit weight. The buyers are CTOs, VPs of Engineering, Heads of Platform, Heads of Developer Experience, and Heads of Application Security. The timing trigger is an open req list for backend, platform, staff, developer-experience, or application-security engineers.",
+        # This territory scores far higher than the others because a code review
+        # platform genuinely sells to the whole engineering org, so the relevant
+        # role net is wide (5 to 59 here, against 1 to 6 elsewhere). Thresholds
+        # are set from this board's own distribution, not borrowed.
+        "hot": 180, "warm": 100,
+        "limit": 20,
+        "verified": "August 10, 2026",
+        "desc": "Demo sales territory for AI code review: 20 real software companies scored on live engineering and application-security hiring, funding, and leadership buying signals.",
     },
 ]
 
@@ -716,7 +738,7 @@ MOM_TH = '        <th data-k="mom">Momentum <span class="arw"></span></th>'
 
 SCORE_HELP = r'''  <section class="about">
   <h2>How the signal score works</h2>
-  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15. Territories that carry developer and tester estimates also add a coverage-gap boost from the estimated dev:tester ratio - +10 at 12:1 or wider, +5 at 8:1 - fixed thresholds rather than percentiles, so the cutoff stays stable and explainable as the territory grows. Both counts are labeled estimates (LinkedIn title sampling, req history, and industry norms), so the ratio feeds coarse buckets, never precise ranking.</p>
+  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, and an expansion or new region +__W_EXPANSION__. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15. Territories that carry developer and tester counts also add a coverage-gap boost from the dev:tester ratio - +10 at 12:1 or wider, +5 at 8:1 - fixed thresholds rather than percentiles, so the cutoff stays stable and explainable as the territory grows. Those two counts come from my own Sales Navigator title-filter counts, never from an industry rule of thumb, and an account I have not counted gets no boost rather than a guessed one. The ratio feeds coarse buckets, never precise ranking.</p>
   <p><b>Tiers:</b> <span class="tier t-Hot"><i></i>Hot</span> at score &ge; __HOT_T__, <span class="tier t-Warm"><i></i>Warm</span> at &ge; __WARM__, <span class="tier t-Watch"><i></i>Watch</span> below that. The thresholds flex per territory because a "lot of hiring" means different things in different markets.</p>
   </section>'''
 

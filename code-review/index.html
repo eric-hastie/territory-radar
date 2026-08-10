@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>AI Code Review - Territory Radar</title>
+<meta name="description" content="Demo sales territory for AI code review: 20 real software companies scored on live engineering and application-security hiring, funding, and leadership buying signals.">
+<style>
+:root{
+  --paper:#FAF6EF;--paper2:#F3EDE2;--card:#FFFDF8;--ink:#2A2520;--ink2:#4A4238;--muted:#7A7060;
+  --hairline:#E2D9C9;--rule:#2A2520;--accent:#B4432E;--accent-soft:#B4432E14;--link:#1F6E68;
+  --hot:#B4432E;--warm:#8F6A1D;--watch:#6E6759;--up:#1F6E68;--down:#B4432E;--sigred:#E00000;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media(prefers-color-scheme:dark){:root{
+  --paper:#211C17;--paper2:#282219;--card:#2A241D;--ink:#E8DFD2;--ink2:#CFC5B4;--muted:#9C9284;
+  --hairline:#3A3226;--rule:#E8DFD2;--accent:#FF9273;--accent-soft:#FF927318;--link:#5FBFA8;
+  --hot:#FF9273;--warm:#E2B45A;--watch:#A39A8A;--up:#5FBFA8;--down:#FF9273;--sigred:#FF3B30;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.62;-webkit-font-smoothing:antialiased;font-size:17px}
+a{color:var(--link);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--link) 40%,transparent)}
+a:hover{border-bottom-color:var(--link)}
+.wrap{max-width:960px;margin:0 auto;padding:0 22px}
+.num{font-variant-numeric:tabular-nums}
+header{padding:52px 0 0}
+.kicker{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+h1{font-size:42px;line-height:1.08;font-weight:600;letter-spacing:-.015em;margin:0 0 14px}
+.dateline{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0;line-height:1.7}
+.dateline b{color:var(--ink);font-weight:600}
+.doubling{border:0;border-top:3px double var(--rule);margin:26px 0 0;opacity:.75}
+.lede{font-size:20px;line-height:1.55;color:var(--ink);margin:30px 0 6px;max-width:820px}
+.lede .hi{font-style:italic}
+.movers{margin:18px 0 8px}
+.mover{display:flex;gap:18px;padding:22px 0;border-top:1px solid var(--hairline)}
+.mover:first-child{border-top:0}
+.badge{flex:none;width:74px;text-align:center;padding-top:3px}
+.badge .score{font-family:var(--sans);font-size:30px;font-weight:750;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;display:block}
+.badge .delta{font-family:var(--mono);font-size:12.5px;font-weight:600;margin-top:5px;display:block}
+.badge .tierw{display:inline-block;font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-top:7px;padding:2px 8px;border-radius:999px;background:var(--accent-soft)}
+.mover.up .delta{color:var(--up)}.mover.down .delta{color:var(--down)}
+.mover h3{font-size:20px;margin:0 0 6px;font-weight:650;letter-spacing:-.01em}
+.mover h3 .move{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);margin-left:8px;letter-spacing:.02em}
+.mover p{margin:0;color:var(--ink2);font-size:16.5px}
+.alsonote{background:var(--paper2);border-left:3px solid var(--accent);padding:14px 18px;margin:14px 0 0;font-size:15.5px;color:var(--ink2)}
+.alsonote b{font-weight:650;color:var(--ink)}
+section.boardsec{margin-top:44px}
+h2{font-size:26px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+.secsub{font-family:var(--sans);font-size:13.5px;color:var(--muted);margin:0 0 16px;max-width:800px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px;font-family:var(--sans)}
+#q{flex:1;min-width:200px;background:var(--card);border:1px solid var(--hairline);color:var(--ink);padding:10px 14px;border-radius:6px;font-size:14px;font-family:var(--sans);outline:none}
+#q:focus{border-color:var(--accent)}
+#q::placeholder{color:var(--muted)}
+.seg{display:flex;gap:4px;background:var(--paper2);border:1px solid var(--hairline);border-radius:999px;padding:3px}
+.seg button{background:transparent;border:0;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--sans)}
+.seg button.on{background:var(--accent);color:var(--card)}
+.count{color:var(--muted);font-size:13px;white-space:nowrap}
+.tablewrap{overflow-x:auto;border:1px solid var(--hairline);background:var(--card);border-radius:6px}
+table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:14px;min-width:980px}
+thead th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline);white-space:nowrap}
+thead th[data-k]{cursor:pointer;user-select:none}
+thead th[data-k]:hover{color:var(--ink)}
+.arw{opacity:.6;font-size:10px}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--hairline);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--paper2)}
+td.rk{color:var(--muted);width:34px}
+.co{font-weight:650;font-size:15px;font-family:var(--serif)}
+.co a{color:var(--ink);border-bottom:0}
+.co a:hover{color:var(--link)}
+.meta{color:var(--muted);font-size:12px;margin-top:1px}
+td.sc{white-space:nowrap}
+.scoren{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.tier{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-left:9px}
+.tier i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.t-Hot{color:var(--hot)}.t-Hot i{background:var(--hot)}
+.t-Warm{color:var(--warm)}.t-Warm i{background:var(--warm)}
+.t-Watch{color:var(--watch)}.t-Watch i{background:var(--watch)}
+td.mo{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+.m-up{color:var(--up)}.m-down{color:var(--down)}.m-flat{color:var(--muted)}
+.m-new{color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.1em}
+td.mo small{color:var(--muted);font-weight:500;margin-left:3px}
+td.ro{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.ro b{font-weight:700}td.ro span{color:var(--muted)}
+.sig{font-size:12.5px;color:var(--ink2);min-width:220px}
+.sig .p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:2px 7px;margin:2px 3px 0 0}
+td.why{color:var(--ink2);font-size:13px;line-height:1.5;min-width:240px;font-family:var(--serif);font-style:italic}
+.tablenote{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:10px 2px 0}
+.keyrow{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0;font-family:var(--sans);font-size:12.5px;color:var(--ink2)}
+.keyrow span{background:var(--paper2);border:1px solid var(--hairline);border-radius:999px;padding:4px 12px}
+.keyrow b{font-weight:700}
+.about{margin-top:46px;border-top:1px solid var(--hairline);padding-top:28px}
+.about p{color:var(--ink2);font-size:16px;max-width:820px;margin:0 0 14px}
+.about b{color:var(--ink);font-weight:650}
+footer{margin-top:44px;border-top:3px double var(--rule);padding:24px 0 64px}
+footer p{font-family:var(--sans);font-size:13px;color:var(--muted);max-width:820px;margin:0 0 10px}
+footer b{color:var(--ink2)}
+.byline{font-family:var(--sans);font-size:13.5px;color:var(--ink2);margin-top:16px}
+.byline b{color:var(--ink)}
+.cards{display:grid;grid-template-columns:1fr;gap:14px;margin:26px 0 0}
+@media(min-width:620px){.cards{grid-template-columns:repeat(2,1fr)}.cards a.card:last-child:nth-child(odd){grid-column:1/-1}}
+@media(min-width:1000px){.cards{grid-template-columns:repeat(3,1fr)}.cards a.card:last-child:nth-child(odd){grid-column:auto}}
+a.card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--hairline);border-top:3px solid var(--accent);border-radius:6px;padding:20px 18px;color:var(--ink);transition:transform .15s ease,box-shadow .15s ease}
+a.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(42,37,32,.08)}
+.card .ind{font-size:19px;font-weight:650;letter-spacing:-.01em;margin:0 0 7px;line-height:1.25}
+.card .cap{font-family:var(--sans);color:var(--muted);font-size:12.5px;margin:0 0 14px;line-height:1.5}
+.card .mini{display:flex;gap:14px;font-family:var(--sans);font-size:12px;color:var(--muted);margin-top:auto}
+.card .mini b{color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+.card .mini .hotn b{color:var(--hot)}
+.card .go{margin-top:12px;font-family:var(--sans);color:var(--accent);font-size:12.5px;font-weight:600}
+.histsec{margin-top:38px}
+.panel{background:var(--card);border:1px solid var(--hairline);border-radius:6px;padding:18px}
+.legend{display:flex;gap:18px;margin-top:10px;font-family:var(--sans);font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.qgroup{margin-top:38px}
+.qgroup h2 .n{color:var(--muted);font-weight:500;font-size:17px}
+.acct{background:var(--card);border:1px solid var(--hairline);border-radius:6px;padding:18px 20px;margin:14px 0}
+.acct.compact{padding:14px 20px}
+.aline{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.aline .co{font-size:18px}
+.aline .sc{margin-left:auto;white-space:nowrap}
+.status{display:inline-block;font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1px solid var(--hairline);background:var(--paper2)}
+.status.s-now{color:var(--accent)}
+.status.s-active{color:var(--up)}
+.status.s-idle{color:var(--muted)}
+.status[data-acct]{cursor:pointer}
+.status[data-acct]:hover{border-color:currentColor}
+.angle{color:var(--ink2);font-size:15.5px;margin:8px 0 10px;line-height:1.5}
+.hunt{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:0}
+.hunt .p{display:inline-block;background:var(--paper2);border:1px solid var(--hairline);border-radius:4px;padding:3px 9px;margin:3px 5px 0 0}
+.hunt a.p{color:var(--link)}
+details.draft{margin-top:12px;border-top:1px solid var(--hairline);padding-top:10px;font-family:var(--sans)}
+details.draft summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--link)}
+details.seq{margin-top:12px;border:1px solid var(--hairline);border-radius:6px;padding:0 16px 4px;background:var(--paper2)}
+details.seq>summary{cursor:pointer;font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--ink);padding:11px 0}
+details.seq>summary .who{font-weight:500;color:var(--muted);font-size:12.5px}
+details.seq[open]>summary{border-bottom:1px solid var(--hairline)}
+details.seq details.draft{border-top:0;margin-top:2px;padding-top:8px}
+details.seq details.draft+details.draft{border-top:1px solid var(--hairline)}
+details.seq pre.dbody{background:var(--card)}
+details.seq.special{border-color:var(--sigred);border-width:1.5px;background:color-mix(in srgb,var(--sigred) 4%,transparent)}
+details.seq.special>summary{color:var(--sigred)}
+.dns{color:var(--sigred);font-weight:700;font-size:12px}
+p.alert{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--sigred);border:1px solid color-mix(in srgb,var(--sigred) 45%,transparent);background:color-mix(in srgb,var(--sigred) 8%,transparent);border-radius:6px;padding:9px 13px;margin:10px 0}
+p.ratioflag{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--warm);border:1px solid color-mix(in srgb,var(--warm) 45%,transparent);background:color-mix(in srgb,var(--warm) 8%,transparent);border-radius:6px;padding:9px 13px;margin:10px 0}
+.subj{font-size:13px;color:var(--muted);margin:10px 0 6px}.subj b{color:var(--ink)}
+pre.dbody{white-space:pre-wrap;font-family:var(--serif);font-size:15px;line-height:1.55;background:var(--paper2);border:1px solid var(--hairline);border-radius:6px;padding:14px 16px;margin:0 0 8px}
+button.copy{font-family:var(--sans);font-size:12px;font-weight:600;background:var(--accent);color:var(--card);border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
+button.copy.ok{background:var(--up)}
+.anote{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.wk{border-bottom:1px solid var(--hairline);padding:14px 0}.wk:last-child{border-bottom:0}
+.wkhead{font-size:15px;margin-bottom:8px}
+.wkrow{display:flex;gap:8px;align-items:baseline;margin:4px 0;flex-wrap:wrap;font-family:var(--sans)}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:80px;font-weight:700}
+.chip{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 0;background:var(--paper2);border:1px solid var(--hairline)}
+.chip.up{color:var(--up)}.chip.down{color:var(--down)}
+.yes{color:var(--up);font-weight:700}.no{color:var(--muted)}
+.muted{color:var(--muted)}
+@media(max-width:600px){h1{font-size:32px}.badge{width:60px}.badge .score{font-size:25px}.mover{gap:12px}}
+</style></head><body>
+<header><div class="wrap">
+  <p class="kicker">Territory Radar · Weekly Briefing</p>
+  <h1>AI Code Review</h1>
+  <p class="dateline"><b>Week of August 10, 2026</b> &nbsp;·&nbsp; 20 accounts, 8 hot &nbsp;·&nbsp; 328 relevant / 2253 open roles</p>
+  <p class="dateline" style="margin-top:4px">This board is run as if selling <b>an AI code review and engineering analytics platform</b> covering automated pull-request review, bug and security-risk detection, and delivery analytics for engineering teams.</p>
+  <p class="dateline" style="margin-top:8px"><a href="../">&larr; All industries</a> &nbsp;·&nbsp; <a href="../data-warehouse/">Cloud Data Warehousing</a> &nbsp;·&nbsp; <a href="../product-analytics/">Product Analytics</a> &nbsp;·&nbsp; <a href="../observability/">Observability</a> &nbsp;·&nbsp; <a href="../machine-health/">Industrial Machine Health</a> &nbsp;·&nbsp; <a href="../test-automation/">Software Test Automation</a></p>
+  <hr class="doubling">
+</div></header>
+
+<main><div class="wrap">
+<p class="lede">Here's what's moving inside the territory right now - the three accounts carrying the strongest live signals, and why I'd call them first.</p><div class="movers"><div class="mover "><div class="badge"><span class="score num" style="color:var(--hot)">602</span><span class="tierw" style="color:var(--hot)">Hot</span></div><div><h3><span class="co">Affirm</span><span class="move">59 relevant roles open + expansion underway</span></h3><p>Affirm is standing up a chartered bank while running one of the largest distributed backend and platform hiring pushes on any public fintech board, including a Staff Software Engineer for Continuous Integration and three Product Security Engineer reqs. A de novo bank charter means every code path touching money movement and ledger now has to produce examiner-grade review evidence, and hiring reviewers is the slowest way to get it.</p></div></div><div class="mover "><div class="badge"><span class="score num" style="color:var(--hot)">352</span><span class="tierw" style="color:var(--hot)">Hot</span></div><div><h3><span class="co">Harvey</span><span class="move">32 relevant roles open + fresh capital</span></h3><p>Harvey is running 382 open roles across four engineering locations on three continents and is hiring two separate Developer Experience engineers plus a Head of Product Security. When a codebase is being extended simultaneously from San Francisco, New York, Toronto and Bengaluru, review turnaround becomes a timezone problem before it becomes a headcount problem.</p></div></div><div class="mover "><div class="badge"><span class="score num" style="color:var(--hot)">272</span><span class="tierw" style="color:var(--hot)">Hot</span></div><div><h3><span class="co">Replit</span><span class="move">24 relevant roles open + fresh capital</span></h3><p>Replit raised $400M in March and is now building three new engineering surfaces at once: an enterprise platform, a Money and payments org, and a European SRE presence, on top of the agent platform. They also opened a dedicated Product Security Incident Response role, which means code risk has already become someone's full-time job rather than a shared concern.</p></div></div></div>
+  <div class="alsonote" style="margin-top:24px"><b>The ICP this board scores against:</b> Software and technology companies with substantial engineering organizations shipping frequently, where pull-request review is a throughput bottleneck and code quality or security risk carries real cost. Two halves: high-growth venture-backed software (Series C through pre-IPO infrastructure, developer tooling, and AI-native product companies), and regulated or compliance-heavy technology (fintech and payments, healthtech, insurtech, govtech, security and identity) where review evidence carries audit weight. The buyers are CTOs, VPs of Engineering, Heads of Platform, Heads of Developer Experience, and Heads of Application Security. The timing trigger is an open req list for backend, platform, staff, developer-experience, or application-security engineers.</div>
+
+  <section class="boardsec">
+    <h2>The board</h2>
+    <p class="secsub">Every account, ranked by signal score. Score = relevant roles &times;10, recent funding +20, new leadership +20, expansion +12, plus people-signal boosts (new senior tech exec &le;4 months or QA-leadership req filled +25, new director +15) and a dev:tester coverage-gap boost where both estimates exist (&ge;12:1 +10, &ge;8:1 +5). Hot &ge; 180, Warm &ge; 100. Click any column to re-sort, or any account for the source behind its signals.</p>
+    <div class="controls">
+      <input id="q" type="search" placeholder="Search account, signal, HQ..." autocomplete="off">
+      <div class="seg" id="seg">
+        <button data-seg="all" class="on">All</button>
+        <button data-seg="Hot">Hot</button>
+        <button data-seg="Warm">Warm</button>
+        <button data-seg="Watch">Watch</button>
+      </div>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr>
+        <th>#</th>
+        <th data-k="account">Account <span class="arw"></span></th>
+        <th data-k="score">Signal <span class="arw">&#9660;</span></th>
+
+        <th data-k="roles">Roles rel / total <span class="arw"></span></th>
+        <th>Key signals</th>
+        <th>Why now</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <div class="keyrow" aria-label="Scoring weights">
+      <span>relevant open role <b>&times;10</b></span>
+      <span>recent funding <b>+20</b></span>
+      <span>new leadership <b>+20</b></span>
+      <span>expansion / new region <b>+12</b></span>
+      <span>new senior tech exec in seat (&le;4 mo) <b>+25</b></span>
+      <span>QA-leadership req filled <b>+25</b></span>
+      <span>new director in seat <b>+15</b></span>
+      <span>Hot <b>&ge; 180</b> · Warm <b>&ge; 100</b> · Watch below</span>
+    </div>
+  </section>
+
+  <section class="about">
+  <h2>How the signal score works</h2>
+  <p>Every account's score is a transparent, weighted sum of verified signals, so the ranking is explainable - no black box, no vibes. A relevant open role is worth &times;10, recent funding +20, new leadership +20, and an expansion or new region +12. On top of that, verified people signals add a boost: a senior tech executive (CTO / CIO / relevant VP or chief) newly in seat within about 4 months +25, a QA-leadership req that just disappeared from the board (position filled - a buyer landing) +25, and a new director in seat +15. Territories that carry developer and tester counts also add a coverage-gap boost from the dev:tester ratio - +10 at 12:1 or wider, +5 at 8:1 - fixed thresholds rather than percentiles, so the cutoff stays stable and explainable as the territory grows. Those two counts come from my own Sales Navigator title-filter counts, never from an industry rule of thumb, and an account I have not counted gets no boost rather than a guessed one. The ratio feeds coarse buckets, never precise ranking.</p>
+  <p><b>Tiers:</b> <span class="tier t-Hot"><i></i>Hot</span> at score &ge; 180, <span class="tier t-Warm"><i></i>Warm</span> at &ge; 100, <span class="tier t-Watch"><i></i>Watch</span> below that. The thresholds flex per territory because a "lot of hiring" means different things in different markets.</p>
+  </section>
+</div></main>
+
+<footer><div class="wrap">
+<p><b>Methodology.</b> Demo territory of 20 real companies. Signals are verified against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources, and re-verified every week. Signal counts and firmographics are best-effort from public data. This board is run as if selling <b>an AI code review and engineering analytics platform</b> covering automated pull-request review, bug and security-risk detection, and delivery analytics for engineering teams. All scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</p><p><a href="../">&larr; All industries</a> · <a href="https://github.com/eric-hastie/territory-radar" target="_blank" rel="noopener">source on GitHub</a>.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · auto-refreshed weekly · see you next Monday</p>
+</div></footer>
+
+<script>
+const DATA = [{"account": "Affirm", "industry": "Fintech / BNPL and Payments", "hq": "San Francisco, CA", "headcount": "", "funding": "", "total_roles": 201, "roles": 59, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "59 unique relevant titles (98 postings) incl. Product Security Engineer II, Director, Information Technology & Security | Expansion: Affirm has applied to the FDIC and the Nevada Financial Institutions Division for an industrial loan company charter to stand up Affirm Bank, and", "why": "Affirm is standing up a chartered bank while running one of the largest distributed backend and platform hiring pushes on any public fintech board, including a Staff Software Engineer for Continuous Integration and three Product Security Engineer reqs. A de novo bank charter means every code path touching money movement and ledger now has to produce examiner-grade review evidence, and hiring reviewers is the slowest way to get it.", "url": "https://job-boards.greenhouse.io/affirm", "score": 602, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "Harvey", "industry": "AI for Legal and Professional Services", "hq": "San Francisco, CA", "headcount": "", "funding": "$200M, Mar 2026, with GIC, Sequoia and Kleiner Perkins leading, at an $11B valuation", "total_roles": 382, "roles": 32, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "32 relevant open roles incl. Staff Software Engineer - Developer Experience, Senior Software Engineer - Developer Experience, Staff Software Engineer - Core Infrastructure | Funding: $200M, Mar 2026, at an $11B valuation | Expansion: the Hexus team joined Harvey in Jan 2026, and the CTO stated the company is hiring engineers in San Francisco, New York, Toronto and Bengaluru", "why": "Harvey is running 382 open roles across four engineering locations on three continents and is hiring two separate Developer Experience engineers plus a Head of Product Security. When a codebase is being extended simultaneously from San Francisco, New York, Toronto and Bengaluru, review turnaround becomes a timezone problem before it becomes a headcount problem.", "url": "https://api.ashbyhq.com/posting-api/job-board/harvey", "score": 352, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "Replit", "industry": "AI Developer Tools", "hq": "Foster City, CA", "headcount": "", "funding": "Series D, $400M, Mar 2026, led by Georgian, at a $9B valuation", "total_roles": 87, "roles": 24, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "24 relevant open roles incl. Staff Infrastructure Engineer, Software Engineer - Developer Experience, Software Engineer - Compute Platform | Funding: Series D, $400M, Mar 2026, at a $9B valuation | Expansion: standing up an SRE function in Remote Europe and a new Money and payments engineering group alongside the enterprise platform build-out", "why": "Replit raised $400M in March and is now building three new engineering surfaces at once: an enterprise platform, a Money and payments org, and a European SRE presence, on top of the agent platform. They also opened a dedicated Product Security Incident Response role, which means code risk has already become someone's full-time job rather than a shared concern.", "url": "https://api.ashbyhq.com/posting-api/job-board/replit", "score": 272, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "Fivetran", "industry": "Data Integration and Analytics Platform", "hq": "Oakland, CA", "headcount": "", "funding": "No new raise verified in the last 12 months; the dbt Labs combination was an all-stock transaction", "total_roles": 184, "roles": 24, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "24 relevant open roles incl. Staff Software Engineer - Developer Productivity, Senior Software Engineer - Developer Productivity, Senior Full Stack Engineer - Developer Productivity | Expansion: merger with dbt Labs completed Jun 1, 2026, with dbt Core v2.0 and the Fusion engine shipped at close, and roles now posted at a dbt Austin site", "why": "Fivetran closed the dbt Labs merger on June 1 and is now merging two mature codebases while shipping a new open-source engine, and the hiring reflects it: three separate Developer Productivity reqs plus an Engineering Manager for Automations and Internal Tooling. Two engineering orgs learning each other's code is the single hardest review environment there is, and they are staffing for it right now.", "url": "https://boards-api.greenhouse.io/v1/boards/fivetran/jobs", "score": 252, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "Grafana Labs", "industry": "Observability and Developer Infrastructure", "hq": "New York, NY", "headcount": "", "funding": "New investors added alongside $400M ARR milestone, Sep 2025 (company press release); a further round at a reported $9B valuation was covered in Feb 2026 but is not company-confirmed", "total_roles": 156, "roles": 19, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "19 unique relevant titles (65 postings) incl. Staff Backend Engineer - Grafana App Platform, Staff Backend Engineer - Alerting, Staff Backend Engineer - Grafana Enterprise | Funding: new investors added at the $400M ARR mark, Sep 2025 | Expansion: the same reqs are posted across the US, Canada, UK, Ireland, Germany, Spain and Sweden, and the Sep 2025 release frames the capital as funding", "why": "Grafana is hiring a full platform-productivity and internal-tooling function at the same time it staffs Staff Backend Engineers across six product areas, which is what an org looks like right before review throughput becomes the constraint. A distributed, seven-country remote engineering org reviewing across Loki, Tempo, Pyroscope and the app platform is exactly where asynchronous review latency gets expensive.", "url": "https://boards-api.greenhouse.io/v1/boards/grafanalabs/jobs", "score": 222, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "ClickHouse", "industry": "Data Infrastructure", "hq": "San Francisco, CA", "headcount": "", "funding": "Series D, $400M, Jan 2026, led by Dragoneer", "total_roles": 172, "roles": 16, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "16 relevant open roles incl. Cloud Database Infrastructure Engineer, Senior Infrastructure Engineer - Postgres, Principal Software Engineer - Postgres | Funding: Series D, $400M, Jan 2026, led by Dragoneer | Expansion: acquired Langfuse and launched a native Postgres service alongside the round, Jan 2026", "why": "ClickHouse took $400M in January and immediately opened two brand new engineering surfaces at once, a native Postgres service and the acquired Langfuse codebase, while hiring Principal and Senior engineers specifically for Postgres. Merging an outside codebase and standing up a new transactional engine in parallel is precisely when review depth and regression risk stop scaling with the team.", "url": "https://boards-api.greenhouse.io/v1/boards/clickhouse/jobs", "score": 192, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "Decagon", "industry": "AI Agents for Customer Experience", "hq": "San Francisco, CA", "headcount": "", "funding": "Series D, $250M, Jan 2026, co-led by Coatue and Index Ventures, at a $4.5B valuation", "total_roles": 128, "roles": 15, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "15 relevant open roles incl. Staff Software Engineer - Agent Platform, Senior Software Engineer - Agent Platform, Senior Software Engineer - Platform Engineering | Funding: Series D, $250M, Jan 2026, at a $4.5B valuation | Expansion: agent platform, agents and data infrastructure reqs are duplicated across San Francisco and New York City, indicating a second engineering location", "why": "Decagon tripled its valuation in January and is now running the same agent platform and infrastructure reqs in both San Francisco and New York, which means review is about to cross a coast boundary. They are also hiring two Platform Security engineers and an AI Developer Experience engineer, so both code risk and internal developer throughput are already funded line items.", "url": "https://api.ashbyhq.com/posting-api/job-board/decagon", "score": 182, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "Netskope", "industry": "Cloud and Network Security (SASE)", "hq": "Santa Clara, CA", "headcount": "", "funding": "IPO, Nasdaq NTSK, 18 Sept 2025, priced at $19.00 per share, approximately $908M raised at roughly a $7.3B pricing valuation", "total_roles": 144, "roles": 16, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "16 relevant open roles incl. Sr. Manager, Information Security - Application Security and Red Team, Bengaluru | Funding: IPO on Nasdaq 18 Sept 2025, approximately $908M raised", "why": "Netskope is hiring a Senior Manager for Application Security and Red Team alongside a Principal Engineer for Engineering Productivity, less than a year after its Nasdaq IPO. Post-IPO, delivery metrics and security findings become reportable numbers, and a security vendor whose own code ships from Santa Clara, Toronto, Bengaluru, Taipei and Manila has an obvious review-consistency problem to solve.", "url": "https://boards.greenhouse.io/netskope", "score": 180, "tier": "Hot", "mom": "new", "mom_delta": null}, {"account": "Vanta", "industry": "Security and Compliance Automation (GRC)", "hq": "San Francisco, CA", "headcount": "", "funding": "", "total_roles": 84, "roles": 16, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "16 relevant open roles incl. Staff Software Engineer, GRC, Senior Security Engineer", "why": "Vanta is hiring two Core Platform engineering managers, two Reporting engineering managers and a Staff Software Engineer for GRC at once, across US, Canada and London. A company whose product is audit evidence has to hold its own code to the standard it sells, and four simultaneous EM hires means four new review cultures forming in parallel.", "url": "https://jobs.ashbyhq.com/vanta", "score": 160, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "CLEAR Secure", "industry": "Identity Verification / Secure Credentialing", "hq": "New York, NY", "headcount": "", "funding": "", "total_roles": 39, "roles": 15, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "15 relevant open roles incl. Director, Engineering (Consumer Experiences), Director of Engineering", "why": "CLEAR is hiring two engineering directors, an infrastructure engineering manager and a Senior Product Security Engineer at the same time, while extending its identity platform into healthcare and B2B under CLEAR1. Adding review capacity through two new director orgs is exactly when review consistency and security findings start slipping, and CLEAR handles biometric and PII data where that slip is expensive.", "url": "https://boards.greenhouse.io/clear", "score": 150, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Postman", "industry": "API Developer Tools", "hq": "San Francisco, CA", "headcount": "", "funding": "No raise in the last 12 months; last disclosed round was 2021", "total_roles": 108, "roles": 13, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "13 relevant open roles incl. Head of AI Platform Engineering, Staff Software Engineer - Fern, Staff Software Engineer - Codegen | Expansion: acquired Fern on Jan 8, 2026 and is now hiring a Staff Software Engineer dedicated to Fern in New York and San Francisco", "why": "Postman is absorbing the Fern SDK and docs codebase acquired in January and is hiring a Staff engineer specifically to carry it, plus a Codegen engineer and a Head of AI Platform Engineering. Generated SDKs across nine languages and an acquired codebase entering an established platform is a review surface that grows faster than the reviewers do.", "url": "https://boards-api.greenhouse.io/v1/boards/postman/jobs", "score": 142, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Mercor", "industry": "AI Talent and Data Marketplace", "hq": "San Francisco, CA", "headcount": "", "funding": "Series C, $350M, Oct 2025, led by Felicis, at a $10B valuation", "total_roles": 85, "roles": 11, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "11 relevant open roles incl. Software Engineer - Backend, Member of Technical Staff - Backend, Software Engineer - Platform | Funding: Series C, $350M, Oct 2025, at a $10B valuation | Expansion: roles posted for San Francisco or New York City plus a dedicated New York City engineering req, indicating a second engineering location", "why": "Mercor has an open Application Security Engineer alongside a Cloud Infrastructure Security Engineer and two backend hiring tracks, which is an unusually security-forward pattern for a company this stage. They are also splitting engineering across San Francisco and New York, so review handoffs are about to get more expensive than the code itself.", "url": "https://api.ashbyhq.com/posting-api/job-board/mercor", "score": 142, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "ID.me", "industry": "Digital Identity / Government Services", "hq": "McLean, VA", "headcount": "", "funding": "Series E, $340M total ($65M equity plus $275M credit facility), Sept 2025, at over $2B valuation, led by Ribbit Capital", "total_roles": 47, "roles": 11, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "11 relevant open roles incl. Principal Engineer, Person and Trust Platform; Principal Engineer, Work Profiles; Staff Site Reliability Engineer; Staff Software Engineer | Funding: $340M raised Sept 2025 at over $2B valuation, led by Ribbit Capital with Ares Management and Viking Global", "why": "ID.me refreshed its entire trust and authentication engineering slate in the first week of August 2026, including two Principal Engineer reqs on the Person and Trust Platform, on the back of a $340M raise aimed squarely at AI-driven fraud. Identity code that federal and state agencies rely on cannot ship faster by adding reviewers, and every merge into the trust path is audit-relevant.", "url": "https://boards.greenhouse.io/idme", "score": 130, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Sierra", "industry": "AI Agents for Customer Experience", "hq": "San Francisco, CA", "headcount": "", "funding": "Series E, $950M, May 2026, led by GV and Tiger Global, at a $15.8B valuation", "total_roles": 192, "roles": 8, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "8 relevant open roles incl. Software Engineer - Platform, Software Engineer - Infrastructure, Software Engineer - Agent Data Platform | Funding: Series E, $950M, May 2026, at a $15.8B valuation | Expansion: an Engineering Manager - Agent req in New York on an otherwise San Francisco engineering board", "why": "Sierra raised $950M in May and is opening an engineering management line in New York against an otherwise San Francisco engineering org, while standing up payments infrastructure and an identity and enterprise platform. New regulated-adjacent surfaces like payments plus a second engineering site is the moment review standards have to be made explicit rather than cultural.", "url": "https://api.ashbyhq.com/posting-api/job-board/sierra", "score": 112, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Omada Health", "industry": "Healthtech / Virtual Chronic Care", "hq": "San Francisco, CA", "headcount": "", "funding": "", "total_roles": 30, "roles": 11, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "11 relevant open roles incl. Staff Software Engineer; Staff Software Engineer, Data Products; Senior Software Engineer, Platform; Senior Software Engineer | Context, not counted as a signal: Omada announced a CEO transition on 6 Aug 2026, with President Wei-Li Shao becoming CEO effective 1 Jan 2027 and co-founder", "why": "Omada posted eleven senior and staff engineering reqs in a single batch on 30 July 2026, including a Senior Engineering Manager and two staff roles, and announced a CEO succession a week later. A public HIPAA-regulated company absorbing that much new engineering headcount at once, mid-leadership-transition, will feel review latency before it feels anything else.", "url": "https://boards.greenhouse.io/omadahealth", "score": 110, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Mark43", "industry": "Govtech / Public Safety Software", "hq": "New York, NY", "headcount": "", "funding": "", "total_roles": 32, "roles": 9, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 1, "est_devs": "", "est_testers": "", "signals": "9 relevant open roles incl. AWS Cloud Security Operations Engineer, Manchester, Engineering Manager - Integrations | Expansion: new UK headquarters opened in Manchester at 24 Mount Street in Jan 2026, publicly launched with the Mayor of Greater Manchester and senior Greater", "why": "Mark43 opened a Manchester UK engineering hub in January 2026 and is now filling it, including an AWS Cloud Security Operations Engineer and an Integrations engineering manager. A brand new second engineering site means review load lands on a US team that has never worked with these people, in a CJIS and public-safety codebase where a bad merge is a headline.", "url": "https://boards.greenhouse.io/mark43", "score": 102, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Grow Therapy", "industry": "Healthtech / Behavioral Health", "hq": "New York, NY", "headcount": "", "funding": "Series D, $150M, March 2026, led by TCV and Growth Equity at Goldman Sachs Alternatives, at a $3B valuation", "total_roles": 26, "roles": 8, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "8 relevant open roles incl. Staff Software Engineer - Developer Experience and AI Enablement, San Francisco, Senior Software Engineer - Developer Experience and AI Enablement | Funding: $150M Series D announced 3 Mar 2026 at a $3B valuation, led by TCV and Growth Equity at Goldman Sachs Alternatives with BCI and Menlo Ventures joining", "why": "Five months after a $150M Series D, Grow Therapy opened a Developer Experience and AI Enablement pod in San Francisco (staff plus senior plus an engineering manager) and two dedicated security engineering reqs. They are explicitly staffing developer throughput and security review as separate problems, in a HIPAA-regulated behavioral health platform where both land on the same pull request.", "url": "https://jobs.ashbyhq.com/Grow-Therapy", "score": 100, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Lemonade", "industry": "Insurtech", "hq": "New York, NY", "headcount": "", "funding": "", "total_roles": 30, "roles": 10, "funding_sig": 0, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "10 relevant open roles incl. Backend Engineer, Senior Backend Engineer, GenAI | Context, not counted as a signal: Lemonade reported 79 percent revenue growth in Q2 2026 and announced a CFO succession, with Nick Stead taking over from Tim", "why": "Lemonade is recruiting a Senior Director of Engineering plus six backend and platform engineers into its Tel Aviv team while revenue grew 79 percent year over year in Q2 2026. A regulated insurance carrier scaling backend headcount that fast, with a new engineering director about to reset standards, is the classic point where pull request review becomes the throughput ceiling.", "url": "https://jobs.ashbyhq.com/Lemonade", "score": 100, "tier": "Warm", "mom": "new", "mom_delta": null}, {"account": "Marqeta", "industry": "Payments / Card Issuing", "hq": "Oakland, CA", "headcount": "", "funding": "", "total_roles": 43, "roles": 6, "funding_sig": 0, "leadership_sig": 1, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "6 relevant open roles incl. Principal Software Engineer, Remote USA, Staff Software Engineer - Banking and Money Movement | Leadership: Lukasz Strozek appointed Chief Technology Officer, announced 8 May 2026; Mike Milotich confirmed as permanent CEO in Sept 2025 after seven months", "why": "Marqeta brought in a new CTO in May 2026 and is now hiring a Principal Software Engineer plus two Identity Platform engineering managers. A new CTO in a PCI-scoped card issuing platform has roughly two quarters to show measurable change in delivery speed and defect escape rate, and the review layer is the usual first place to look.", "url": "https://boards.greenhouse.io/marqeta", "score": 80, "tier": "Watch", "mom": "new", "mom_delta": null}, {"account": "Vercel", "industry": "Developer Tools and Cloud Infrastructure", "hq": "San Francisco, CA", "headcount": "", "funding": "Series F, $300M, Sep 2025, co-led by Accel and GIC, at a $9.3B valuation, alongside a $300M tender offer", "total_roles": 83, "roles": 5, "funding_sig": 1, "leadership_sig": 0, "expansion_sig": 0, "est_devs": "", "est_testers": "", "signals": "5 relevant open roles incl. Software Engineer - Backend, Software Engineer - Deployment Infrastructure, Engineering Manager - CDN | Funding: Series F, $300M, Sep 2025, at a $9.3B valuation", "why": "Vercel is hiring a Product Security Engineer across four offices and a dedicated Internal Agent engineer at the same time, which says internal engineering leverage and security review are both live priorities rather than someday problems. Deployment infrastructure and CDN hires on a small relevant-role footprint suggest a team going deeper rather than wider, where per-change risk is high.", "url": "https://boards-api.greenhouse.io/v1/boards/vercel/jobs", "score": 70, "tier": "Watch", "mom": "new", "mom_delta": null}];
+const HASHIST = false;
+const tbody=document.getElementById('rows'),q=document.getElementById('q'),count=document.getElementById('count');
+let seg='all',sortK='score',sortDir=-1;
+const MOM={up:'<span class="m-up">&#9650;</span>',down:'<span class="m-down">&#9660;</span>',flat:'<span class="m-flat">&#9644;</span>',new:'<span class="m-new">NEW</span>'};
+function sigChips(s){return s? s.split('|').map(x=>`<span class="p">${x.trim()}</span>`).join('') : '<span class="muted">-</span>';}
+function render(){
+  const t=q.value.trim().toLowerCase();
+  let list=DATA.filter(r=>{
+    if(seg!=='all' && r.tier!==seg)return false;
+    if(!t)return true;
+    return (r.account+' '+r.industry+' '+r.signals+' '+r.hq).toLowerCase().includes(t);
+  });
+  list=list.slice().sort((a,b)=>{
+    let av=a[sortK],bv=b[sortK];
+    if(sortK==='score'||sortK==='roles')return (av-bv)*sortDir;
+    return String(av).localeCompare(String(bv))*sortDir;
+  });
+  tbody.innerHTML=list.map((r,i)=>`<tr>
+    <td class="rk num">${i+1}</td>
+    <td><div class="co">${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.account}</a>`:r.account}</div>
+        <div class="meta">${[r.industry,r.hq,r.headcount,r.funding].filter(Boolean).join(' · ')}</div></td>
+    <td class="sc"><span class="scoren num">${r.score}</span><span class="tier t-${r.tier}"><i></i>${r.tier}</span></td>
+    ${HASHIST?`<td class="mo">${MOM[r.mom]||''}${r.mom_delta?`<small>${r.mom_delta>0?'+':''}${r.mom_delta}</small>`:''}</td>`:''}
+    <td class="ro"><b>${r.roles}</b> <span>/ ${r.total_roles||0}</span></td>
+    <td class="sig">${sigChips(r.signals)}</td>
+    <td class="why">${r.why||''}</td>
+  </tr>`).join('');
+  count.textContent=list.length+' of '+DATA.length+' accounts';
+}
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{seg=b.dataset.seg;document.querySelectorAll('#seg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();});
+document.querySelectorAll('thead th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k){sortDir*=-1}else{sortK=k;sortDir=(k==='score'||k==='roles')?-1:1}document.querySelectorAll('.arw').forEach(a=>a.textContent='');th.querySelector('.arw').innerHTML=sortDir>0?'&#9650;':'&#9660;';render();});
+q.oninput=render;render();
+</script>
+</body></html>
