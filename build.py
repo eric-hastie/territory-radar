@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-"""Regenerate the Territory Radar site: landing page + five demo territory
-boards + the original (legacy) demo board, all in the "Monday briefing" look.
+"""Regenerate the Territory Radar site: landing page + one board per demo
+territory + the build archive, all in the "Monday briefing" look.
 
 Site layout:
   index.html                    - landing page: pick an industry
-  data-warehouse/index.html     - Cloud Data Warehousing board (unnamed vendor)
-  product-analytics/index.html  - Product Analytics board (unnamed vendor)
-  observability/index.html      - Observability board (unnamed vendor)
-  machine-health/index.html     - Industrial Machine Health board (unnamed vendor)
-  test-automation/index.html    - Software Test Automation board (unnamed vendor)
-  legacy.html                   - the original demo board (June-July 2026)
+  <slug>/index.html             - one board per entry in TERRITORIES below
+  archive/index.html            - provenance, momentum, and the build record
+  legacy.html                   - the original demo board, frozen
   history.html / roles.html     - momentum + open-roles inventory for the legacy board
+
+PUBLIC PAGES CARRY NO PROVENANCE DATES. The landing page and the territory
+boards deliberately show no research dates, no "verified <month>" line, and no
+momentum column. The tool's claim is that it tells you who to call this
+morning, and dated provenance invites the reader to judge it as a finished past
+project. The dates and the week-over-week movement are not deleted: they are
+rendered on archive/index.html, which is regenerated on every build from the
+same data. Do not reintroduce dates onto the public pages.
 
 Inputs:
   data/territories/<slug>/latest.csv     - current account rows for each territory
@@ -21,12 +26,23 @@ Inputs:
 
 No third-party dependencies. Scores and tiers are always recomputed at build
 time from the CSV signal columns, so the CSVs are the single source of truth.
-Each board opens with a Monday-briefing narrative: once a territory has two or
-more dated snapshots it spotlights the biggest week-over-week movers; until
-then it spotlights the strongest live signals (an honest first-snapshot mode).
+Each board opens with a Monday-briefing narrative spotlighting the strongest
+live signals in the territory. The week-over-week movers narrative and the
+momentum column still exist in the code and still run for the legacy board,
+but public territory boards pass has_history=False so they read as a current
+snapshot. Snapshots keep accumulating on disk either way.
+
+BANNED PHRASES in any generated or hand-written outreach copy: "real question",
+"honest question", and "honest strategic question". They read as filler and
+they crept back in twice via the weekly refresh. Ask the question directly.
+
+BOARD SIZE CAP: a TERRITORIES entry may carry a "limit" key. build.py sorts by
+score and truncates to that many accounts. test-automation is capped at 20. If
+a refresh writes more rows than the cap, the extra rows stay in the CSV but
+never reach the board - do not "fix" this by raising the cap.
 
 --- WEEKLY CLOUD REFRESH ROUTINE (what the weekly agent should do) ---
-1. For each of the five territory folders in data/territories/ (any or all):
+1. For each territory folder in data/territories/ (any or all):
    re-verify every account's signals against its live ATS job board and
    public sources, rewrite latest.csv in the same column schema, and save an
    identical copy as YYYY-MM-DD.csv (today's date) in the same folder - the
@@ -270,8 +286,9 @@ TERRITORIES = [
         "vendor_line": "run as if selling <b>an AI-powered test automation platform</b> covering autonomous testing for web, mobile, and API for QA and engineering teams (an illustrative demo, not modeled on any real vendor)",
         "icp": "Mid-market software companies (roughly 200 to 2,000 employees) building high-stakes, compliance-heavy, or complex-integration products - logistics and supply chain, BFSI (banking, financial services, insurance), HR tech and payroll, CRM and customer platforms, health tech - where testing is genuinely painful and release risk is real money. They ship web and mobile products on fast release cycles, and the tell is an active req list for QA engineers, SDETs, and test automation engineers: test-coverage pain that AI-powered autonomous testing (web, mobile, API) can absorb. Primary buyers are QA leads and managers, engineering managers, and VPs of Engineering; a QA leadership req, fresh funding, or a new engineering executive is the timing trigger.",
         "hot": 52, "warm": 22,
+        "limit": 20,
         "verified": "July 19 to 20, 2026",
-        "desc": "Demo sales territory for software test automation: 50 real software companies in high-stakes verticals scored on live QA and SDET hiring, funding, and leadership buying signals.",
+        "desc": "Demo sales territory for software test automation: 20 real software companies in high-stakes verticals scored on live QA and SDET hiring, funding, and leadership buying signals.",
     },
 ]
 
@@ -321,6 +338,12 @@ def score_of(r):
 
 def tier_of(s, hot, warm):
     return "Hot" if s >= hot else "Warm" if s >= warm else "Watch"
+
+def number_word(n):
+    """Small counts read better spelled out in prose than as digits."""
+    words = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six",
+             7: "seven", 8: "eight", 9: "nine", 10: "ten"}
+    return words.get(n, str(n))
 
 def human_date(iso):
     d = datetime.date.fromisoformat(iso)
@@ -546,12 +569,12 @@ LANDING = r'''<!DOCTYPE html>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Territory Radar - The weekly territory briefing for Account Executives</title>
-<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Five demo industries: cloud data warehousing, product analytics, observability, industrial machine health, software test automation.">
+<meta name="description" content="An automated territory-intelligence tool that scores target accounts on buying signals from hiring, funding, and leadership activity. Demo industries: __INDLIST__.">
 <style>__CSS__</style></head><body>
 <header><div class="wrap">
   <p class="kicker">B2B Sales · Territory Intelligence</p>
   <h1>Territory Radar</h1>
-  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; five demo industries, __NACCTS__ accounts &nbsp;·&nbsp; updated __DATEHUMAN__ &nbsp;·&nbsp; built by Eric Hastie</p>
+  <p class="dateline"><b>The Monday territory briefing for Account Executives</b> &nbsp;·&nbsp; __NTERR__ demo industries, __NACCTS__ accounts &nbsp;·&nbsp; updated __DATEHUMAN__ &nbsp;·&nbsp; built by Eric Hastie</p>
   <hr class="doubling">
 </div></header>
 
@@ -560,9 +583,8 @@ LANDING = r'''<!DOCTYPE html>
 
   <section class="boardsec">
     <h2>Pick an industry</h2>
-    <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Five demo territories below - same tool, five different products, five different answers to "who do I call first?"</p>
+    <p class="secsub">The engine doesn't care what I'm selling. I point it at a market, describe the ideal customer profile, and it re-scores a universe of companies through that lens. Each territory below runs the same tool against a different market: a different product, a different ideal customer profile, and a different answer to "who do I call first?"</p>
     <div class="cards">__CARDS__</div>
-    <div class="alsonote" style="margin-top:22px"><b>Illustrative demos.</b> All five boards are run against unnamed hypothetical products; no real vendor is named, and none is affiliated with or has endorsed this project. The companies, job postings, funding rounds, and leadership moves are all real, verified __VERIFIED__ against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources; the scoring and tiering are this tool's own. A live deployment runs against a real book of business in a <b>private</b> repo.</div>
   </section>
 
   <section class="about">
@@ -575,8 +597,7 @@ LANDING = r'''<!DOCTYPE html>
 
 <footer><div class="wrap">
   <p><b>Scoring.</b> Every account's score is a transparent, weighted sum of verified signals: relevant open roles &times;__W_ROLES__, recent funding +__W_FUNDING__, new leadership +__W_LEADERSHIP__, expansion +__W_EXPANSION__. Each board explains its own Hot / Warm / Watch tiers.</p>
-  <p><b>The archive.</b> <a href="legacy.html">The original demo board (June-July 2026)</a> - a cloud-infrastructure territory tracked across weekly snapshots - is still live, with its <a href="history.html">momentum history</a> and <a href="roles.html">open-roles inventory</a>.</p>
-  <p><a href="https://github.com/__REPO__" target="_blank" rel="noopener">Source on GitHub</a> · refreshed by a weekly cloud agent.</p>
+  <p><a href="https://github.com/__REPO__" target="_blank" rel="noopener">Source on GitHub</a> · refreshed by a weekly cloud agent · <a href="archive/">build archive</a>.</p>
   <p class="byline">Built by <b>Eric Hastie</b> · auto-refreshed weekly · see you next Monday</p>
 </div></footer>
 </body></html>'''
@@ -599,7 +620,7 @@ BOARD = r'''<!DOCTYPE html>
 <header><div class="wrap">
   <p class="kicker">__EYEBROW__</p>
   <h1>__H1__</h1>
-  <p class="dateline"><b>Week of __DATEHUMAN__</b> &nbsp;·&nbsp; signals verified __VERIFIED__ &nbsp;·&nbsp; __ACCOUNTS__ accounts, __HOT__ hot &nbsp;·&nbsp; __ROLES__ relevant / __TOTALROLES__ open roles</p>
+  <p class="dateline"><b>Week of __DATEHUMAN__</b> &nbsp;·&nbsp; __ACCOUNTS__ accounts, __HOT__ hot &nbsp;·&nbsp; __ROLES__ relevant / __TOTALROLES__ open roles</p>
   <p class="dateline" style="margin-top:4px">This board is __VENDORLINE__.</p>
   <p class="dateline" style="margin-top:8px">__NAV__</p>
   <hr class="doubling">
@@ -703,6 +724,63 @@ LEGACY_ABOUT = r'''  <section class="about">
   <h2>About this board</h2>
   <p>This is the original Territory Radar territory: 16 real mid-market and enterprise companies scored on buying signals for a cloud infrastructure / DevOps platform, tracked across weekly snapshots since June 2026. Job postings are one of the cleanest, earliest intent signals in B2B - a company scaling its platform team or hiring an infra leader is telling you about budget and initiatives before any intent-data vendor flags it. The site has since grown into <a href="./">five industry demo territories</a>; this page is preserved because it carries the longest momentum history.</p>
   </section>''' + SCORE_HELP
+
+# ---------------------------------- archive ----------------------------------
+# The public boards read as a current snapshot with no provenance dates and no
+# momentum column. Everything stripped from them is preserved here instead, and
+# this page is regenerated on every build so it never drifts from the live site.
+ARCHIVE = r'''<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>Build archive - Territory Radar</title>
+<meta name="description" content="Provenance, weekly momentum, and the build record behind Territory Radar.">
+<style>__CSS__</style></head><body>
+<header><div class="wrap">
+  <p class="kicker">Territory Radar · Build Archive</p>
+  <h1>Build archive</h1>
+  <p class="dateline"><b>Provenance, momentum, and the build record</b> &nbsp;·&nbsp; regenerated __DATEHUMAN__</p>
+  <p class="dateline" style="margin-top:8px"><a href="../">&larr; Live boards</a></p>
+  <hr class="doubling">
+</div></header>
+
+<main><div class="wrap">
+  <p class="lede">The live boards are built to answer one question: who do I call first, right now. That means they carry no research dates, no archive of past weeks, and no momentum column. This page keeps all of it, so nothing is lost just because the front of the site stopped leading with it.</p>
+
+  <section class="boardsec">
+    <h2>Territory provenance</h2>
+    <p class="secsub">When each territory was first researched, and what it holds today. Signals on every board are re-verified weekly regardless of when the territory was first built.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Territory</th><th>Accounts</th><th>Hot</th><th>First researched</th><th>Weekly snapshots</th></tr></thead>
+      <tbody>__PROVROWS__</tbody>
+    </table></div>
+  </section>
+
+  <section class="boardsec">
+    <h2>This week's momentum</h2>
+    <p class="secsub">Week-over-week score movement per territory, computed from the stored snapshots. This is the data that used to drive the momentum column on each public board.</p>
+    __MOMENTUM__
+  </section>
+
+  <section class="boardsec">
+    <h2>The original demo board</h2>
+    <p class="secsub">The first Territory Radar territory: 16 mid-market and enterprise companies scored for a cloud infrastructure and DevOps platform, tracked across weekly snapshots since June 2026. It carries the longest continuous history on the project and is frozen rather than refreshed.</p>
+    <p><a href="../legacy.html">Open the original board &rarr;</a> &nbsp;·&nbsp; <a href="../history.html">Momentum &amp; history &rarr;</a> &nbsp;·&nbsp; <a href="../roles.html">Open-roles inventory &rarr;</a></p>
+  </section>
+
+  <section class="about">
+    <h2>Build record</h2>
+    __CHANGELOG__
+  </section>
+</div></main>
+
+<footer><div class="wrap">
+  <p><b>Why this page exists.</b> Removing the dates from the public boards was a positioning decision, not a cleanup: the tool's value is that it tells you who to call this morning, and a page that leads with when it was built invites the reader to judge it as a past project instead. The record still matters, so it lives here.</p>
+  <p><a href="../">&larr; Live boards</a> · <a href="https://github.com/__REPO__" target="_blank" rel="noopener">source on GitHub</a>.</p>
+  <p class="byline">Built by <b>Eric Hastie</b> · regenerated on every build</p>
+</div></footer>
+</body></html>'''
 
 # ---------------------------------- history ----------------------------------
 HISTORY = r'''<!DOCTYPE html>
@@ -1275,15 +1353,12 @@ def briefing_html(board, has_history):
             note = (f'<div class="alsonote"><b>Also moved:</b> {rest} more account{"s" if rest != 1 else ""} '
                     'changed score this week - the momentum column below has every arrow.</div>')
         return lede + f'<div class="movers">{blocks}</div>' + note
-    # first snapshot: no week-over-week yet - narrate the strongest live signals
+    # current-signals mode: narrate the strongest live signals in the territory
     top = board[:3]
-    lede = (f'<p class="lede">This territory is on its first weekly snapshot, so there\'s no '
-            'week-over-week movement to report yet. Instead, here\'s what\'s moving <i>inside</i> the '
-            'territory right now - the three accounts with the strongest live signals, and why I\'d call them first.</p>')
+    lede = ('<p class="lede">Here\'s what\'s moving inside the territory right now - the three accounts '
+            'carrying the strongest live signals, and why I\'d call them first.</p>')
     blocks = "".join(mover_block(r, signal_label(r)) for r in top)
-    note = ('<div class="alsonote"><b>Momentum starts next week.</b> Every account below is at its baseline '
-            'score; once the second weekly snapshot lands, real week-over-week movers take over this space automatically.</div>')
-    return lede + f'<div class="movers">{blocks}</div>' + note
+    return lede + f'<div class="movers">{blocks}</div>'
 
 def render_board(out_path, board, ctx):
     html_s = (BOARD
@@ -1324,6 +1399,12 @@ def build_territory(t):
     snaps = snapshots(data_dir, t["hot"], t["warm"])
     board = add_momentum(board, snaps)
     board.sort(key=lambda r: r["score"], reverse=True)
+    # A territory may cap how many accounts reach the board. The weekly refresh
+    # agent rewrites these CSVs unattended, so this is the guard that keeps a
+    # board from quietly growing back past the size it is meant to be.
+    if t.get("limit") and len(board) > t["limit"]:
+        print(f'  {t["slug"]}: capping board at {t["limit"]} of {len(board)} accounts')
+        board = board[:t["limit"]]
     updated = human_date(snaps[-1]["date"]) if snaps else t["verified"]
 
     others = [x for x in TERRITORIES if x["slug"] != t["slug"]]
@@ -1342,25 +1423,35 @@ def build_territory(t):
         "nav": nav,
         "icp": t["icp"],
         "about": SCORE_HELP,
-        "footer": (f'<p><b>Methodology.</b> Demo territory of 20 real companies; signals verified {t["verified"]} '
-                   'against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public sources, '
-                   're-verified weekly. Signal counts and firmographics are best-effort from public data. '
-                   f'This board is {vendor_clause}. All scoring and tiering are this tool\'s own. '
+        "footer": (f'<p><b>Methodology.</b> Demo territory of {len(board)} real companies. Signals are verified '
+                   'against live ATS job boards (Greenhouse / Lever / Ashby / Workday and others) and public '
+                   'sources, and re-verified every week. Signal counts and firmographics are best-effort from '
+                   f'public data. This board is {vendor_clause}. All scoring and tiering are this tool\'s own. '
                    'A live deployment runs against a real book of business in a <b>private</b> repo.</p>'
                    '<p><a href="../">&larr; All industries</a> · <a href="https://github.com/' + REPO +
                    '" target="_blank" rel="noopener">source on GitHub</a>.</p>'),
         "updated": updated,
         "hot": t["hot"], "warm": t["warm"],
-        "has_history": len(snaps) >= 2,
+        # Public boards read as a current snapshot: no momentum column, no
+        # week-over-week narration. The snapshot history still accumulates on
+        # disk and is surfaced on archive/index.html instead.
+        "has_history": False,
     }
     render_board(os.path.join(ROOT, t["slug"], "index.html"), board, ctx)
     if has_queue:
         build_outreach(t, board, updated, people)
     hot_n = sum(1 for r in board if r["tier"] == "Hot")
     print(f'built {t["slug"]}/index.html: {len(board)} accounts, {hot_n} hot')
+    # Momentum is still computed and stored; it just renders on the archive page
+    # now instead of on the public board.
+    movers = sorted(
+        ({"account": r["account"], "delta": r["mom_delta"], "score": r["score"], "tier": r["tier"]}
+         for r in board if r.get("mom") in ("up", "down") and r.get("mom_delta")),
+        key=lambda m: abs(m["delta"]), reverse=True)
     return {"slug": t["slug"], "industry": t["industry"], "caption": t["caption"],
             "accounts": len(board), "hot": hot_n,
-            "last_date": snaps[-1]["date"] if snaps else None}
+            "last_date": snaps[-1]["date"] if snaps else None,
+            "researched": t.get("verified"), "n_snaps": len(snaps), "movers": movers}
 
 def build_legacy(today_human):
     csv_path = os.path.join(ROOT, "data", "latest.csv")
@@ -1382,8 +1473,8 @@ def build_legacy(today_human):
         "vendorline": (f'run as if selling {LEGACY["product"]} - a <b>buying signal</b> here means '
                        f'{LEGACY["signal_desc"]}'),
         "verified": "weekly since June 2026",
-        "nav": ('<a href="./">&larr; All industries</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> '
-                '&nbsp;·&nbsp; <a href="roles.html">All open roles &rarr;</a>'),
+        "nav": ('<a href="archive/">&larr; Build archive</a> &nbsp;·&nbsp; <a href="history.html">Momentum &amp; history</a> '
+                '&nbsp;·&nbsp; <a href="roles.html">All open roles &rarr;</a> &nbsp;·&nbsp; <a href="./">Live boards</a>'),
         "icp": ("mid-market and enterprise companies investing in their platform / infrastructure org: hiring SRE, "
                 "platform, DevOps or infrastructure engineers, raising fresh capital, or bringing on engineering "
                 "leadership. Swap the config and the account list, and the same engine works for any product and territory."),
@@ -1442,6 +1533,77 @@ def build_legacy(today_human):
     else:
         print("no data/roles-latest.csv - skipping roles.html")
 
+def build_archive(cards_info, today_human):
+    """Everything the public boards no longer carry: research provenance, the
+    week-over-week momentum, the frozen original board, and the build record.
+    Regenerated on every run so it never drifts from the live site."""
+    live = [c for c in cards_info if c]
+
+    prov = "".join(
+        f'<tr><td><a href="../{c["slug"]}/">{esc(c["industry"])}</a></td>'
+        f'<td class="num">{c["accounts"]}</td><td class="num">{c["hot"]}</td>'
+        f'<td>{esc(c["researched"] or "not recorded")}</td>'
+        f'<td class="num">{c["n_snaps"]}</td></tr>'
+        for c in live)
+
+    blocks = []
+    for c in live:
+        if c["n_snaps"] < 2:
+            blocks.append(f'<div class="alsonote"><b>{esc(c["industry"])}.</b> Only '
+                          f'{c["n_snaps"]} snapshot stored, so there is no week-over-week '
+                          'comparison to draw yet.</div>')
+            continue
+        if not c["movers"]:
+            blocks.append(f'<div class="alsonote"><b>{esc(c["industry"])}.</b> A quiet week: '
+                          'no account changed its signal score.</div>')
+            continue
+        up = sum(1 for m in c["movers"] if m["delta"] > 0)
+        down = sum(1 for m in c["movers"] if m["delta"] < 0)
+        rows = "".join(
+            f'<tr><td>{esc(m["account"])}</td>'
+            f'<td class="num">{"+" if m["delta"] > 0 else ""}{m["delta"]}</td>'
+            f'<td class="num">{m["score"]}</td>'
+            f'<td><span class="tier t-{m["tier"]}"><i></i>{m["tier"]}</span></td></tr>'
+            for m in c["movers"])
+        blocks.append(
+            f'<h3 style="margin:26px 0 6px">{esc(c["industry"])}</h3>'
+            f'<p class="secsub">{up} heating up, {down} cooling, across {c["n_snaps"]} stored snapshots.</p>'
+            '<div class="tablewrap"><table><thead><tr><th>Account</th><th>Change</th>'
+            '<th>Score</th><th>Tier</th></tr></thead><tbody>' + rows + '</tbody></table></div>')
+    momentum = "".join(blocks) or '<div class="alsonote">No snapshots stored yet.</div>'
+
+    changelog = (
+        '<p><b>The boards stopped carrying dates.</b> Research dates, the "verified July" provenance line, '
+        'and the illustrative-demos disclaimer all came off the public pages. The tool is meant to answer '
+        '"who do I call first this morning," and a page that opens with when it was built asks to be read as '
+        'a finished past project instead of a running one. The provenance did not stop mattering, so it moved here.</p>'
+        '<p><b>Momentum moved off the boards.</b> The public boards no longer show a momentum column or narrate '
+        'week-over-week movers. Snapshots are still written every week and still drive the tables above; the '
+        'boards just read as a current snapshot now.</p>'
+        '<p><b>The original board was unlinked from the front page.</b> It is frozen, not deleted, and it still '
+        'holds the longest continuous history on the project. It lives in this archive rather than in the '
+        'site footer.</p>'
+        '<p><b>Named vendors were generalized.</b> Every territory now runs against an unnamed hypothetical '
+        'product. No real vendor is named anywhere on the site, and none is affiliated with or has endorsed '
+        'this project.</p>'
+        '<p><b>The test automation territory was cut from 50 accounts to its 20 strongest.</b> Fifty rows made '
+        'the board a list to read rather than a call list to work, and it was the only territory out of step '
+        'with the others.</p>')
+
+    html_s = (ARCHIVE
+              .replace("__CSS__", CSS)
+              .replace("__DATEHUMAN__", today_human)
+              .replace("__PROVROWS__", prov)
+              .replace("__MOMENTUM__", momentum)
+              .replace("__CHANGELOG__", changelog)
+              .replace("__REPO__", REPO))
+    html_s = fill_weights(html_s, 0, 0)
+    out_dir = os.path.join(ROOT, "archive")
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, "index.html"), "w") as f:
+        f.write(html_s)
+    print(f"built archive/index.html: {len(live)} territories")
+
 def build_landing(cards_info, today_human):
     dates = [c["last_date"] for c in cards_info if c and c["last_date"]]
     updated = human_date(max(dates)) if dates else today_human
@@ -1452,12 +1614,14 @@ def build_landing(cards_info, today_human):
             .replace("__ACCOUNTS__", str(c["accounts"]))
             .replace("__HOT__", str(c["hot"]))
         for c in cards_info if c)
+    live = [c for c in cards_info if c]
     html_s = (LANDING
               .replace("__CSS__", CSS)
-              .replace("__NACCTS__", str(sum(c["accounts"] for c in cards_info if c)))
+              .replace("__NACCTS__", str(sum(c["accounts"] for c in live)))
+              .replace("__NTERR__", number_word(len(live)))
+              .replace("__INDLIST__", ", ".join(c["industry"].lower() for c in live))
               .replace("__CARDS__", cards)
               .replace("__DATEHUMAN__", updated)
-              .replace("__VERIFIED__", VERIFIED_HUMAN)
               .replace("__REPO__", REPO))
     html_s = fill_weights(html_s, 0, 0)
     with open(os.path.join(ROOT, "index.html"), "w") as f:
@@ -1469,6 +1633,7 @@ def main():
     today_human = today.strftime("%B %-d, %Y") if os.name != "nt" else today.strftime("%B %d, %Y")
     cards_info = [build_territory(t) for t in TERRITORIES]
     build_landing(cards_info, today_human)
+    build_archive(cards_info, today_human)
     build_legacy(today_human)
 
 if __name__ == "__main__":
