@@ -372,3 +372,10 @@ iCapital,BTL,"pytest, jmeter, and two acquisitions","Happy [Day], [First]! iCapi
 Eric","Circling back, [First] - curious how the team's absorbing the Passthrough and Hexure surfaces: extending the existing Playwright and PyTest suites, or standing up separate coverage per platform?","One number that translates to actual sprint time: a QA leader the platform featured cut regression from two weeks to two days - shift-left plus AI, public story. For the SDETs, that's less time rerunning suites across two newly integrated platforms and more coverage without the backlog growing. Under regulatory scrutiny, that margin is worth something. Happy to share a short clip if that's easier than a call.
 
 Eric",,"Hi [First], just sent you an email. We usually hear from SDETs in regulated fintech when the suite has to prove correctness on every release and the maintenance load keeps climbing - would love to compare notes on your testing setup, thanks!"
+Netomi,Special,your first Fortune 100 QA architecture decision,"[First] - congrats on the new role! You're walking into the quality lead seat at a company Accenture is rolling into the Fortune 100 right now. The architecture decisions you make in the first 90 days will define quality for every enterprise client that follows. Before the stack hardens - have you looked at agentic testing as the foundation?
+
+Eric","Hey [First] - quick question: is the plan to build coverage for each enterprise deployment manually, or is autonomous testing part of the eval? Asking because Fortune 100 quality standards set a different bar, and the first choice usually becomes the architecture.
+
+Eric","One data point worth having: a QA leader the platform featured cut regression testing from two weeks to two days (shift-left plus AI - the story is public). At Fortune 100 enterprise scale, cycle time like that is not a nice-to-have. If relevant - would love to connect while the approach is still in pencil.
+
+Eric",,"Hi [First], just sent you an email. We usually hear from incoming quality leaders when enterprise scale raises the bar overnight - thought it might be valuable to connect, thanks!"
