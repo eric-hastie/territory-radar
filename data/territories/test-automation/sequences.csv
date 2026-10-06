@@ -379,3 +379,8 @@ Eric","Hey [First] - quick question: is the plan to build coverage for each ente
 Eric","One data point worth having: a QA leader the platform featured cut regression testing from two weeks to two days (shift-left plus AI - the story is public). At Fortune 100 enterprise scale, cycle time like that is not a nice-to-have. If relevant - would love to connect while the approach is still in pencil.
 
 Eric",,"Hi [First], just sent you an email. We usually hear from incoming quality leaders when enterprise scale raises the bar overnight - thought it might be valuable to connect, thanks!"
+HighLevel,Special,your Director seat on 2.2M businesses,"[First] - congrats on the new role! You inherit the SDET director seat at a 2.2M-business CRM with two more SDET seats still open behind you. The automation platform decision you make now shapes what the whole team builds on. Before the architecture hardens - have you looked at agentic testing as the foundation?
+
+Eric","Hey [First] - with the Lead SDET Mobile and Engineering Manager II seats still open behind you, will those hires inherit whatever platform you pick, or does each bring their own approach? Asking because that first choice usually becomes the architecture.","One number worth having before the stack is decided: a QA leader the platform featured cut regression from two weeks to two days - shift-left plus AI, and the story is public. At 2.2M businesses, coverage that can't keep pace shows up in support queues fast. Happy to share a short clip if that is easier than a call.
+
+Eric",,"Hi [First], just sent you an email - congrats on the new role. We usually hear from incoming SDET directors when the automation platform decision hasn't been made yet - thought it might be valuable to connect, thanks!"
